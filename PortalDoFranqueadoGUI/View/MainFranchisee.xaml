@@ -1,0 +1,142 @@
+﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.MainFranchisee"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             d:DataContext="{d:DesignInstance Type=viewmodel:MainFranchiseeViewModel}"
+             mc:Ignorable="d" 
+             Background="White"
+             Cursor="{Binding CurrentCursor}"
+             Loaded="UserControl_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition MinHeight="226" Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Content="{Binding WellcomeMessage}"
+                   FontSize="12"/>
+            <Label Grid.Column="1"
+            Content="Última atualização: 04/01/2021"
+            HorizontalAlignment="Right"
+            FontFamily="Open Sans"
+            FontSize="10"
+            Visibility="Hidden"/>
+        </Grid>
+        <DockPanel Grid.Row="1"
+        Background="Black">
+            <StackPanel Margin="15">
+                <Label Content="{Binding InformativeTitle}"
+                FontFamily="Open Sans"
+                FontSize="16"
+                Foreground="White"/>
+                <TextBlock TextWrapping="WrapWithOverflow"
+                    Foreground="White"
+                    FontFamily="Open Sans"
+                    FontSize="14"
+                    HorizontalAlignment="Left"
+                    Margin="3,0,0,0"
+                    Text="{Binding InformativeText}"
+                    MaxWidth="{Binding MaxWidthInformativeText}"
+                    Visibility="{Binding VisibilityInformativeText}"/>
+            </StackPanel>
+        </DockPanel>
+        <Grid Grid.Row="2"
+                Margin="0,5"
+                HorizontalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Style="{StaticResource MainButton}"
+                    IsEnabled="{Binding EnabledPurchase}"
+                    Command="{Binding PurchaseCommand}">
+                <StackPanel>
+                    <Label Content="COMPRAS" 
+                        Style="{StaticResource LabelButton}"/>
+                    <Image Source="/PortalDoFranqueadoGUI;component/Media/compras.png"
+                        Width="70"/>
+                    <Label Content="{Binding TextPurchase}" 
+                        Style="{StaticResource LabelButton}"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1"
+                Style="{StaticResource MainButton}"
+                IsEnabled="False">
+                <StackPanel>
+                    <Label Content="PREVISÃO DE PEDIDO" 
+                        Style="{StaticResource LabelButton}"/>
+                    <Image Source="/PortalDoFranqueadoGUI;component/Media/previsao.png"
+                    Width="70"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2"
+            Style="{StaticResource MainButton}"
+            Command="{Binding PhotosCommand}">
+                <StackPanel>
+                    <Label Content="FOTOS E VÍDEOS" 
+                    Style="{StaticResource LabelButton}"/>
+                    <Image Source="/PortalDoFranqueadoGUI;component/Media/fotos.png"
+                    Width="70"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="3"
+            Style="{StaticResource MainButton}"
+            Command="{Binding SupportCommand}">
+                <StackPanel>
+                    <Label Content="MATERIAL DE APOIO" 
+                    Style="{StaticResource LabelButton}"/>
+                    <Image Source="/PortalDoFranqueadoGUI;component/Media/media.png"
+                    Width="70"/>
+                </StackPanel>
+            </Button>
+            <DockPanel Grid.Column="4" Width="221"
+                Margin="5">
+                <Rectangle Fill="#56BE8D"/>
+            </DockPanel>
+            <StackPanel Grid.Column="4" Margin="5" x:Name="stpCampanhas">
+                <Label Content="CAMPANHAS" 
+                    Style="{StaticResource LabelButton}"/>
+                <Image Source="/PortalDoFranqueadoGUI;component/Media/campanha.png"
+                    Width="70"/>
+                <!--<ListView ItemsSource="{Binding Campanhas}"
+                    x:Name="ListViewCampanhas"
+                Background="#56BE8D"
+                    SelectedItem="{Binding CampanhaSelecionada}"
+                    SelectionChanged="{event:EventBinding CampanhasCommand}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:Name="SingleLineDataTemplate">
+                            <StackPanel Orientation="Horizontal" 
+                                Height="44">
+                                <Image Source="/PortalDoFranqueadoGUI;component/Media/media.png" 
+                                Height="16" 
+                                Width="16" 
+                                VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Titulo}"
+                                    Style="{StaticResource TextBlockMinButton}"
+                                    MaxWidth="205"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" Width="205"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>-->
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
