@@ -38,6 +38,7 @@
         <Setter Property="Padding" Value="5"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Style.Resources>
             <Style TargetType="Label">
                 <Style.Triggers>

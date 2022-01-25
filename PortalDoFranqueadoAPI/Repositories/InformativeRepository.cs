@@ -21,7 +21,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (reader.Read())
+                if (await reader.ReadAsync())
                     return new Informative()
                     {
                         Title = reader.GetString("titulo"),
@@ -52,7 +52,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.Add("@titulo", MySqlDbType.String).Value = informative.Title;
                 cmd.Parameters.Add("@texto", MySqlDbType.String).Value = informative.Text;
 
-                if (cmd.ExecuteNonQuery() > 0)
+                if (await cmd.ExecuteNonQueryAsync() > 0)
                     throw new Exception(RecordNotFoundException);
             }
             finally

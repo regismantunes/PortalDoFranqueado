@@ -21,14 +21,14 @@ namespace PortalDoFranqueadoAPI.Repositories
                                         " WHERE idcolecao = @idcolecao" +
                     (familyId.HasValue ? " AND idfamilia = @idfamilia" : string.Empty), connection);
                 
-                cmd.Parameters.Add("@idcolecao", DbType.Int32).Value = collectionId;
+                cmd.Parameters.AddWithValue("@idcolecao", collectionId);
                 if (familyId.HasValue)
-                    cmd.Parameters.Add("@idfamilia", DbType.Int32).Value = familyId;
+                    cmd.Parameters.AddWithValue("@idfamilia", familyId);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<Product>();
-                while (reader.Read())
+                while (await reader.ReadAsync())
                     list.Add(new Product()
                     {
                         Id = reader.GetInt32("id"),
@@ -59,18 +59,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var cmd = new MySqlCommand("INSERT INTO produto (idcolecao, idfamilia, foto, preco)" +
                                                 " VALUES (@idcolecao, @idfamilia, @foto, @preco);", connection);
 
-                cmd.Parameters.Add("@idcolecao", MySqlDbType.Int32).Value = collectionId;
-                cmd.Parameters.Add("@idfamilia", MySqlDbType.Int32).Value = product.FamilyId.ToDBValue();
-                cmd.Parameters.Add("@foto", MySqlDbType.String).Value = product.FileId.ToDBValue();
-                cmd.Parameters.Add("@preco", MySqlDbType.Decimal).Value = product.Price.ToDBValue();
+                cmd.Parameters.AddWithValue("@idcolecao", collectionId);
+                cmd.Parameters.AddWithValue("@idfamilia", product.FamilyId.ToDBValue());
+                cmd.Parameters.AddWithValue("@foto", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@preco", product.Price.ToDBValue());
 
-                if (cmd.ExecuteNonQuery() == 0)
+                if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.InsertFailException);
 
                 cmd.Parameters.Clear();
                 cmd.CommandText = "SELECT LAST_INSERT_ID();";
 
-                var newid = (ulong)cmd.ExecuteScalar();
+                var newid = (ulong)await cmd.ExecuteScalarAsync();
                 return Convert.ToInt32(newid);
             }
             finally
@@ -96,12 +96,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", preco = @preco" +
                                         " WHERE id = @id;", connection);
 
-                cmd.Parameters.Add("@idfamilia", MySqlDbType.Int32).Value = product.FamilyId.ToDBValue();
-                cmd.Parameters.Add("@foto", MySqlDbType.String).Value = product.FileId.ToDBValue();
-                cmd.Parameters.Add("@preco", MySqlDbType.Decimal).Value = product.Price.ToDBValue();
-                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = product.Id;
-
-                if (cmd.ExecuteNonQuery() == 0)
+                cmd.Parameters.AddWithValue("@idfamilia", product.FamilyId.ToDBValue());
+                cmd.Parameters.AddWithValue("@foto", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@preco", product.Price.ToDBValue());
+                cmd.Parameters.AddWithValue("@id", product.Id);
+                
+                if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }
             finally
@@ -122,9 +122,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var cmd = new MySqlCommand("DELETE FROM produto" +
                                         " WHERE id = @id;", connection);
 
-                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
+                cmd.Parameters.AddWithValue("@id", id);
 
-                return cmd.ExecuteNonQuery() > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
             finally
             {

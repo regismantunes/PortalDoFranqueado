@@ -6,8 +6,8 @@ namespace PortalDoFranqueadoGUI.Model
     {
         [Description("Aberta")]
         Opened = 0,
-        [Description("Confirmada")]
-        Confirmed = 1,
+        [Description("Fechada")]
+        Closed = 1,
         [Description("Encerrada")]
         Finished = 8
     }

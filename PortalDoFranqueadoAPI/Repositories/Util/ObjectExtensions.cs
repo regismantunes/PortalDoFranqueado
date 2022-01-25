@@ -2,7 +2,10 @@
 {
     public static class ObjectExtensions
     {
-        public static object? ToDBValue(this object? obj)
+        public static dynamic ToDBValue<T>(this T obj)
             => obj is null ? DBNull.Value : obj;
+
+        public static int ToZeroIfNull(this int? obj)
+            => obj is null ? 0 : obj.Value;
     }
 }

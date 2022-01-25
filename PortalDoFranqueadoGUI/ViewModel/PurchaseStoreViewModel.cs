@@ -4,6 +4,7 @@ using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace PortalDoFranqueadoGUI.ViewModel
@@ -14,7 +15,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             private bool _focused;
 
-            public ProductViewModel(Product product)
+            public ProductViewModel(Product product, PurchaseItem[]? items = null)
             {
                 Product = product;
 
@@ -41,10 +42,18 @@ namespace PortalDoFranqueadoGUI.ViewModel
                      Itens = list.OrderBy(i => i.Value.GetValueToOrder())
                                  .ToArray();*/
 
-                    Items = (from t in Product.Family.Sizes
+                    Items = (from s in Product.Family.Sizes
                             select new FieldViewModel<PurchaseItem>
                             {
-                                Value = new PurchaseItem { Size = t },
+                                Value = new PurchaseItem
+                                {
+                                    ProductId = Product.Id.Value,
+                                    Product = Product,
+                                    Size = s,
+                                    Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
+                                                                          i.Size == s)?
+                                                                          .Quantity
+                                },
                             })
                             .OrderBy(i => i.Value.GetValueToOrder())
                             .ToArray();
@@ -93,11 +102,15 @@ namespace PortalDoFranqueadoGUI.ViewModel
         }
         public Collection Collection { get; private set; }
         public ProductViewModel[] Products { get; private set; }
+        public PurchaseStatus PurchaseStatus { get; private set; }
+        public Visibility VisibilityButtonSave { get; private set; }
+        public bool ItemsReadyOnly { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
         public RelayCommand GoToNextFieldCommand { get; }
         public RelayCommand GoToPreviusFieldCommand { get; }
         public RelayCommand SaveCommand { get; }
+        public RelayCommand SaveAndCloseCommand { get; }
 
         public PurchaseStoreViewModel()
         {
@@ -109,10 +122,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
             LoadedCommand = new RelayCommand(LoadStore);
             GoToNextFieldCommand = new RelayCommand(GoToNextField);
             GoToPreviusFieldCommand = new RelayCommand(GoToPreviusField);
-            SaveCommand = new RelayCommand(Save);
+            SaveCommand = new RelayCommand(async () => await Save(false));
+            SaveAndCloseCommand = new RelayCommand(async () => await Save(true));
         }
 
-        public async void Save()
+        private async Task Save(bool close)
         {
             try
             {
@@ -122,9 +136,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 {
                     StoreId = _store.Id,
                     CollectionId = Collection.Id,
-                    Status = PurchaseStatus.Opened,
-                    Items = _fields.Select(f => f.Value).ToArray()
+                    Status = close ? PurchaseStatus.Closed : PurchaseStatus.Opened,
+                    Items = _fields.Where(item => item.Value.Quantity > 0)
+                                   .Select(f => f.Value)
+                                   .ToArray()
                 };
+
+                await API.ApiPurchase.Save(purchase);
+
+                if (close)
+                    DisableSave();
             }
             catch (Exception ex)
             {
@@ -134,6 +155,28 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 EnableContent();
             }
+        }
+
+        private void DisableSave()
+        {
+            VisibilityButtonSave = Visibility.Hidden;
+            PurchaseStatus = PurchaseStatus.Closed;
+            ItemsReadyOnly = true;
+
+            OnPropertyChanged(nameof(VisibilityButtonSave));
+            OnPropertyChanged(nameof(PurchaseStatus));
+            OnPropertyChanged(nameof(ItemsReadyOnly));
+        }
+
+        private void EnableSave()
+        {
+            VisibilityButtonSave = Visibility.Visible;
+            PurchaseStatus = PurchaseStatus.Opened;
+            ItemsReadyOnly = false;
+
+            OnPropertyChanged(nameof(VisibilityButtonSave));
+            OnPropertyChanged(nameof(PurchaseStatus));
+            OnPropertyChanged(nameof(ItemsReadyOnly));
         }
 
         private void GoToNextField()
@@ -243,6 +286,14 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     {
                         emptyProducts = false;
 
+                        var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
+
+                        if (purchase == null || 
+                            purchase.Status == PurchaseStatus.Opened)
+                            EnableSave();
+                        else
+                            DisableSave();
+                        
                         var families = await _cache.LoadFamilies();
                         products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
 
@@ -252,9 +303,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                         var repository = API.Configuration.Current.Session.FilesRepository;
                         Products = (from p in ordered
-                                    select new ProductViewModel(p)
+                                    select new ProductViewModel(p, 
+                                                                purchase?.Items.Where(i => i.ProductId == p.Id)
+                                                                               .ToArray())
                                     {
-                                        FileView = repository?.GetFile(p.FileId)
+                                        FileView = repository?.GetFile(p.FileId),
                                     }).ToArray();
 
                         var listFields = new List<FieldViewModel<PurchaseItem>>();

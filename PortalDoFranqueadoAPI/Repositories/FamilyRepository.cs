@@ -35,7 +35,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     reader = await cmd.ExecuteReaderAsync();
 
                     var tamanhos = new List<KeyValuePair<int, string>>();
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                         tamanhos.Add(new KeyValuePair<int, string>(
                             reader.GetInt32("idfamilia"),
                             reader.GetString("idtamanho")));

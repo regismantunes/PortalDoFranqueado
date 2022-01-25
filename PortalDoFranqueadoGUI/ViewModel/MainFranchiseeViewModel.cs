@@ -82,7 +82,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             MaxWidthInformativeText = 0;
 
-            API.Configuration.Current.PropertyChanged += Current_PropertyChanged;
+            API.Configuration.Current.SessionConnected += SessionConnected;
 
             UpdateSessionInformations();
             UpdateInformative();
@@ -319,13 +319,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private void Current_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void SessionConnected(object? sender, EventArgs e)
         {
-            if (e.PropertyName == "Session")
-            {
-                UpdateSessionInformations();
-                UpdateInformative();
-            }
+            UpdateSessionInformations();
+            UpdateInformative();
         }
     }
 }

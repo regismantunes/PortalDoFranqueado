@@ -20,7 +20,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<MarketingCampaign>();
-                while (reader.Read())
+                while (await reader.ReadAsync())
                     list.Add(new MarketingCampaign()
                     {
                         Id = reader.GetInt32("Id"),

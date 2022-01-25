@@ -29,7 +29,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0"
-               Content="GERENCIAR PERÍODO DE COMPRA"
+               Content="PERÍODO DE COMPRA ABERTO"
                FontWeight="Bold"/>
         <Grid Grid.Row="1"
               Margin="0,0,5,5">
@@ -44,7 +44,9 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -70,12 +72,13 @@
                        Text="{Binding Store.Name}"
                        Visibility="{Binding VisibilityTextBlockStore}"
                        Style="{StaticResource TextBlockSubTitle}"/>
-            <Border Grid.Column="3" Grid.ColumnSpan="4"
+            <Border Grid.Column="3" Grid.ColumnSpan="5"
                        Grid.Row="0" Grid.RowSpan="2"
                        Style="{StaticResource DefaultBlackBorder}"
-                    Width="220"/>
+                    Width="330"/>
             <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
             <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
+            <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
             <TextBlock Grid.Row="1" Grid.Column="4" 
                         Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
                         Margin="5"
@@ -86,10 +89,25 @@
                         Margin="5"
                        Foreground="White"
                        Width="100"/>
+            <TextBlock Grid.Row="1" Grid.Column="6" 
+                        Text="{Binding PurchaseStatus, Converter={StaticResource EnumConverter}}"
+                        Margin="5"
+                       Foreground="White"
+                       Width="100"/>
             <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="7"
+                    Grid.Column="8"
                     Content="Salvar"
-                    Style="{StaticResource DefaultButtonFull}"/>
+                    Style="{StaticResource DefaultButtonFull}"
+                    Command="{Binding SaveCommand}"
+                    Visibility="{Binding VisibilityButtonSave}"/>
+            <Button Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="9"
+                    Width="78"
+                    Style="{StaticResource DefaultButtonFull}"
+                    Command="{Binding SaveAndCloseCommand}"
+                    Visibility="{Binding VisibilityButtonSave}">
+                <TextBlock Text="Salvar e fechar" TextWrapping="Wrap"/>
+            </Button>
         </Grid>
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
@@ -150,7 +168,8 @@
                                                        Width="42"/>
                                                 <TextBox Text="{Binding Value.Quantity}"
                                                          Width="30"
-                                                         util:FocusExtension.IsFocused="{Binding IsFocused}"/>
+                                                         util:FocusExtension.IsFocused="{Binding IsFocused}"
+                                                         IsReadOnly="{Binding ItemsReadyOnly}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>

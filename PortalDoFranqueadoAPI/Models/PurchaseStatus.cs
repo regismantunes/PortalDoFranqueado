@@ -6,8 +6,8 @@ namespace PortalDoFranqueadoAPI.Models
     {
         [Description("Aberta")]
         Opened = 0,
-        [Description("Confirmada")]
-        Confirmed = 1,
+        [Description("Fechada")]
+        Closed = 1,
         [Description("Encerrada")]
         Finished = 8
     }

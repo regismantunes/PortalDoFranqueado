@@ -23,7 +23,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (reader.Read())
+                if (await reader.ReadAsync())
                 {
                     var passwordHash = reader.GetString("senha");
 

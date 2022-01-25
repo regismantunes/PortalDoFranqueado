@@ -46,13 +46,18 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             _controls = new Stack<ContentControl>();
 
-            API.Configuration.Current.PropertyChanged += Current_PropertyChanged;
+            API.Configuration.Current.SessionChanged += SessionChanged;
 
             ChangeCurrentView();
 
             ReturnCommand = new RelayCommand(() => PreviousNavigate());
             LoadedCommand = new RelayCommand(() => CurrentViewControlFocused = true);
             ReloadCurrentViewCommand = new RelayCommand(ReloadCurrentView);
+        }
+
+        private void SessionChanged(object? sender, EventArgs e)
+        {
+            ChangeCurrentView();
         }
 
         private void ReloadCurrentView()
@@ -67,14 +72,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
             CurrentViewControl = API.Configuration.Current.Session == null ?     new Login() :
                 API.Configuration.Current.Session.User.Role == "manager" ?    new MainManager() : 
                                                                                 new MainFranchisee();
-        }
-
-        private void Current_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Session")
-            {
-                ChangeCurrentView();
-            }
         }
 
         public void NextNavigate(ContentControl control)

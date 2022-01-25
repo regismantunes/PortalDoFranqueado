@@ -15,35 +15,37 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT fim FROM colecao" +
-                                            " WHERE excluido = 0 AND situacao = 1;", connection);
+                using var cmd = new MySqlCommand("SELECT fim FROM colecao" +
+                                                " WHERE excluido = 0" +
+                                                    " AND situacao = 1;", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                bool compraHabilitada = reader.Read();
+                bool compraHabilitada = await reader.ReadAsync();
                 string texto = "Sem previsão";
 
                 if (compraHabilitada)
                 {
-                    DateTime fimPeriodo = reader.GetDateTime("fim");
+                    var fimPeriodo = reader.GetDateTime("fim");
                     texto = $"Aberto até {fimPeriodo:dd/MM}";
                 }
                 else
                 {
-                    reader.Close();
+                    await reader.CloseAsync();
 
                     cmd.Parameters.Clear();
                     cmd.CommandText = "SELECT MIN(inicio) AS proximo" +
                                     " FROM colecao" +
-                                    " WHERE excluido = 0 AND inicio >= @dataAtual;";
+                                    " WHERE excluido = 0" +
+                                        " AND inicio >= @dataAtual;";
                     cmd.Parameters.AddWithValue("@dataAtual", DateTime.Now);
 
                     reader = await cmd.ExecuteReaderAsync();
-                    if (reader.Read())
+                    if (await reader.ReadAsync())
                     {
                         if (reader["proximo"].GetType() != typeof(DBNull))
                         {
-                            DateTime fimPeriodo = reader.GetDateTime("proximo");
+                            var fimPeriodo = reader.GetDateTime("proximo");
                             texto = $"Abre {fimPeriodo:dd/MM}";
                         }
                     }
@@ -77,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<Collection>();
-                while (reader.Read())
+                while (await reader.ReadAsync())
                     list.Add(CreateCollection(reader));
 
                 return list.ToArray();
@@ -101,11 +103,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 " WHERE excluido = 0" +
                                                     " AND id = @id;", connection);
 
-                cmd.Parameters.Add("id", DbType.Int32).Value = id;
+                cmd.Parameters.AddWithValue("@id", id);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (reader.Read())
+                if (!await reader.ReadAsync())
                     return CreateCollection(reader);
 
                 return null;
@@ -129,7 +131,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE excluido = 0" +
                                                 " AND situacao = 1;", connection);
 
-                return cmd.ExecuteScalar() is not null;
+                return await cmd.ExecuteScalarAsync() is not null;
             }
             finally
             {
@@ -152,7 +154,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                if (reader.Read())
+                if (await reader.ReadAsync())
                     return CreateCollection(reader);
 
                 return null;
@@ -187,10 +189,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 " WHERE excluido = 0" +
                                                     " AND id = @id;", connection);
 
-                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
-                cmd.Parameters.Add("@situacao", MySqlDbType.Int32).Value = situacao;
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@situacao", (int)situacao);
 
-                if (cmd.ExecuteNonQuery() == 0)
+                if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }
             finally
@@ -211,18 +213,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var cmd = new MySqlCommand("INSERT INTO colecao (inicio, fim, situacao, pasta, excluido)" +
                                                 " VALUES (@inicio, @fim, @situacao, @pasta, 0);", connection);
 
-                cmd.Parameters.Add("@inicio", MySqlDbType.DateTime).Value = colecao.StartDate;
-                cmd.Parameters.Add("@fim", MySqlDbType.DateTime).Value = colecao.EndDate;
-                cmd.Parameters.Add("@pasta", MySqlDbType.String).Value = colecao.FolderId;
-                cmd.Parameters.Add("@situacao", MySqlDbType.Int32).Value = colecao.Status;
+                cmd.Parameters.AddWithValue("@inicio", colecao.StartDate);
+                cmd.Parameters.AddWithValue("@fim", colecao.EndDate);
+                cmd.Parameters.AddWithValue("@pasta", colecao.FolderId);
+                cmd.Parameters.AddWithValue("@situacao", (int)colecao.Status);
 
-                if (cmd.ExecuteNonQuery() == 0)
+                if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.InsertFailException);
 
                 cmd.Parameters.Clear();
                 cmd.CommandText = "SELECT LAST_INSERT_ID();";
 
-                var dbid = (ulong)cmd.ExecuteScalar();
+                var dbid = (ulong)await cmd.ExecuteScalarAsync();
                 return Convert.ToInt32(dbid);
             }
             finally
@@ -240,14 +242,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                //var cmd = new MySqlCommand("DELETE FROM colecao WHERE id = @id;", connection);
                 var cmd = new MySqlCommand("UPDATE colecao" +
-                                                " SET excluido = 1" +
-                                                " WHERE id = @id;", connection);
+                                            " SET excluido = 1" +
+                                            " WHERE id = @id;", connection);
 
-                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = id;
+                cmd.Parameters.AddWithValue("@id", id);
 
-                return cmd.ExecuteNonQuery() > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
             finally
             {
@@ -265,18 +266,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new MySqlCommand("UPDATE colecao" +
-                                                " SET inicio = @inicio" +
-                                                    ", fim = @fim" +
-                                                    ", pasta = @pasta" +
-                                                " WHERE excluido = 0" +
-                                                    " AND id = @id;", connection);
+                                            " SET inicio = @inicio" +
+                                                ", fim = @fim" +
+                                                ", pasta = @pasta" +
+                                            " WHERE excluido = 0" +
+                                                " AND id = @id;", connection);
 
-                cmd.Parameters.Add("@id", MySqlDbType.Int32).Value = colecao.Id;
-                cmd.Parameters.Add("@inicio", MySqlDbType.DateTime).Value = colecao.StartDate;
-                cmd.Parameters.Add("@fim", MySqlDbType.DateTime).Value = colecao.EndDate;
-                cmd.Parameters.Add("@pasta", MySqlDbType.VarChar, 33).Value = colecao.FolderId;
+                cmd.Parameters.AddWithValue("@id", colecao.Id);
+                cmd.Parameters.AddWithValue("@inicio", colecao.StartDate);
+                cmd.Parameters.AddWithValue("@fim", colecao.EndDate);
+                cmd.Parameters.AddWithValue("@pasta", colecao.FolderId);
 
-                if (cmd.ExecuteNonQuery() == 0)
+                if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }
             finally

@@ -20,12 +20,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 " INNER JOIN usuario_loja" +
                                                     " ON loja.id = usuario_loja.idloja" +
                                             " WHERE usuario_loja.idusuario = @idusuario", connection);
-                cmd.Parameters.Add("@idusuario", MySqlDbType.Int32).Value = idUser;
+                cmd.Parameters.AddWithValue("@idusuario", idUser);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<Store>();
-                while (reader.Read())
+                while (await reader.ReadAsync())
                     list.Add(new Store()
                     {
                         Id = reader.GetInt32("id"),

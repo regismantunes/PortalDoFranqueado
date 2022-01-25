@@ -14,7 +14,7 @@ namespace PortalDoFranqueadoGUI.API
                 Password = password
             });
 
-            Configuration.Current.Session = session;
+            Configuration.Current.SetConectedSession(session);
         }
     }
 }
