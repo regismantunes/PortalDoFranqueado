@@ -13,6 +13,10 @@ namespace PortalDoFranqueadoGUI.API
             => await BaseApi.GetSimpleHttpClientRequest<Collection[]>("collections/all")
                             .Get();
 
+        public static async Task<Collection[]> Get(int id)
+            => await BaseApi.GetSimpleHttpClientRequest<Collection[]>($"collections/{id}")
+                            .Get();
+
         public static async Task<Collection> GetOpened()
             => await BaseApi.GetSimpleHttpClientRequest<Collection>("collections/opened")
                             .Get();

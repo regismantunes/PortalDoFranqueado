@@ -1,4 +1,6 @@
-﻿namespace PortalDoFranqueadoGUI.ViewModel
+﻿using System.ComponentModel;
+
+namespace PortalDoFranqueadoGUI.ViewModel
 {
     internal class FieldViewModel<T> : BaseNotifyPropertyChanged
     {
@@ -8,7 +10,15 @@
         public T Value
         {
             get => _value;
-            set { _value = value; OnPropertyChanged(); }
+            set 
+            {   
+                _value = value;
+
+                if (_value is INotifyPropertyChanged notify)
+                    notify.PropertyChanged += (o, e) => OnPropertyChanged(nameof(Value));
+
+                OnPropertyChanged(); 
+            }
         }
 
         public bool IsFocused

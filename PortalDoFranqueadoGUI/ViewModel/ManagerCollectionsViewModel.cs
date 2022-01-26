@@ -23,6 +23,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public bool EnabledPreviusStatus { get; set; }
             public RelayCommand<Collection>? PreviusStatusCommand { get; set; }
             public RelayCommand<Collection>? DeleteCommand { get; set; }
+            public RelayCommand<Collection>? ShowPurchasesCommand { get; set; }
         }
 
         public class NewCollection
@@ -56,6 +57,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand<Collection> ListViewCloseCommand { get; }
         public RelayCommand<Collection> ListViewReverseCommand { get; }
         public RelayCommand<Collection> ListViewDeleteCommand { get; }
+        public RelayCommand<Collection> ViewPurchasesCommand { get; }
 
         public ManagerCollectionsViewModel()
         {
@@ -70,8 +72,23 @@ namespace PortalDoFranqueadoGUI.ViewModel
             ListViewCloseCommand = new RelayCommand<Collection>(CloseCollection);
             ListViewReverseCommand = new RelayCommand<Collection>(ReverseCollection);
             ListViewDeleteCommand = new RelayCommand<Collection>(DeleteCollection);
+            ViewPurchasesCommand = new RelayCommand<Collection>(ViewPurchases);
 
             LoadCollections();
+        }
+
+        private void ViewPurchases(Collection collection)
+        {
+            try
+            {
+                DesableContent();
+
+                //Navigator.NextNavigate(new CollectionPurchases(collection));
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private void EditCollection(Collection collection)
@@ -80,7 +97,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new ManagerCollection(collection));
+                Navigator.NextNavigate(new ManagerCollection(collection, true));
             }
             finally
             {
@@ -90,7 +107,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         private void ViewCollection(Collection collection)
         {
+            try
+            {
+                DesableContent();
 
+                Navigator.NextNavigate(new ManagerCollection(collection, false));
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private void OpenCollection(Collection collection)

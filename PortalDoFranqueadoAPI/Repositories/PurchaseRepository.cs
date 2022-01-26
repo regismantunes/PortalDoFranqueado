@@ -97,6 +97,71 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
+        public static async Task<Purchase?> Get(MySqlConnection connection, int purchaseId)
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                if (connection.State != ConnectionState.Open)
+                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+
+                var cmd = new MySqlCommand("SELECT * FROM compra" +
+                                            " WHERE id = @id;", connection);
+
+                cmd.Parameters.AddWithValue("@id", purchaseId);;
+
+                return await LoadPurchase(cmd);
+            }
+            finally
+            {
+                await connection.CloseAsync();
+            }
+        }
+
+        private static async Task<Purchase?> LoadPurchase(MySqlCommand cmd, bool loadItems = true)
+        {
+            var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                var purchase = new Purchase()
+                {
+                    Id = reader.GetInt32("id"),
+                    CollectionId = reader.GetInt32("idcolecao"),
+                    StoreId = reader.GetInt32("idloja"),
+                    Status = (PurchaseStatus)reader.GetInt32("situacao")
+                };
+
+                await reader.CloseAsync();
+
+                if (loadItems)
+                {
+                    cmd.Parameters.Clear();
+                    cmd.CommandText = "SELECT * FROM compra_produto" +
+                                        " WHERE idcompra = @idcompra;";
+                    cmd.Parameters.AddWithValue("@idcompra", purchase.Id);
+
+                    reader = await cmd.ExecuteReaderAsync();
+
+                    var listItems = new List<PurchaseItem>();
+                    while (await reader.ReadAsync())
+                        listItems.Add(new PurchaseItem()
+                        {
+                            ProductId = reader.GetInt32("idproduto"),
+                            Size = reader.GetString("idtamanho"),
+                            Quantity = reader.GetInt32("quantidade")
+                        });
+
+                    purchase.Items = listItems.ToArray();
+                }
+
+                return purchase;
+            }
+
+            return null;
+        }
+
         public static async Task<Purchase?> Get(MySqlConnection connection, int collectionId, int storeId, bool loadItems = true)
         {
             try
@@ -113,45 +178,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@idcolecao", collectionId);
                 cmd.Parameters.AddWithValue("@idloja", storeId);
 
-                var reader = await cmd.ExecuteReaderAsync();
-
-                if (await reader.ReadAsync())
-                {
-                    var purchase = new Purchase()
-                    {
-                        Id = reader.GetInt32("id"),
-                        CollectionId = collectionId,
-                        StoreId = storeId,
-                        Status = (PurchaseStatus)reader.GetInt32("situacao")
-                    };
-
-                    await reader.CloseAsync();
-
-                    if (loadItems)
-                    {
-                        cmd.Parameters.Clear();
-                        cmd.CommandText = "SELECT * FROM compra_produto" +
-                                            " WHERE idcompra = @idcompra;";
-                        cmd.Parameters.AddWithValue("@idcompra", purchase.Id);
-
-                        reader = await cmd.ExecuteReaderAsync();
-
-                        var listItems = new List<PurchaseItem>();
-                        while (await reader.ReadAsync())
-                            listItems.Add(new PurchaseItem()
-                            {
-                                ProductId = reader.GetInt32("idproduto"),
-                                Size = reader.GetString("idtamanho"),
-                                Quantity = reader.GetInt32("quantidade")
-                            });
-
-                        purchase.Items = listItems.ToArray();
-                    }
-
-                    return purchase;
-                }
-
-                return null;
+                return await LoadPurchase(cmd, loadItems);
             }
             finally
             {

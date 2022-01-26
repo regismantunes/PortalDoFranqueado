@@ -50,6 +50,23 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpGet]
+        [Route("{id}")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> Get(int id)
+        {
+            try
+            {
+                var collections = await CollectionRepository.Get(_connection, id);
+
+                return Ok(collections);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("opened")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetOpened()

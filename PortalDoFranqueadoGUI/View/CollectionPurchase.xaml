@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.PurchaseStore"
+﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.CollectionPurchase"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,15 +8,11 @@
              xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
-             d:DataContext="{d:DesignInstance Type=viewmodel:PurchaseStoreViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodel:CollectionPurchaseViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White"
              Cursor="{Binding CurrentCursor}">
-    <UserControl.InputBindings>
-        <KeyBinding Gesture="Shift+Tab" Command="{Binding GoToPreviusFieldCommand}"/>
-        <KeyBinding Gesture="Tab" Command="{Binding GoToNextFieldCommand}"/>
-    </UserControl.InputBindings>
     <Grid>
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
@@ -29,7 +25,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0"
-               Content="PERÍODO DE COMPRA ABERTO"
+               Content="VISUALIZAR COMPRA"
                FontWeight="Bold"/>
         <Grid Grid.Row="1"
               Margin="0,0,5,5">
@@ -40,74 +36,24 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Grid.ColumnSpan="3"
+            <Border Grid.Column="0" Grid.ColumnSpan="4"
                     Grid.Row="0" Grid.RowSpan="2"
                     Style="{StaticResource DefaultBlackBorder}"
-                    Width="150"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" 
-                       Text="Selecione uma loja para fazer a compra" 
-                       TextWrapping="Wrap"
-                       Foreground="White"
-                       FontSize="10"
-                       Visibility="{Binding VisibilityComboBoxStore}"/>
-            <ComboBox Grid.Row="1" Grid.Column="1"
-                      DisplayMemberPath="Name"
-                      SelectedValue="{Binding Store}"
-                      Margin="0,5"
-                      Cursor="Arrow"
-                      Visibility="{Binding VisibilityComboBoxStore}"
-                      ItemsSource="{Binding Stores, Source={StaticResource Cache}}"/>
+                    Width="260"/>
             <TextBlock Grid.Row="0" Grid.RowSpan="2"
                        Grid.Column="1"
                        Text="{Binding Store.Name}"
-                       Visibility="{Binding VisibilityTextBlockStore}"
                        Style="{StaticResource TextBlockSubTitle}"/>
-            <Border Grid.Column="3" Grid.ColumnSpan="5"
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Style="{StaticResource DefaultBlackBorder}"
-                    Width="330"/>
-            <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
-            <TextBlock Grid.Row="1" Grid.Column="4" 
-                       Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
+            <Label Grid.Row="0" Grid.Column="2" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" 
+                       Text="{Binding Purchase.Status, Converter={StaticResource EnumConverter}}"
                        Margin="5"
                        Foreground="White"
                        Width="100"/>
-            <TextBlock Grid.Row="1" Grid.Column="5" 
-                       Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <TextBlock Grid.Row="1" Grid.Column="6" 
-                       Text="{Binding Status, Converter={StaticResource EnumConverter}}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="8"
-                    Content="Salvar"
-                    Style="{StaticResource DefaultButtonFull}"
-                    Command="{Binding SaveCommand}"
-                    Visibility="{Binding VisibilityButtonSave}"/>
-            <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="9"
-                    Width="78"
-                    Style="{StaticResource DefaultButtonFull}"
-                    Command="{Binding SaveAndCloseCommand}"
-                    Visibility="{Binding VisibilityButtonSave}">
-                <TextBlock Text="Salvar e fechar" TextWrapping="Wrap"/>
-            </Button>
         </Grid>
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
@@ -164,13 +110,8 @@
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
                                                        Margin="-8,-1,0,0"/>
-                                                <TextBox Text="{Binding Value.Quantity}"
-                                                         Width="30"
-                                                         util:FocusExtension.IsFocused="{Binding IsFocused}"
-                                                         Visibility="{Binding Value.VisibilityTextBoxQuantity}"/>
                                                 <Label Content="{Binding Value.Quantity}"
                                                        Width="30"
-                                                       Visibility="{Binding Value.VisibilityTextBlockQuantity}"
                                                        BorderBrush="Gray"
                                                        BorderThickness="1"/>
                                             </StackPanel>

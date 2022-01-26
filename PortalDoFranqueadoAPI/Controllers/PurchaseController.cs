@@ -33,13 +33,30 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{collectionId}/{storeId}")]
+        [Route("collection/{collectionId}/{storeId}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int collectionId, int storeId)
         {
             try
             {
                 var purchase = await PurchaseRepository.Get(_connection, collectionId, storeId);
+
+                return Ok(purchase);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("id/{purchaseId}")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> Get(int purchaseId)
+        {
+            try
+            {
+                var purchase = await PurchaseRepository.Get(_connection, purchaseId);
 
                 return Ok(purchase);
             }

@@ -9,11 +9,11 @@ namespace PortalDoFranqueadoGUI.View
     /// </summary>
     public partial class ManagerCollection : UserControl
     {
-        public ManagerCollection(Collection collection)
+        public ManagerCollection(Collection collection, bool canEdit)
         {
             InitializeComponent();
 
-            DataContext = new ManagerCollectionViewModel(collection);
+            DataContext = new ManagerCollectionViewModel(collection, canEdit);
         }
     }
 }

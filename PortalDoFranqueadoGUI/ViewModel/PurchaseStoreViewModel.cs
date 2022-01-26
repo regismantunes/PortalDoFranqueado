@@ -3,6 +3,7 @@ using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,50 +22,29 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if (Product.Family != null)
                 {
-                    /*var list = new List<FieldViewModel<CompraItem>>();
-                     FieldViewModel<CompraItem>? previusField = null;
-                     foreach (var tamanho in Produto.Familia.Tamanhos)
-                     {
-                         var newField = new FieldViewModel<CompraItem>
-                         {
-                             Value = new CompraItem { Tamanho = tamanho },
-                             PreviusField = previusField
-                         };
-
-                         if (previusField != null)
-                             previusField.NextField = newField;
-
-                         list.Add(newField);
-
-                         previusField = newField;
-                     }
-
-                     Itens = list.OrderBy(i => i.Value.GetValueToOrder())
-                                 .ToArray();*/
-
                     Items = (from s in Product.Family.Sizes
-                            select new FieldViewModel<PurchaseItem>
+                            select new FieldViewModel<PurchaseItemViewModel>
                             {
-                                Value = new PurchaseItem
-                                {
-                                    ProductId = Product.Id.Value,
-                                    Product = Product,
-                                    Size = s,
-                                    Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
-                                                                          i.Size == s)?
-                                                                          .Quantity
-                                },
+                                Value = new PurchaseItemViewModel(
+                                        new PurchaseItem
+                                    {
+                                        ProductId = Product.Id.Value,
+                                        Product = Product,
+                                        Size = s,
+                                        Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
+                                                                              i.Size == s)?
+                                                                              .Quantity
+                                    })
                             })
-                            .OrderBy(i => i.Value.GetValueToOrder())
+                            .ToList()
+                            .OrderBy(i => i.Value.Item.GetValueToOrder())
                             .ToArray();
                 }
             }
 
-
-
             public Product Product { get; set; }
             public FileView? FileView { get; set; }
-            public FieldViewModel<PurchaseItem>[] Items { get; }
+            public FieldViewModel<PurchaseItemViewModel>[] Items { get; }
             public bool Focused
             {
                 get => _focused;
@@ -78,11 +58,45 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public PurchaseStoreViewModel ViewModel { get; set; }
         }
 
-        private LocalRepository _cache;
-        private int _indexFocus;
-        private FieldViewModel<PurchaseItem>[] _fields;
-        private Store? _store;
+        public class PurchaseItemViewModel : BaseNotifyPropertyChanged
+        {
+            public int ProductId { get => Item.ProductId; set => Item.ProductId = value; }
+            public Product? Product { get => Item.Product; set => Item.Product = value; }
+            public string Size { get => Item.Size; set => Item.Size = value; }
+            public int? Quantity { get => Item.Quantity; set => Item.Quantity = value; }
 
+            public Visibility VisibilityTextBlockQuantity => ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;
+            public Visibility VisibilityTextBoxQuantity => !ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;
+            public PurchaseItem Item { get; }
+
+            public PurchaseItemViewModel(PurchaseItem item)
+            {
+                Item = item;
+                StaticPropertyChanged += (o, e) =>
+                {
+                    OnPropertyChanged(nameof(VisibilityTextBlockQuantity));
+                    OnPropertyChanged(nameof(VisibilityTextBoxQuantity));
+                };
+            }
+
+            private static bool _itemsReadyOnly = false;
+            private static event PropertyChangedEventHandler? StaticPropertyChanged;
+            internal static bool ItemsReadyOnly 
+            { 
+                get => _itemsReadyOnly;
+                set
+                {
+                    _itemsReadyOnly = value;
+                    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ItemsReadyOnly)));
+                }
+            }
+        }
+
+        private readonly LocalRepository _cache;
+        private int _indexFocus;
+        private FieldViewModel<PurchaseItemViewModel>[] _fields;
+        private Store? _store;
+        
         public Visibility VisibilityComboBoxStore => _store == null ? Visibility.Visible : Visibility.Hidden;
         public Visibility VisibilityTextBlockStore => _store == null ? Visibility.Hidden : Visibility.Visible;
         public Store? Store
@@ -102,9 +116,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
         }
         public Collection Collection { get; private set; }
         public ProductViewModel[] Products { get; private set; }
-        public PurchaseStatus PurchaseStatus { get; private set; }
+        public PurchaseStatus? Status { get; private set; }
         public Visibility VisibilityButtonSave { get; private set; }
-        public bool ItemsReadyOnly { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
         public RelayCommand GoToNextFieldCommand { get; }
@@ -117,7 +130,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
             _cache = (LocalRepository)App.Current.Resources["Cache"];
 
             _indexFocus = 0;
-            _fields = Array.Empty<FieldViewModel<PurchaseItem>>();
+            _fields = Array.Empty<FieldViewModel<PurchaseItemViewModel>>();
+
+            Status = null;
+            VisibilityButtonSave = Visibility.Hidden;
 
             LoadedCommand = new RelayCommand(LoadStore);
             GoToNextFieldCommand = new RelayCommand(GoToNextField);
@@ -138,7 +154,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     CollectionId = Collection.Id,
                     Status = close ? PurchaseStatus.Closed : PurchaseStatus.Opened,
                     Items = _fields.Where(item => item.Value.Quantity > 0)
-                                   .Select(f => f.Value)
+                                   .Select(f => f.Value.Item)
                                    .ToArray()
                 };
 
@@ -160,23 +176,21 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private void DisableSave()
         {
             VisibilityButtonSave = Visibility.Hidden;
-            PurchaseStatus = PurchaseStatus.Closed;
-            ItemsReadyOnly = true;
+            Status = PurchaseStatus.Closed;
+            PurchaseItemViewModel.ItemsReadyOnly = true;
 
             OnPropertyChanged(nameof(VisibilityButtonSave));
-            OnPropertyChanged(nameof(PurchaseStatus));
-            OnPropertyChanged(nameof(ItemsReadyOnly));
+            OnPropertyChanged(nameof(Status));
         }
 
         private void EnableSave()
         {
             VisibilityButtonSave = Visibility.Visible;
-            PurchaseStatus = PurchaseStatus.Opened;
-            ItemsReadyOnly = false;
+            Status = PurchaseStatus.Opened;
+            PurchaseItemViewModel.ItemsReadyOnly = false;
 
             OnPropertyChanged(nameof(VisibilityButtonSave));
-            OnPropertyChanged(nameof(PurchaseStatus));
-            OnPropertyChanged(nameof(ItemsReadyOnly));
+            OnPropertyChanged(nameof(Status));
         }
 
         private void GoToNextField()
@@ -297,34 +311,34 @@ namespace PortalDoFranqueadoGUI.ViewModel
                         var families = await _cache.LoadFamilies();
                         products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
 
-                        var ordered = products.OrderBy(p => p.FileId)
-                                             .OrderBy(p => p.Price)
-                                             .OrderBy(p => p.Family?.Name);
-
                         var repository = API.Configuration.Current.Session.FilesRepository;
-                        Products = (from p in ordered
-                                    select new ProductViewModel(p, 
-                                                                purchase?.Items.Where(i => i.ProductId == p.Id)
-                                                                               .ToArray())
-                                    {
-                                        FileView = repository?.GetFile(p.FileId),
-                                    }).ToArray();
 
-                        var listFields = new List<FieldViewModel<PurchaseItem>>();
-                        foreach (var product in Products)
+                        var productsVM = new List<ProductViewModel>();
+                        foreach(var product in products.OrderBy(p => p.FileId)
+                                                       .OrderBy(p => p.Price)
+                                                       .OrderBy(p => p.Family?.Name))
                         {
-                            listFields.AddRange(product.Items);
-                            product.FileView?.StartDownload(repository.Drive);
+                            var fileView = repository?.GetFile(product.FileId);
+                            fileView?.StartDownload(repository.Drive);
+                            productsVM.Add(new ProductViewModel(product, purchase?.Items.Where(i => i.ProductId == product.Id)
+                                                                                        .ToArray())
+                            {
+                                FileView = fileView
+                            });
                         }
 
-                        _fields = listFields.ToArray();
+                        Products = productsVM.ToArray();
+
+                        _fields = PurchaseItemViewModel.ItemsReadyOnly ?
+                            Array.Empty<FieldViewModel<PurchaseItemViewModel>>() :
+                            Products.SelectMany(p => p.Items).ToArray();
                     }
                 }
 
                 if (emptyProducts)
                 {
                     Products = Array.Empty<ProductViewModel>();
-                    _fields = Array.Empty<FieldViewModel<PurchaseItem>>();
+                    _fields = Array.Empty<FieldViewModel<PurchaseItemViewModel>>();
                 }
 
                 OnPropertyChanged(nameof(Products));

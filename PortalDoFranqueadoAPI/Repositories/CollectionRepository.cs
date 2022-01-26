@@ -100,8 +100,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new MySqlCommand("SELECT * FROM colecao" +
-                                                " WHERE excluido = 0" +
-                                                    " AND id = @id;", connection);
+                                            " WHERE excluido = 0" +
+                                                " AND id = @id;", connection);
 
                 cmd.Parameters.AddWithValue("@id", id);
 

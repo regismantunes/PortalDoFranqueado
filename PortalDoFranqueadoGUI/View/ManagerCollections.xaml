@@ -101,30 +101,24 @@
                     <GridViewColumn Header="Início" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
-                                               Style="{StaticResource TextBlockCell}"/>
-                                </DockPanel>
+                                <TextBlock Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
+                                            Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Fim" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
-                                               Style="{StaticResource TextBlockCell}"/>
-                                </DockPanel>
+                                <TextBlock Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
+                                            Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Header="Situação" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Collection.Status, Converter={StaticResource EnumConverter}}"
-                                               Style="{StaticResource TextBlockCell}"/>
-                                </DockPanel>
+                                <TextBlock Text="{Binding Collection.Status, Converter={StaticResource EnumConverter}}"
+                                            Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -145,6 +139,10 @@
                                             IsEnabled="{Binding EnabledPreviusStatus}"
                                             Style="{StaticResource CellButton}"
                                             Command="{Binding PreviusStatusCommand}"
+                                            CommandParameter="{Binding Collection}"/>
+                                    <Button Content="Pedidos"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding ViewPurchasesCommand}"
                                             CommandParameter="{Binding Collection}"/>
                                     <Button Content="Excluir"
                                             Style="{StaticResource CellButton}"

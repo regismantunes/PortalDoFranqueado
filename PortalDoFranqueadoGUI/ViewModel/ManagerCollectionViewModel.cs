@@ -108,7 +108,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         public bool ItemsEnabled
         {
-            get => _itemsEnabled;
+            get => _itemsEnabled && CanEdit;
             private set
             {
                 _itemsEnabled = value;
@@ -116,12 +116,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
+        public bool CanEdit { get; }
+
         public RelayCommand<ProductViewModel> SaveCommand { get; }
         public RelayCommand<ProductViewModel> DeleteCommand { get; }
         public RelayCommand LoadedCommand { get; }
 
-        public ManagerCollectionViewModel(Collection colecao)
+        public ManagerCollectionViewModel(Collection colecao, bool canEdit)
         {
+            CanEdit = canEdit;
+
             CollectionStartDate = colecao.StartDate;
             CollectionEndDate = colecao.EndDate;
             CollectionFolderId = colecao.FolderId;
