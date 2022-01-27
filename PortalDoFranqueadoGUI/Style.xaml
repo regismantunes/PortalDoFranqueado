@@ -78,6 +78,7 @@
         <Setter Property="CornerRadius" Value="5,5,5,5"/>
         <Setter Property="Background" Value="Black"/>
         <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
     </Style>
     <Style TargetType="Border" x:Key="LoginBorder" BasedOn="{StaticResource DefaultBorder}">
         <Setter Property="CornerRadius" Value="10,10,10,10"/>

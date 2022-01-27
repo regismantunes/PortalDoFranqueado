@@ -50,6 +50,23 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpGet]
+        [Route("collection/{collectionId}")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> GetPurchases(int collectionId)
+        {
+            try
+            {
+                var purchase = await PurchaseRepository.GetPurchases(_connection, collectionId);
+
+                return Ok(purchase);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("id/{purchaseId}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int purchaseId)

@@ -23,7 +23,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public bool EnabledPreviusStatus { get; set; }
             public RelayCommand<Collection>? PreviusStatusCommand { get; set; }
             public RelayCommand<Collection>? DeleteCommand { get; set; }
-            public RelayCommand<Collection>? ShowPurchasesCommand { get; set; }
+            public RelayCommand<Collection>? ViewPurchasesCommand { get; set; }
         }
 
         public class NewCollection
@@ -83,7 +83,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                //Navigator.NextNavigate(new CollectionPurchases(collection));
+                Navigator.NextNavigate(new CollectionPurchases(collection));
             }
             finally
             {
@@ -275,7 +275,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                         CollectionStatus.Closed => ListViewOpenCommand,
                         _ => null
                     },
-                    DeleteCommand = ListViewDeleteCommand
+                    DeleteCommand = ListViewDeleteCommand,
+                    ViewPurchasesCommand = ViewPurchasesCommand
                 });
         }
 

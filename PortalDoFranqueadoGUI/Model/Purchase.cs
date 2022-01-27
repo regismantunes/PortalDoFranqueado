@@ -7,5 +7,6 @@
         public int CollectionId { get; set; }
         public PurchaseItem[] Items { get; set; }
         public PurchaseStatus Status { get; set; }
+        public decimal? Amount { get; set; }
     }
 }

@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.ViewModel;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PortalDoFranqueadoGUI.View
 {
@@ -20,9 +9,11 @@ namespace PortalDoFranqueadoGUI.View
     /// </summary>
     public partial class CollectionPurchases : UserControl
     {
-        public CollectionPurchases()
+        public CollectionPurchases(Collection collection)
         {
             InitializeComponent();
+
+            DataContext = new CollectionPurchasesViewModel(collection);
         }
     }
 }

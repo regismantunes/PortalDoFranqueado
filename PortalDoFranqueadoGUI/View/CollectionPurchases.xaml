@@ -3,10 +3,128 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
+             d:DataContext="{d:DesignInstance Type=viewmodel:CollectionPurchasesViewModel}"
              xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="White">
     <Grid>
-            
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Grid.Column="0"
+               Content="COMPRAS DO PERÍODO"
+               FontWeight="Bold"/>
+        <Grid Grid.Row="1" Grid.Column="0"
+              Margin="0,0,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="5"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Grid.ColumnSpan="5"
+                    Grid.Row="0" Grid.RowSpan="2"
+                    Style="{StaticResource DefaultBlackBorder}"
+                    Width="310"/>
+            <Label Grid.Row="0" Grid.Column="1" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
+            <Label Grid.Row="0" Grid.Column="3" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" 
+                       Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
+                       Margin="5"
+                       Foreground="White"
+                       Width="100"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" 
+                       Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
+                       Margin="5"
+                       Foreground="White"
+                       Width="100"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" 
+                       Text="{Binding Collection.Status, Converter={StaticResource EnumConverter}}"
+                       Margin="5"
+                       Foreground="White"
+                       Width="100"/>
+        </Grid>
+        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                  ItemsSource="{Binding Purchases}"
+                  SelectionMode="Single"
+                  Width="879"
+                  HorizontalAlignment="Left">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Loja" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Store.Name}"
+                                            Style="{StaticResource TextBlockCell}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Valor total" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Amount}"
+                                            Style="{StaticResource TextBlockCell}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Situação" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Status, Converter={StaticResource EnumConverter}}"
+                                            Style="{StaticResource TextBlockCell}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!--<GridViewColumn Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{Binding CurrentStatusAction}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding CurrentStatusCommand}"
+                                            CommandParameter="{Binding Collection}"/>
+                                    <Button Content="{Binding NextStatusAction}"
+                                            IsEnabled="{Binding EnabledNextStatus}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding NextStatusCommand}"
+                                            CommandParameter="{Binding Collection}"/>
+                                    <Button Content="{Binding PreviusStatusAction}"
+                                            IsEnabled="{Binding EnabledPreviusStatus}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding PreviusStatusCommand}"
+                                            CommandParameter="{Binding Collection}"/>
+                                    <Button Content="Pedidos"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding ViewPurchasesCommand}"
+                                            CommandParameter="{Binding Collection}"/>
+                                    <Button Content="Excluir"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding DeleteCommand}"
+                                            CommandParameter="{Binding Collection}"
+                                            Background="#FF0009"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </UserControl>
