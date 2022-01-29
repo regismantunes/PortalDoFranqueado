@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.ViewModel;
 using System.Windows.Controls;
 
 namespace PortalDoFranqueadoGUI.View
@@ -8,11 +9,11 @@ namespace PortalDoFranqueadoGUI.View
     /// </summary>
     public partial class CollectionPurchase : UserControl
     {
-        public CollectionPurchase(int purchaseId)
+        public CollectionPurchase(Purchase purchase)
         {
             InitializeComponent();
 
-            DataContext = new CollectionPurchaseViewModel(purchaseId);
+            DataContext = new CollectionPurchaseViewModel(purchase);
         }
     }
 }

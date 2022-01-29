@@ -134,7 +134,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                         return BadRequest(new { message = "Já existe um período de compras aberto." });
                 }
 
-                await CollectionRepository.ChangeCollectionStatus(_connection, id, collectionStatus);
+                await CollectionRepository.ChangeStatus(_connection, id, collectionStatus);
 
                 return Ok();
             }

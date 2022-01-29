@@ -175,7 +175,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Status = (CollectionStatus)reader.GetInt32("situacao")
             };
 
-        public static async Task ChangeCollectionStatus(MySqlConnection connection, int id, CollectionStatus situacao)
+        public static async Task ChangeStatus(MySqlConnection connection, int id, CollectionStatus status)
         {
             try
             {
@@ -184,16 +184,53 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("UPDATE colecao" +
-                                                " SET situacao = @situacao" +
-                                                " WHERE excluido = 0" +
-                                                    " AND id = @id;", connection);
+                var transaction = await connection.BeginTransactionAsync();
 
-                cmd.Parameters.AddWithValue("@id", id);
-                cmd.Parameters.AddWithValue("@situacao", (int)situacao);
+                try
+                {
+                    using var cmd = new MySqlCommand("SELECT situacao" +
+                                                    " FROM colecao" +
+                                                    " WHERE excluido = 0" +
+                                                        " AND id = @id;", connection);
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
-                    throw new Exception(MessageRepositories.UpdateFailException);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    var previusStatus = (CollectionStatus?)await cmd.ExecuteScalarAsync();
+
+                    if (previusStatus == null)
+                        throw new Exception(MessageRepositories.UpdateFailException);
+
+                    cmd.CommandText = "UPDATE colecao" +
+                                        $" SET situacao = {(int)status}" +
+                                        " WHERE excluido = 0" +
+                                            " AND id = @id;";
+
+                    if (await cmd.ExecuteNonQueryAsync() == 0)
+                        throw new Exception(MessageRepositories.UpdateFailException);
+
+                    var purchaseStatus = (PurchaseStatus?)(previusStatus == CollectionStatus.Closed &&
+                                                           status == CollectionStatus.Opened ?
+                                                            PurchaseStatus.Closed :
+                                                           previusStatus == CollectionStatus.Opened &&
+                                                           status == CollectionStatus.Closed ?
+                                                            PurchaseStatus.Finished :
+                                                            null);
+                    if (purchaseStatus != null)
+                    {
+                        cmd.CommandText = "UPDATE compra" +
+                                            $" SET situacao = {(int)purchaseStatus}" +
+                                            " WHERE idcolecao = @id;";
+
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
             finally
             {

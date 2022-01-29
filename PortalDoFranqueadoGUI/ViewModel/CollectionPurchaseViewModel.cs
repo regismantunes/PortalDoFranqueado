@@ -27,32 +27,35 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                  Product = Product,
                                  Size = s,
                                  Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
-                                                                       i.Size == s)?
-                                                                               .Quantity
+                                                                       i.Size == s)?.Quantity
                              })
                             .ToList()
                             .OrderBy(i => i.GetValueToOrder())
                             .ToArray();
+
+                    Amount = Items.Sum(item => (item.Quantity ?? 0) * (item.Product?.Price ?? 0));
                 }
             }
 
             public Product Product { get; set; }
             public FileView? FileView { get; set; }
             public PurchaseItem[] Items { get; }
+            public decimal Amount { get; }
         }
 
         private readonly LocalRepository _cache;
-        private readonly int _purchaseId;
 
         public Purchase Purchase { get; private set; }
-        public Store Store { get; }
+        public Store Store { get; private set; }
         public ProductViewModel[] Products { get; private set; }
+        public decimal Amount { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
 
-        public CollectionPurchaseViewModel(int purchaseId)
+        public CollectionPurchaseViewModel(Purchase purchase)
         {
-            _purchaseId = purchaseId;
+            Purchase = purchase;
+
             _cache = (LocalRepository)App.Current.Resources["Cache"];
 
             LoadedCommand = new RelayCommand(LoadPurchase);
@@ -64,18 +67,24 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                var purchase = await API.ApiPurchase.Get(_purchaseId);
-                if (purchase == null)
+                /*if (Purchase == null)
                 {
-                    MessageBox.Show("A compra não foi encontrada.", "BROTHERS - Falha ao carregar compras", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Navigator.PreviousNavigate();
-                    return;
-                }
+                    var purchase = await API.ApiPurchase.Get(_purchaseId);
+                    if (purchase == null)
+                    {
+                        MessageBox.Show("A compra não foi encontrada.", "BROTHERS - Falha ao carregar compras", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Navigator.PreviousNavigate();
+                        return;
+                    }
 
-                Purchase = purchase;
+                    Purchase = purchase;
+                }*/
 
-                var products = (await API.ApiProduct.Get(purchase.CollectionId))
-                                                    .Where(p => purchase.Items.Any(i => i.ProductId == p.Id))
+                Store = _cache.Stores.First(store => store.Id == Purchase.StoreId);
+                OnPropertyChanged(nameof(Store));
+
+                var products = (await API.ApiProduct.Get(Purchase.CollectionId))
+                                                    .Where(p => Purchase.Items.Any(i => i.ProductId == p.Id))
                                                     .ToList();
 
                 var families = await _cache.LoadFamilies();
@@ -90,7 +99,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 {
                     var fileView = repository?.GetFile(product.FileId);
                     fileView?.StartDownload(repository.Drive);
-                    productsVM.Add(new ProductViewModel(product, purchase.Items.Where(i => i.ProductId == product.Id)
+                    productsVM.Add(new ProductViewModel(product, Purchase.Items.Where(i => i.ProductId == product.Id)
                                                                                .ToArray())
                     {
                         FileView = fileView
@@ -98,8 +107,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 }
 
                 Products = productsVM.ToArray();
+                Amount = productsVM.Sum(p => p.Amount);
 
                 OnPropertyChanged(nameof(Products));
+                OnPropertyChanged(nameof(Amount));
             }
             catch (Exception ex)
             {

@@ -1,9 +1,8 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.Repository;
 using PortalDoFranqueadoGUI.View;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 
@@ -11,15 +10,78 @@ namespace PortalDoFranqueadoGUI.ViewModel
 {
     internal class CollectionPurchasesViewModel : BaseViewModel
     {
+        public class PurchaseViewModel : BaseNotifyPropertyChanged
+        {
+            private decimal _amount = decimal.MinValue;
+            private Purchase _purchase;
+            private bool _canReverse;
+
+            public Purchase Purchase { get => _purchase; set { _purchase = value; OnPropertyChanged(); } }
+            public PurchaseStatus Status { get => _purchase.Status; set { _purchase.Status = value; OnPropertyChanged();} }
+            public decimal Amount 
+            {
+                get 
+                { 
+                    if (_amount == decimal.MinValue)
+                        _amount = Purchase.Items.Sum(item => (item.Quantity ?? 0) * (item.Product?.Price ?? 0));
+
+                    return _amount;
+                }
+            }
+
+            public RelayCommand<Purchase> ViewCommand { get; set; }
+            public RelayCommand<PurchaseViewModel> ReverseCommand { get; set; }
+            public bool CanReverse { get => _canReverse; set { _canReverse = value; OnPropertyChanged(); } }
+        }
+
+        private readonly LocalRepository _cache;
+
         public Collection Collection { get; }
-        public Purchase[] Purchases { get; private set; }
+        public PurchaseViewModel[] Purchases { get; private set; }
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand<Purchase> ViewPurchaseCommand { get; }
+        public RelayCommand<PurchaseViewModel> ReversePurchaseCommand { get; }
 
         public CollectionPurchasesViewModel(Collection collection)
         {
             Collection = collection;
 
+            _cache = (LocalRepository)App.Current.Resources["Cache"];
+
             LoadedCommand = new RelayCommand(LoadPurchases);
+            ViewPurchaseCommand = new RelayCommand<Purchase>(ViewPurchase);
+            ReversePurchaseCommand = new RelayCommand<PurchaseViewModel>(ReversePurchase);
+        }
+        
+        public void ViewPurchase(Purchase purchase)
+        {
+            try
+            {
+                DesableContent();
+
+                Navigator.NextNavigate(new CollectionPurchase(purchase));
+            }
+            finally
+            {
+                EnableContent();
+            }
+        }
+
+        public async void ReversePurchase(PurchaseViewModel purchaseVM)
+        {
+            try
+            {
+                DesableContent();
+
+                await API.ApiPurchase.Reverse(purchaseVM.Purchase.Id.Value);
+
+                purchaseVM.Status = PurchaseStatus.Opened;
+                purchaseVM.CanReverse = false;
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         public async void LoadPurchases()
@@ -30,24 +92,39 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 var purchases = await API.ApiPurchase.GetPurchases(Collection.Id);
 
-                var products = await API.ApiProduct.Get(Collection.Id);
-
-                purchases.ToList()
-                         .ForEach(purchase =>
+                if (purchases.Length > 0)
                 {
-                    var amount = (decimal)0;
-                    purchase.Items.ToList()
-                                  .ForEach(item =>
-                    {
-                        item.Product = products.FirstOrDefault(product => product.Id == item.ProductId);
-                        if (item.Product != null &&
-                            item.Quantity != null)
-                            amount += (decimal)(item.Product.Price * item.Quantity);
-                    });
-                    purchase.Amount = amount;
-                });
+                    if (_cache.Stores.Count == 0)
+                        _cache.Stores = await API.ApiStore.GetStores();
+                    
+                    var stores = _cache.Stores.ToArray();
+                    var products = await API.ApiProduct.Get(Collection.Id);
 
-                Purchases = purchases.ToArray();
+                    purchases.ToList()
+                             .ForEach(purchase =>
+                    {
+                        purchase.Store = stores.FirstOrDefault(store => store.Id == purchase.StoreId);
+                        purchase.Items.ToList()
+                                      .ForEach(item => item.Product = products
+                                      .FirstOrDefault(product => product.Id == item.ProductId)
+                        );
+                    });
+
+                    Purchases = purchases.OrderBy(purchase => purchase.Store.Name)
+                                         .Select(purchase => new PurchaseViewModel 
+                                         {
+                                            Purchase = purchase,
+                                            ViewCommand = ViewPurchaseCommand,
+                                            ReverseCommand = ReversePurchaseCommand,
+                                            CanReverse = purchase.Status != PurchaseStatus.Opened && 
+                                                         Collection.Status == CollectionStatus.Opened
+                                         })
+                                         .ToArray();
+                }
+                else
+                    Purchases = Array.Empty<PurchaseViewModel>();
+
+                OnPropertyChanged(nameof(Purchases));
             }
             catch (Exception ex)
             {

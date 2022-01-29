@@ -9,7 +9,8 @@
              xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="White">
+             Background="White"
+             Cursor="{Binding CurrentCursor}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -94,11 +95,12 @@
         <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                   ItemsSource="{Binding FilteredCollection}"
                   SelectionMode="Single"
-                  Width="779"
-                  HorizontalAlignment="Left">
+                  Width="809"
+                  HorizontalAlignment="Left"
+                  IsEnabled="{Binding EnabledContent}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Início" Width="100">
+                    <GridViewColumn Header="Início" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
@@ -106,7 +108,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Fim" Width="100">
+                    <GridViewColumn Header="Fim" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
@@ -114,7 +116,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Situação" Width="100">
+                    <GridViewColumn Header="Situação" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Collection.Status, Converter={StaticResource EnumConverter}}"

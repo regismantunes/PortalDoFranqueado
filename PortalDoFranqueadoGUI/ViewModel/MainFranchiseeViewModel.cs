@@ -9,6 +9,7 @@ using GalaSoft.MvvmLight.CommandWpf;
 using System.Windows.Media.Imaging;
 using PortalDoFranqueadoGUI.View;
 using PortalDoFranqueadoGUI.Repository;
+using System.Diagnostics;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
@@ -139,7 +140,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     foreach (var file in files)
                         file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
 
-                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
+                    Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
                 catch (Exception ex)
                 {
@@ -167,7 +168,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     foreach (var file in files)
                         file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
 
-                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
+                    Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
                 catch (Exception ex)
                 {
@@ -204,7 +205,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     foreach (var file in files)
                         file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
 
-                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
+                    Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
                 catch (Exception ex)
                 {

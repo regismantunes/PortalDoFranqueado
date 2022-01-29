@@ -10,7 +10,8 @@
              xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="White">
+             Background="White"
+             Cursor="{Binding CurrentCursor}">
     <Grid>
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
@@ -64,14 +65,15 @@
         <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                   ItemsSource="{Binding Purchases}"
                   SelectionMode="Single"
-                  Width="879"
-                  HorizontalAlignment="Left">
+                  Width="779"
+                  HorizontalAlignment="Left"
+                  IsEnabled="{Binding EnabledContent}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Loja" Width="100">
+                    <GridViewColumn Header="Loja" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Store.Name}"
+                                <TextBlock Text="{Binding Purchase.Store.Name}"
                                             Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -79,7 +81,7 @@
                     <GridViewColumn Header="Valor total" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Amount}"
+                                <TextBlock Text="{Binding Amount, StringFormat=C, ConverterCulture=pt-BR}"
                                             Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -92,37 +94,23 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <!--<GridViewColumn Width="Auto">
+                    <GridViewColumn Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Content="{Binding CurrentStatusAction}"
+                                    <Button Content="Visualizar"
                                             Style="{StaticResource CellButton}"
-                                            Command="{Binding CurrentStatusCommand}"
-                                            CommandParameter="{Binding Collection}"/>
-                                    <Button Content="{Binding NextStatusAction}"
-                                            IsEnabled="{Binding EnabledNextStatus}"
+                                            Command="{Binding ViewCommand}"
+                                            CommandParameter="{Binding Purchase}"/>
+                                    <Button Content="Estornar"
                                             Style="{StaticResource CellButton}"
-                                            Command="{Binding NextStatusCommand}"
-                                            CommandParameter="{Binding Collection}"/>
-                                    <Button Content="{Binding PreviusStatusAction}"
-                                            IsEnabled="{Binding EnabledPreviusStatus}"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding PreviusStatusCommand}"
-                                            CommandParameter="{Binding Collection}"/>
-                                    <Button Content="Pedidos"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding ViewPurchasesCommand}"
-                                            CommandParameter="{Binding Collection}"/>
-                                    <Button Content="Excluir"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding DeleteCommand}"
-                                            CommandParameter="{Binding Collection}"
-                                            Background="#FF0009"/>
+                                            Command="{Binding ReverseCommand}"
+                                            CommandParameter="{Binding}"
+                                            IsEnabled="{Binding CanReverse}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>-->
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

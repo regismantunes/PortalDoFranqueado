@@ -56,9 +56,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchase = await PurchaseRepository.GetPurchases(_connection, collectionId);
+                var purchases = await PurchaseRepository.GetPurchases(_connection, collectionId);
 
-                return Ok(purchase);
+                return Ok(purchases);
             }
             catch (Exception ex)
             {
@@ -76,6 +76,23 @@ namespace PortalDoFranqueadoAPI.Controllers
                 var purchase = await PurchaseRepository.Get(_connection, purchaseId);
 
                 return Ok(purchase);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        [Route("reverse")]
+        [Authorize(Roles = "manager")]
+        public async Task<ActionResult<dynamic>> Reverse([FromBody] int purchaseId)
+        {
+            try
+            {
+                await PurchaseRepository.Reverse(_connection, purchaseId);
+
+                return Ok();
             }
             catch (Exception ex)
             {

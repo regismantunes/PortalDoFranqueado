@@ -35,30 +35,38 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Grid.ColumnSpan="4"
+            <Border Grid.Column="0" Grid.ColumnSpan="5"
                     Grid.Row="0" Grid.RowSpan="2"
                     Style="{StaticResource DefaultBlackBorder}"
-                    Width="260"/>
+                    Width="470"/>
             <TextBlock Grid.Row="0" Grid.RowSpan="2"
                        Grid.Column="1"
                        Text="{Binding Store.Name}"
-                       Style="{StaticResource TextBlockSubTitle}"/>
-            <Label Grid.Row="0" Grid.Column="2" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+                       Style="{StaticResource TextBlockSubTitle}"
+                       Foreground="White"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="Total" Style="{StaticResource LabelTituloCampo}"/>
             <TextBlock Grid.Row="1" Grid.Column="2" 
+                       Text="{Binding Amount, StringFormat=C, ConverterCulture=pt-BR}"
+                       Margin="5"
+                       Foreground="White"
+                       Width="80"/>
+            <Label Grid.Row="0" Grid.Column="3" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" 
                        Text="{Binding Purchase.Status, Converter={StaticResource EnumConverter}}"
                        Margin="5"
                        Foreground="White"
-                       Width="100"/>
+                       Width="80"/>
         </Grid>
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="895"
+                  Width="985"
                   HorizontalAlignment="Left"
                   Style="{StaticResource ListViewUnfocusable}"
                   IsEnabled="{Binding EnabledContent}">
@@ -82,8 +90,20 @@
                     <GridViewColumn Header="Preço" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Product.Price, StringFormat='C', ConverterCulture=pt-BR}"
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Product.Price, StringFormat='C', ConverterCulture=pt-BR}"
                                             Style="{StaticResource TextBlockCellNumber}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Total" Width="90">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Amount, StringFormat='C', ConverterCulture=pt-BR}"
+                                            Style="{StaticResource TextBlockCellNumber}"/>
+                                </DockPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -102,7 +122,7 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Label Content="{Binding Value.Size}"
+                                                <Label Content="{Binding Size}"
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
                                                        Width="42"/>
@@ -110,7 +130,7 @@
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
                                                        Margin="-8,-1,0,0"/>
-                                                <Label Content="{Binding Value.Quantity}"
+                                                <Label Content="{Binding Quantity}"
                                                        Width="30"
                                                        BorderBrush="Gray"
                                                        BorderThickness="1"/>

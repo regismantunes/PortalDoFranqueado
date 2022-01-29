@@ -67,12 +67,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.Drive.v2" Version="1.55.0.2530" />
-    <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2502" />
+    <PackageReference Include="Google.Apis.Drive.v2" Version="1.55.0.2566" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2566" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="MvvmEventBinding" Version="1.0.0" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="squirrel.windows" Version="2.0.1" />
     <PackageReference Include="System.ObjectModel" Version="4.3.0" />
   </ItemGroup>
 

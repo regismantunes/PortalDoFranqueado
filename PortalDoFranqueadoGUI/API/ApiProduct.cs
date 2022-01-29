@@ -10,15 +10,15 @@ namespace PortalDoFranqueadoGUI.API
                             .Get();
 
         public static async Task<int> Insert(int collectionId, Product product)
-            => await BaseApi.GetSimpleHttpClientRequest<int>($"product/{collectionId}/insert")
+            => await BaseApi.GetSimpleHttpClientRequest<int>($"product/{collectionId}")
                             .Post(product);
 
         public static async Task<bool> Delete(int id)
-            => await BaseApi.GetSimpleHttpClientRequest<bool>($"product/delete/{id}")
+            => await BaseApi.GetSimpleHttpClientRequest<bool>($"product/{id}")
                             .Delete();
 
         public static async Task Update(Product product)
-            => await BaseApi.GetSimpleHttpClientRequest("product/update")
+            => await BaseApi.GetSimpleHttpClientRequest("product")
                             .Put(product);
     }
 }

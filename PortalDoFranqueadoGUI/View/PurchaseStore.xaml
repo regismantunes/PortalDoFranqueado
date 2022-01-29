@@ -53,7 +53,7 @@
             <Border Grid.Column="0" Grid.ColumnSpan="3"
                     Grid.Row="0" Grid.RowSpan="2"
                     Style="{StaticResource DefaultBlackBorder}"
-                    Width="150"/>
+                    Width="145"/>
             <TextBlock Grid.Row="0" Grid.Column="1" 
                        Text="Selecione uma loja para fazer a compra" 
                        TextWrapping="Wrap"

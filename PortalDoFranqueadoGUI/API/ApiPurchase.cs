@@ -20,5 +20,9 @@ namespace PortalDoFranqueadoGUI.API
         public static async Task<Purchase[]> GetPurchases(int collectionId)
             => await BaseApi.GetSimpleHttpClientRequest<Purchase[]>($"purchase/collection/{collectionId}")
                             .Get();
+
+        public static async Task Reverse(int purchaseId)
+            => await BaseApi.GetSimpleHttpClientRequest("purchase/reverse")
+                            .Put(purchaseId);
     }
 }
