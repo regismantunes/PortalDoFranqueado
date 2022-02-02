@@ -106,7 +106,7 @@
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveAndCloseCommand}"
                     Visibility="{Binding VisibilityButtonSave}">
-                <TextBlock Text="Salvar e fechar" TextWrapping="Wrap"/>
+                <TextBlock Text="Fechar compra" TextWrapping="Wrap"/>
             </Button>
         </Grid>
         <ListView Grid.Row="2"
