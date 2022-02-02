@@ -8,13 +8,17 @@
         xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
         xmlns:view="clr-namespace:PortalDoFranqueadoGUI.View"
         xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
-        xmlns:event="clr-namespace:MvvmEventBinding;assembly=MvvmEventBinding"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
-        Title="BROTHERS - Portal do Franqueado" Height="500" Width="1160"
+        Title="{Binding Title}" Height="500" Width="1160"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Cursor="{Binding CurrentCursor}"
-        Loaded="{event:EventBinding LoadedCommand}">
+        Cursor="{Binding CurrentCursor}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding ReloadCurrentViewCommand}"/>
     </Window.InputBindings>
@@ -29,19 +33,19 @@
             <view:MainManager/>
         </DataTemplate>
     </Window.Resources>-->
-    <Grid Background="Black">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <DockPanel Background="Black">
         <Grid Grid.Row="0" Margin="15,5"
-              Background="Black">
+              Background="Black"
+              DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45"/>
+            </Grid.RowDefinitions>
             <Button Grid.Column="0" 
                     Visibility="{Binding VisibilityReturn}"
                     Command="{Binding ReturnCommand}"
@@ -53,6 +57,9 @@
             <Image Grid.Column="1"
                     Source="/PortalDoFranqueadoGUI;component/Media/cabecalho.png"/>
         </Grid>
+        <Label Content="{Binding StatusMessage}"
+               DockPanel.Dock="Bottom"
+               Foreground="White"/>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
                       VerticalScrollBarVisibility="Auto"
@@ -62,5 +69,5 @@
             <ContentControl Content="{Binding CurrentViewControl}"
                             util:FocusExtension.IsFocused="{Binding CurrentViewControlFocused}"/>
         </ScrollViewer>
-    </Grid>
+    </DockPanel>
 </Window>

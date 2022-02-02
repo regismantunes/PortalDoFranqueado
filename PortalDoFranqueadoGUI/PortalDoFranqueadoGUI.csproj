@@ -5,11 +5,11 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <StartupObject></StartupObject>
+    <StartupObject>PortalDoFranqueadoGUI.App</StartupObject>
+    <Version>0.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="client_secret.json" />
     <None Remove="Media\Cabecalho.png" />
     <None Remove="Media\campanha-ativa.png" />
     <None Remove="Media\campanha.png" />
@@ -28,11 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="client_secret.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="Media\cabecalho.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -71,9 +66,12 @@
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.55.0.2566" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="MvvmEventBinding" Version="1.0.0" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
-    <PackageReference Include="squirrel.windows" Version="2.0.1" />
+    <PackageReference Include="NuGet.CommandLine" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="squirrel.windows" Version="1.9.0" />
     <PackageReference Include="System.ObjectModel" Version="4.3.0" />
   </ItemGroup>
 
@@ -82,5 +80,23 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+	<NugetTools>$(PkgNuGet_CommandLine)\tools</NugetTools>
+	<SquirrelTools>$(Pkgsquirrel_windows)\tools</SquirrelTools>
+	<NuspecFile>$(SolutionDir)\PortalDoFranqueadoGUI\ReleaseSpec.nuspec</NuspecFile>
+  </PropertyGroup>
+
+  <Target Name="GenerateRelease" AfterTargets="AfterBuild" Condition="$(Configuration) == Release">
+	<!--<XmlPeek XmlInputPath="$(NuspecFile)" Query="/package/metadata/id/text()">
+		<Output TaskParameter="Result" ItemName="ID" />
+	</XmlPeek>-->
+	<Exec Command="$(NugetTools)\NuGet.exe pack $(NuspecFile) -Version $(Version) -Properties Configuration=Release -OutputDirectory $(SolutionDir)Deployment\GeneratedNugets" />
+	<Exec Command="$(SquirrelTools)\Squirrel.exe --releasify $(SolutionDir)Deployment\GeneratedNugets\PortalDoFranqueado.$(Version).nupkg --releaseDir=$(SolutionDir)Deployment\Releases\$(Version)" />
+  </Target>
 
 </Project>

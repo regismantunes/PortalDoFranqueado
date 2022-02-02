@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>PortalDoFranqueado</id>
+    <version>0.0.2</version>
+    <title>BROTHERS - Portal do Franqueado</title>
+    <authors>Regis Antunes</authors>
+    <owners>BROTHERS</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Central de comunicação com franqueados.</description>
+  </metadata>
+  
+  <files>
+	<file src="bin\Release\net6.0-windows\**" target="lib\net45"/>
+  </files>
+</package>

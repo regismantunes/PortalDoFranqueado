@@ -20,7 +20,9 @@ namespace PortalDoFranqueadoGUI.GoogleDrive
 
         private readonly string[] _scopes;
         private readonly string _applicationName;
-        private readonly UserCredential _userCredential;
+        private readonly string _clientSecretFile;
+        private readonly string _driveServiceCredentialsFile;
+        private UserCredential? _userCredential;
 
         public GoogleDriveFilesRepository(bool fullScope, string clientSecret, string driveServiceCredentials, string applicationName)
         {
@@ -30,37 +32,71 @@ namespace PortalDoFranqueadoGUI.GoogleDrive
 
             DirectoryExtensions.CreateDirectoryChain(appTempFolder);
 
-            var clientSecretFile = Path.Combine(appTempFolder, "client_secret.json");
-            File.WriteAllText(clientSecretFile, clientSecret);
+            _clientSecretFile = Path.Combine(appTempFolder, "client_secret.json");
+            File.WriteAllText(_clientSecretFile, clientSecret);
 
-            var driveServiceCredentialsFile = Path.Combine(appTempFolder, "DriveServiceCredentials.json");
-            if (!Directory.Exists(driveServiceCredentialsFile))
-                Directory.CreateDirectory(driveServiceCredentialsFile);
-            File.WriteAllText(Path.Combine(driveServiceCredentialsFile, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"), driveServiceCredentials);
+            _driveServiceCredentialsFile = Path.Combine(appTempFolder, "DriveServiceCredentials.json");
+            if (!Directory.Exists(_driveServiceCredentialsFile))
+                Directory.CreateDirectory(_driveServiceCredentialsFile);
+            File.WriteAllText(Path.Combine(_driveServiceCredentialsFile, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"), driveServiceCredentials);
 
             _applicationName = applicationName;
+        }
 
-            using var stream = new FileStream(clientSecretFile, FileMode.Open, FileAccess.Read);
-            _userCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStream(stream).Secrets,
-                _scopes,
-                "user",
-                CancellationToken.None,
-                new FileDataStore(driveServiceCredentialsFile, true)).Result;
+        private UserCredential GetCredential()
+        {
+            if (_userCredential == null)
+            {
+                UserCredential userCredential;
+
+            tryAgain:
+                using (var stream = new FileStream(_clientSecretFile, FileMode.Open, FileAccess.Read))
+                    userCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.FromStream(stream).Secrets,
+                        _scopes,
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore(_driveServiceCredentialsFile, true)).Result;
+
+                try
+                {
+                    var service = new Google.Apis.Drive.v3.DriveService(new BaseClientService.Initializer()
+                    {
+                        HttpClientInitializer = userCredential,
+                        ApplicationName = _applicationName
+                    });
+
+                    var request = service.Files.Get("000000000000000000000000000000000");
+                    request.Execute();
+                }
+                catch (Google.Apis.Auth.OAuth2.Responses.TokenResponseException)
+                {
+                    goto tryAgain;
+                }
+                catch (Google.GoogleApiException ex)
+                {
+                    if (ex.HttpStatusCode != System.Net.HttpStatusCode.NotFound)
+                        throw ex;
+                }
+
+                _userCredential = userCredential;
+            }
+
+            return _userCredential;
         }
 
         //create Drive API service.
         private Google.Apis.Drive.v3.DriveService GetService_v3()
             => new(new BaseClientService.Initializer()
             {
-                HttpClientInitializer = _userCredential,
+                HttpClientInitializer = GetCredential(),
                 ApplicationName = _applicationName
             });
 
         public Google.Apis.Drive.v2.DriveService GetService_v2()
             => new(new BaseClientService.Initializer()
             {
-                HttpClientInitializer = _userCredential,
+                HttpClientInitializer = GetCredential(),
                 ApplicationName = _applicationName
             });
 
