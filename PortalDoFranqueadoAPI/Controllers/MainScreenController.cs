@@ -160,11 +160,11 @@ namespace PortalDoFranqueadoAPI.Controllers
         [HttpPut]
         [Route("informative")]
         [Authorize]
-        public async Task<ActionResult<dynamic>> UpdateInformativo([FromBody] Informative informativo)
+        public async Task<ActionResult<dynamic>> UpdateInformative([FromBody] Informative informative)
         {
             try
             {
-                await InformativeRepository.Save(_connection, informativo);
+                await InformativeRepository.Save(_connection, informative);
 
                 return Ok();
             }

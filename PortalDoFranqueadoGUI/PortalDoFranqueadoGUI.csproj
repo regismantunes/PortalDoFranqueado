@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <StartupObject>PortalDoFranqueadoGUI.App</StartupObject>
-    <Version>0.0.2</Version>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

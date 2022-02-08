@@ -69,7 +69,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Store?> Get(MySqlConnection connection)
+        public static async Task<Store?> Get(MySqlConnection connection, int id)
         {
             try
             {
@@ -78,7 +78,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM loja;", connection);
+                var cmd = new MySqlCommand("SELECT * FROM loja" +
+                                        " WHERE id = @id;", connection);
+
+                cmd.Parameters.AddWithValue("@id", id);
 
                 var reader = await cmd.ExecuteReaderAsync();
 

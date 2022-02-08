@@ -1,0 +1,825 @@
+{
+  "service": {
+    "service": "portaldofranqueadoapi",
+    "serviceObject": {
+      "name": "portaldofranqueadoapi"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "dotnetcore3.1",
+      "stage": "dev",
+      "region": "us-east-1",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "LoginLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-login"
+            }
+          },
+          "CollecctionsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-collecctions"
+            }
+          },
+          "FamiliesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-families"
+            }
+          },
+          "MainLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-main"
+            }
+          },
+          "ProductsLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-products"
+            }
+          },
+          "PurchasesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-purchases"
+            }
+          },
+          "StoresLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-stores"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "portaldofranqueadoapi",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/portaldofranqueadoapi-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/portaldofranqueadoapi-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "portaldofranqueadoapi",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "LoginLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/login.zip"
+              },
+              "Handler": "AccountController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-login",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "LoginLogGroup"
+            ]
+          },
+          "CollecctionsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/collecctions.zip"
+              },
+              "Handler": "CollectionsController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-collecctions",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "CollecctionsLogGroup"
+            ]
+          },
+          "FamiliesLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/families.zip"
+              },
+              "Handler": "FamilyController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-families",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "FamiliesLogGroup"
+            ]
+          },
+          "MainLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/main.zip"
+              },
+              "Handler": "MainScreenController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-main",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "MainLogGroup"
+            ]
+          },
+          "ProductsLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/products.zip"
+              },
+              "Handler": "ProductController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-products",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ProductsLogGroup"
+            ]
+          },
+          "PurchasesLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/purchases.zip"
+              },
+              "Handler": "PurchaseController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-purchases",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "PurchasesLogGroup"
+            ]
+          },
+          "StoresLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/bin/Release/net6.0/api.zip"
+              },
+              "Handler": "StoreController",
+              "Runtime": "dotnetcore3.1",
+              "FunctionName": "portaldofranqueadoapi-dev-stores",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "StoresLogGroup"
+            ]
+          },
+          "StoresLambdaVersionMmYcKqQxoYAEr2S987NbkHIDwx2GMa16Yrh06JaARg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "StoresLambdaFunction"
+              },
+              "CodeSha256": "58L2OQjjS77TwACCB/pewfdae23Z7Afw/3kDJqNwqsU="
+            }
+          },
+          "PurchasesLambdaVersionBypOdyuIZHnsXnvWOmkX1sGPnZ8buDxNeOABp1iOj2I": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "PurchasesLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          },
+          "FamiliesLambdaVersionNIL7ls1jU2jeApT6NUBAKJpvqTtCGS6yDZ5UibYsdo": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "FamiliesLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          },
+          "ProductsLambdaVersionWEn7xFlaaEcigpGbWxy3HlvsJkMfI23hN3p78CID1Hc": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ProductsLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          },
+          "MainLambdaVersionYFzJzI6Dbxffqf2Mv1RVmPPssHua38EfHB4gN6X5rI": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "MainLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          },
+          "CollecctionsLambdaVersionn5yfAmn6FKnbQnbHSUGiqgB83JiJfF672LwXUJxhGQ": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "CollecctionsLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          },
+          "LoginLambdaVersionEtvnGWTOfX58cJ1cWxoANStZusXiznAT6eGoFQ4k48": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "LoginLambdaFunction"
+              },
+              "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "StoresLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "StoresLambdaVersionMmYcKqQxoYAEr2S987NbkHIDwx2GMa16Yrh06JaARg"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-StoresLambdaFunctionQualifiedArn"
+            }
+          },
+          "PurchasesLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "PurchasesLambdaVersionBypOdyuIZHnsXnvWOmkX1sGPnZ8buDxNeOABp1iOj2I"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-PurchasesLambdaFunctionQualifiedArn"
+            }
+          },
+          "FamiliesLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "FamiliesLambdaVersionNIL7ls1jU2jeApT6NUBAKJpvqTtCGS6yDZ5UibYsdo"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-FamiliesLambdaFunctionQualifiedArn"
+            }
+          },
+          "ProductsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ProductsLambdaVersionWEn7xFlaaEcigpGbWxy3HlvsJkMfI23hN3p78CID1Hc"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-ProductsLambdaFunctionQualifiedArn"
+            }
+          },
+          "MainLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "MainLambdaVersionYFzJzI6Dbxffqf2Mv1RVmPPssHua38EfHB4gN6X5rI"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-MainLambdaFunctionQualifiedArn"
+            }
+          },
+          "CollecctionsLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "CollecctionsLambdaVersionn5yfAmn6FKnbQnbHSUGiqgB83JiJfF672LwXUJxhGQ"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-CollecctionsLambdaFunctionQualifiedArn"
+            }
+          },
+          "LoginLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "LoginLambdaVersionEtvnGWTOfX58cJ1cWxoANStZusXiznAT6eGoFQ4k48"
+            },
+            "Export": {
+              "Name": "sls-portaldofranqueadoapi-dev-LoginLambdaFunctionQualifiedArn"
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "ServerlessDeploymentBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+              "Bucket": {
+                "Ref": "ServerlessDeploymentBucket"
+              },
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": "s3:*",
+                    "Effect": "Deny",
+                    "Principal": "*",
+                    "Resource": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            },
+                            "/*"
+                          ]
+                        ]
+                      },
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":s3:::",
+                            {
+                              "Ref": "ServerlessDeploymentBucket"
+                            }
+                          ]
+                        ]
+                      }
+                    ],
+                    "Condition": {
+                      "Bool": {
+                        "aws:SecureTransport": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "pluginsData": {},
+    "functions": {
+      "login": {
+        "handler": "AccountController",
+        "event": [
+          {
+            "httpApi": "POST /api/account/login"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-login",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\login.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "LoginLambdaVersionEtvnGWTOfX58cJ1cWxoANStZusXiznAT6eGoFQ4k48"
+      },
+      "collecctions": {
+        "handler": "CollectionsController",
+        "event": [
+          {
+            "httpApi": "GET /api/collections/noclosed"
+          },
+          {
+            "httpApi": "GET /api/collections/all"
+          },
+          {
+            "httpApi": "GET /api/collections/{id}"
+          },
+          {
+            "httpApi": "GET /api/collections/opened"
+          },
+          {
+            "httpApi": "POST /api/collections"
+          },
+          {
+            "httpApi": "DELETE /api/collections/{id}"
+          },
+          {
+            "httpApi": "PUT /api/collections/changestatus/{id}"
+          },
+          {
+            "httpApi": "PUT /api/collections/{id}"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-collecctions",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\collecctions.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "CollecctionsLambdaVersionn5yfAmn6FKnbQnbHSUGiqgB83JiJfF672LwXUJxhGQ"
+      },
+      "families": {
+        "handler": "FamilyController",
+        "event": [
+          {
+            "httpApi": "GET /api/family/all"
+          },
+          {
+            "httpApi": "GET /api/family/all/withsizes"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-families",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\families.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "FamiliesLambdaVersionNIL7ls1jU2jeApT6NUBAKJpvqTtCGS6yDZ5UibYsdo"
+      },
+      "main": {
+        "handler": "MainScreenController",
+        "event": [
+          {
+            "httpApi": "GET /api/main/info"
+          },
+          {
+            "httpApi": "GET /api/main/info/basic"
+          },
+          {
+            "httpApi": "GET /api/main/informative"
+          },
+          {
+            "httpApi": "GET /api/main/googledrive"
+          },
+          {
+            "httpApi": "GET /api/main/folderid/{folderType}"
+          },
+          {
+            "httpApi": "PUT /api/main/informative"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-main",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\main.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "MainLambdaVersionYFzJzI6Dbxffqf2Mv1RVmPPssHua38EfHB4gN6X5rI"
+      },
+      "products": {
+        "handler": "ProductController",
+        "event": [
+          {
+            "httpApi": "GET /api/product/{collectionId}"
+          },
+          {
+            "httpApi": "POST /api/product/{collectionId}"
+          },
+          {
+            "httpApi": "DELETE /api/product/{id}"
+          },
+          {
+            "httpApi": "PUT /api/product"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-products",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\products.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "ProductsLambdaVersionWEn7xFlaaEcigpGbWxy3HlvsJkMfI23hN3p78CID1Hc"
+      },
+      "purchases": {
+        "handler": "PurchaseController",
+        "event": [
+          {
+            "httpApi": "PUT /api/purchase"
+          },
+          {
+            "httpApi": "GET /api/purchase/collection/{collectionId}/{storeId}"
+          },
+          {
+            "httpApi": "GET /api/purchase/collection/{collectionId}"
+          },
+          {
+            "httpApi": "GET /api/purchase/id/{purchaseId}"
+          },
+          {
+            "httpApi": "PUT /api/purchase/reverse"
+          }
+        ],
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-purchases",
+        "package": {
+          "artifact": "D:\\Source\\Brothers\\PortalFranqueado\\PortalDoFranqueadoAPI\\.serverless\\purchases.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "PurchasesLambdaVersionBypOdyuIZHnsXnvWOmkX1sGPnZ8buDxNeOABp1iOj2I"
+      },
+      "stores": {
+        "handler": "StoreController",
+        "event": [
+          {
+            "httpApi": "GET /api/store/all"
+          },
+          {
+            "httpApi": "GET /api/store/{id}"
+          }
+        ],
+        "package": {
+          "artifact": "bin/Release/net6.0/api.zip"
+        },
+        "events": [],
+        "name": "portaldofranqueadoapi-dev-stores",
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "dotnetcore3.1",
+        "vpc": {},
+        "versionLogicalId": "StoresLambdaVersionMmYcKqQxoYAEr2S987NbkHIDwx2GMa16Yrh06JaARg"
+      }
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
+    "initialServerlessConfig": {
+      "service": "portaldofranqueadoapi",
+      "frameworkVersion": "3",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "package": {
+        "individually": true,
+        "artifactDirectoryName": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false
+  },
+  "package": {
+    "individually": true,
+    "artifactDirectoryName": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z",
+    "artifact": ""
+  }
+}

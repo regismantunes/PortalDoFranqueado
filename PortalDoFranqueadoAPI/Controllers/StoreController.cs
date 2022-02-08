@@ -32,13 +32,13 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpGet]
-        [Route("")]
+        [Route("{id}")]
         [Authorize]
-        public async Task<ActionResult<dynamic>> Get()
+        public async Task<ActionResult<dynamic>> Get(int id)
         {
             try
             {
-                var store = await StoreRepository.Get(_connection);
+                var store = await StoreRepository.Get(_connection, id);
 
                 return Ok(store);
             }

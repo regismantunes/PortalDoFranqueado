@@ -1,0 +1,512 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "LoginLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-login"
+      }
+    },
+    "CollecctionsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-collecctions"
+      }
+    },
+    "FamiliesLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-families"
+      }
+    },
+    "MainLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-main"
+      }
+    },
+    "ProductsLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-products"
+      }
+    },
+    "PurchasesLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-purchases"
+      }
+    },
+    "StoresLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/portaldofranqueadoapi-dev-stores"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "portaldofranqueadoapi",
+                  "dev",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/portaldofranqueadoapi-dev*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/portaldofranqueadoapi-dev*:*:*"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "portaldofranqueadoapi",
+              "dev",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "LoginLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/login.zip"
+        },
+        "Handler": "AccountController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-login",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "LoginLogGroup"
+      ]
+    },
+    "CollecctionsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/collecctions.zip"
+        },
+        "Handler": "CollectionsController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-collecctions",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "CollecctionsLogGroup"
+      ]
+    },
+    "FamiliesLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/families.zip"
+        },
+        "Handler": "FamilyController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-families",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "FamiliesLogGroup"
+      ]
+    },
+    "MainLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/main.zip"
+        },
+        "Handler": "MainScreenController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-main",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "MainLogGroup"
+      ]
+    },
+    "ProductsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/products.zip"
+        },
+        "Handler": "ProductController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-products",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "ProductsLogGroup"
+      ]
+    },
+    "PurchasesLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/purchases.zip"
+        },
+        "Handler": "PurchaseController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-purchases",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "PurchasesLogGroup"
+      ]
+    },
+    "StoresLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/portaldofranqueadoapi/dev/1643947158342-2022-02-04T03:59:18.342Z/bin/Release/net6.0/api.zip"
+        },
+        "Handler": "StoreController",
+        "Runtime": "dotnetcore3.1",
+        "FunctionName": "portaldofranqueadoapi-dev-stores",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "StoresLogGroup"
+      ]
+    },
+    "StoresLambdaVersionMmYcKqQxoYAEr2S987NbkHIDwx2GMa16Yrh06JaARg": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "StoresLambdaFunction"
+        },
+        "CodeSha256": "58L2OQjjS77TwACCB/pewfdae23Z7Afw/3kDJqNwqsU="
+      }
+    },
+    "PurchasesLambdaVersionBypOdyuIZHnsXnvWOmkX1sGPnZ8buDxNeOABp1iOj2I": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "PurchasesLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    },
+    "FamiliesLambdaVersionNIL7ls1jU2jeApT6NUBAKJpvqTtCGS6yDZ5UibYsdo": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "FamiliesLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    },
+    "ProductsLambdaVersionWEn7xFlaaEcigpGbWxy3HlvsJkMfI23hN3p78CID1Hc": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ProductsLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    },
+    "MainLambdaVersionYFzJzI6Dbxffqf2Mv1RVmPPssHua38EfHB4gN6X5rI": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MainLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    },
+    "CollecctionsLambdaVersionn5yfAmn6FKnbQnbHSUGiqgB83JiJfF672LwXUJxhGQ": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "CollecctionsLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    },
+    "LoginLambdaVersionEtvnGWTOfX58cJ1cWxoANStZusXiznAT6eGoFQ4k48": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LoginLambdaFunction"
+        },
+        "CodeSha256": "ucy3mEDJ2B1ZJU8DZcDMYZqyfo3o2arDEyF4oVU9IVw="
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-ServerlessDeploymentBucketName"
+      }
+    },
+    "StoresLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "StoresLambdaVersionMmYcKqQxoYAEr2S987NbkHIDwx2GMa16Yrh06JaARg"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-StoresLambdaFunctionQualifiedArn"
+      }
+    },
+    "PurchasesLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "PurchasesLambdaVersionBypOdyuIZHnsXnvWOmkX1sGPnZ8buDxNeOABp1iOj2I"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-PurchasesLambdaFunctionQualifiedArn"
+      }
+    },
+    "FamiliesLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "FamiliesLambdaVersionNIL7ls1jU2jeApT6NUBAKJpvqTtCGS6yDZ5UibYsdo"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-FamiliesLambdaFunctionQualifiedArn"
+      }
+    },
+    "ProductsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ProductsLambdaVersionWEn7xFlaaEcigpGbWxy3HlvsJkMfI23hN3p78CID1Hc"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-ProductsLambdaFunctionQualifiedArn"
+      }
+    },
+    "MainLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "MainLambdaVersionYFzJzI6Dbxffqf2Mv1RVmPPssHua38EfHB4gN6X5rI"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-MainLambdaFunctionQualifiedArn"
+      }
+    },
+    "CollecctionsLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "CollecctionsLambdaVersionn5yfAmn6FKnbQnbHSUGiqgB83JiJfF672LwXUJxhGQ"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-CollecctionsLambdaFunctionQualifiedArn"
+      }
+    },
+    "LoginLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "LoginLambdaVersionEtvnGWTOfX58cJ1cWxoANStZusXiznAT6eGoFQ4k48"
+      },
+      "Export": {
+        "Name": "sls-portaldofranqueadoapi-dev-LoginLambdaFunctionQualifiedArn"
+      }
+    }
+  }
+}

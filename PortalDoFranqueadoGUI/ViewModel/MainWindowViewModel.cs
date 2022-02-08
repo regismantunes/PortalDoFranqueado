@@ -76,7 +76,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private void Loaded()
         {
             CurrentViewControlFocused = true;
-            Task.Run(async () => await VerifyUpdate());
+            Task.Factory.StartNew(() => VerifyUpdate());
         }
 
         public async Task VerifyUpdate()
@@ -100,6 +100,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 {
                     StatusMessage = "Baixando uma atualização...";
                     await Updater.Update();
+                    StatusMessage = "A atualização será instalada quando você fechar o aplicativo.";
                 }
                 else
                     StatusMessage = "Nenhuma atualização foi encontrada.";

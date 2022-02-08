@@ -1,0 +1,169 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: portaldofranqueadoapi
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: dotnetcore3.1
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
+
+# you can add statements to the Lambda function's IAM Role here
+#  iam:
+#    role:
+#      statements:
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:ListBucket"
+#          Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+#        - Effect: "Allow"
+#          Action:
+#            - "s3:PutObject"
+#          Resource:
+#            Fn::Join:
+#              - ""
+#              - - "arn:aws:s3:::"
+#                - "Ref" : "ServerlessDeploymentBucket"
+#                - "/*"
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+package:
+  individually: true
+
+functions:
+  login:
+    handler: AccountController
+    event:
+        - httpApi: 'POST /api/account/login'
+        
+  collecctions:
+    handler: CollectionsController
+    event:
+        - httpApi: 'GET /api/collections/noclosed'
+        - httpApi: 'GET /api/collections/all'
+        - httpApi: 'GET /api/collections/{id}'
+        - httpApi: 'GET /api/collections/opened'
+        - httpApi: 'POST /api/collections'
+        - httpApi: 'DELETE /api/collections/{id}'
+        - httpApi: 'PUT /api/collections/changestatus/{id}'
+        - httpApi: 'PUT /api/collections/{id}'
+        
+  families:
+    handler: FamilyController
+    event:
+        - httpApi: 'GET /api/family/all'
+        - httpApi: 'GET /api/family/all/withsizes'
+  
+  main:
+    handler: MainScreenController
+    event:
+        - httpApi: 'GET /api/main/info'
+        - httpApi: 'GET /api/main/info/basic'
+        - httpApi: 'GET /api/main/informative'
+        - httpApi: 'GET /api/main/googledrive'
+        - httpApi: 'GET /api/main/folderid/{folderType}'
+        - httpApi: 'PUT /api/main/informative'
+  
+  products:
+    handler: ProductController
+    event:
+        - httpApi: 'GET /api/product/{collectionId}'
+        - httpApi: 'POST /api/product/{collectionId}'
+        - httpApi: 'DELETE /api/product/{id}'
+        - httpApi: 'PUT /api/product'
+  
+  purchases:
+    handler: PurchaseController
+    event:
+        - httpApi: 'PUT /api/purchase'
+        - httpApi: 'GET /api/purchase/collection/{collectionId}/{storeId}'
+        - httpApi: 'GET /api/purchase/collection/{collectionId}'
+        - httpApi: 'GET /api/purchase/id/{purchaseId}'
+        - httpApi: 'PUT /api/purchase/reverse'
+  
+  stores:
+    handler: StoreController
+    event:
+        - httpApi: 'GET /api/store/all'
+        - httpApi: 'GET /api/store/{id}'
+
+    # you can add packaging information here
+    package:
+      artifact: bin/Release/net6.0/api.zip
+    #  exclude:
+    #    - exclude-me.js
+    #    - exclude-me-dir/**
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - httpApi:
+#          path: /users/create
+#          method: get
+#      - websocket: $connect
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"

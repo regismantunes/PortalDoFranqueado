@@ -3,9 +3,13 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#Securuty
 appsettings.json
 Google.Apis.Auth.OAuth2.Responses.TokenResponse-user
 client_secret.json
+
+#Deployment
+Deployment/
 
 # User-specific files
 *.rsuser
