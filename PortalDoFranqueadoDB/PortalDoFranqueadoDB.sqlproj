@@ -59,17 +59,19 @@
     <Folder Include="Tabelas" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tabelas\Loja.sql" />
-    <Build Include="Tabelas\Usuario.sql" />
-    <Build Include="Tabelas\UsuarioLoja.sql" />
-    <Build Include="Tabelas\Informativo.sql" />
-    <Build Include="Tabelas\Arquivo.sql" />
-    <Build Include="Tabelas\InformativoAnexo.sql" />
-    <Build Include="Tabelas\Colecao.sql" />
-    <Build Include="Tabelas\Compra.sql" />
-    <Build Include="Tabelas\CompraProduto.sql" />
-    <Build Include="Tabelas\Familia.sql" />
-    <Build Include="Tabelas\FamiliaTamanho.sql" />
-    <Build Include="Tabelas\Produto.sql" />
+    <Build Include="Tabelas\Store.sql" />
+    <Build Include="Tabelas\User.sql" />
+    <Build Include="Tabelas\User_Store.sql" />
+    <Build Include="Tabelas\Informative.sql" />
+    <Build Include="Tabelas\Collection.sql" />
+    <Build Include="Tabelas\Purchase.sql" />
+    <Build Include="Tabelas\Purchase_Product.sql" />
+    <Build Include="Tabelas\Family.sql" />
+    <Build Include="Tabelas\Family_Size.sql" />
+    <Build Include="Tabelas\Product.sql" />
+    <Build Include="Tabelas\MarketingCampaign.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />
   </ItemGroup>
 </Project>
