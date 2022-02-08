@@ -1,11 +1,11 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Repositories;
+﻿using PortalDoFranqueadoAPI.Repositories;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Models.Validations
 {
     public static class PurchaseValidation
     {
-        public static async Task Validate(this Purchase purchase, MySqlConnection connection)
+        public static async Task Validate(this Purchase purchase, SqlConnection connection)
         {
             var currentCollection = await CollectionRepository.GetOpenedCollection(connection);
 

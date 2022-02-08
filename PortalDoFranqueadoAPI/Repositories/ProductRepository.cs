@@ -1,14 +1,14 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories.Util;
 using System.Data;
 using PortalDoFranqueadoAPI.Models.Validations;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class ProductRepository
     {
-        public static async Task<Product[]> GetProducts(MySqlConnection connection, int collectionId, int? familyId = null)
+        public static async Task<Product[]> GetProducts(SqlConnection connection, int collectionId, int? familyId = null)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM produto" +
+                var cmd = new SqlCommand("SELECT * FROM produto" +
                                         " WHERE idcolecao = @idcolecao" +
                     (familyId.HasValue ? " AND idfamilia = @idfamilia" : string.Empty), connection);
                 
@@ -45,7 +45,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(MySqlConnection connection, int collectionId, Product product)
+        public static async Task<int> Insert(SqlConnection connection, int collectionId, Product product)
         {
             product.Validate();
 
@@ -56,7 +56,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("INSERT INTO produto (idcolecao, idfamilia, foto, preco)" +
+                var cmd = new SqlCommand("INSERT INTO produto (idcolecao, idfamilia, foto, preco)" +
                                                 " VALUES (@idcolecao, @idfamilia, @foto, @preco);", connection);
 
                 cmd.Parameters.AddWithValue("@idcolecao", collectionId);
@@ -79,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(MySqlConnection connection, Product product)
+        public static async Task Update(SqlConnection connection, Product product)
         {
             product.Validate();
 
@@ -90,7 +90,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("UPDATE produto" +
+                var cmd = new SqlCommand("UPDATE produto" +
                                             " SET idfamilia = @idfamilia" +
                                                 ", foto = @foto" +
                                                 ", preco = @preco" +
@@ -110,7 +110,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(MySqlConnection connection, int id)
+        public static async Task<bool> Delete(SqlConnection connection, int id)
         {
             try
             {
@@ -119,7 +119,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("DELETE FROM produto" +
+                var cmd = new SqlCommand("DELETE FROM produto" +
                                         " WHERE id = @id;", connection);
 
                 cmd.Parameters.AddWithValue("@id", id);

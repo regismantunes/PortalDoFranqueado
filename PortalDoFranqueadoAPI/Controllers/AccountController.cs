@@ -1,8 +1,8 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Repositories;
+﻿using PortalDoFranqueadoAPI.Repositories;
 using PortalDoFranqueadoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -10,10 +10,10 @@ namespace PortalDoFranqueadoAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly MySqlConnection _connection;
+        private readonly SqlConnection _connection; 
         private readonly IConfiguration _configuration;
 
-        public AccountController(MySqlConnection connection, IConfiguration configuration)
+        public AccountController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = (connection, configuration);
 
         [HttpPost]

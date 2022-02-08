@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MySqlConnector;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System.Reflection;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -11,10 +11,10 @@ namespace PortalDoFranqueadoAPI.Controllers
     [ApiController]
     public class MainScreenController : ControllerBase
     {
-        private readonly MySqlConnection _connection;
+        private readonly SqlConnection _connection;
         private readonly IConfiguration _configuration;
 
-        public MainScreenController(MySqlConnection connection, IConfiguration configuration)
+        public MainScreenController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = (connection, configuration);
 
         [HttpGet]

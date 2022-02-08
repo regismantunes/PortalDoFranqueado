@@ -1,12 +1,12 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class MarketingCampaignRepository
     {
-        public static async Task<MarketingCampaign[]> GetActiveMarketingCampaigns(MySqlConnection connection)
+        public static async Task<MarketingCampaign[]> GetActiveMarketingCampaigns(SqlConnection connection)
         {
             try
             {
@@ -15,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM campanha WHERE situacao = 1", connection);
+                var cmd = new SqlCommand("SELECT * FROM campanha WHERE situacao = 1", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 

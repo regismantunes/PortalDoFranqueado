@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MySqlConnector;
+using System.Data.SqlClient;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors();
 builder.Services.AddControllers();
-builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(builder.Configuration["ConnectionStrings:Default"]));
+//builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(builder.Configuration["ConnectionStrings:Default"]));
+builder.Services.AddTransient<SqlConnection>(_ => new SqlConnection(builder.Configuration["ConnectionStrings:Default"]));
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["AppSettings:SecretToken"]);
 builder.Services.AddAuthentication(x =>

@@ -1,13 +1,13 @@
 ﻿using PortalDoFranqueadoAPI.Models;
-using MySqlConnector;
 using System.Data;
 using PortalDoFranqueadoAPI.Services;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class UserRepository
     {
-        public static async Task<User?> Get(MySqlConnection connection, string username, string password)
+        public static async Task<User?> Get(SqlConnection connection, string username, string password)
         {
             try
             {
@@ -16,7 +16,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM usuario" +
+                var cmd = new SqlCommand("SELECT * FROM usuario" +
                                             " WHERE email = @username" +
                                                 " AND situacao = 1", connection);
                 cmd.Parameters.AddWithValue("@username", username);

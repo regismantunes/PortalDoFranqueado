@@ -1,6 +1,6 @@
-﻿using MySqlConnector;
-using System.Data;
+﻿using System.Data;
 using PortalDoFranqueadoAPI.Models;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -8,7 +8,7 @@ namespace PortalDoFranqueadoAPI.Repositories
     {
         private const string RecordNotFoundException = "Não foi encontrado registro de informativo no banco de dados.";
 
-        public static async Task<Informative> Get(MySqlConnection connection)
+        public static async Task<Informative> Get(SqlConnection connection)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM informativo LIMIT 1", connection);
+                var cmd = new SqlCommand("SELECT * FROM informativo LIMIT 1", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -36,7 +36,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Save(MySqlConnection connection, Informative informative)
+        public static async Task Save(SqlConnection connection, Informative informative)
         {
             try
             {
@@ -45,12 +45,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("UPDATE informativo" +
+                var cmd = new SqlCommand("UPDATE informativo" +
                                                 " SET titulo = @titulo" +
                                                     ", texto = @texto", connection);
 
-                cmd.Parameters.Add("@titulo", MySqlDbType.String).Value = informative.Title;
-                cmd.Parameters.Add("@texto", MySqlDbType.String).Value = informative.Text;
+                cmd.Parameters.AddWithValue("@titulo", informative.Title);
+                cmd.Parameters.AddWithValue("@texto", informative.Text);
 
                 if (await cmd.ExecuteNonQueryAsync() > 0)
                     throw new Exception(RecordNotFoundException);

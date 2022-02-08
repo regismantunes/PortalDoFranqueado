@@ -1,12 +1,12 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class FamilyRepository
     {
-        public static async Task<Family[]> GetFamilies(MySqlConnection connection, bool loadSizes)
+        public static async Task<Family[]> GetFamilies(SqlConnection connection, bool loadSizes)
         {
             try
             {
@@ -15,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM familia", connection);
+                var cmd = new SqlCommand("SELECT * FROM familia", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 

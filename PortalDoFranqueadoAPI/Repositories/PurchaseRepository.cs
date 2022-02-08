@@ -1,13 +1,13 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
 using PortalDoFranqueadoAPI.Models.Validations;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class PurchaseRepository
     {
-        public static async Task Save(MySqlConnection connection, Purchase purchase)
+        public static async Task Save(SqlConnection connection, Purchase purchase)
         {
             await purchase.Validate(connection);
 
@@ -24,7 +24,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    using var cmd = new MySqlCommand()
+                    using var cmd = new SqlCommand()
                     {
                         Connection = connection,
                         CommandText = newPurchase ?
@@ -35,7 +35,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             ", idcolecao = @idcolecao" +
                                             ", situacao = @situacao" +
                                         " WHERE id = @id;",
-                        Transaction = transaction
+                        Transaction = (SqlTransaction)transaction
                     };
 
                     cmd.Parameters.AddWithValue("@idloja", purchase.StoreId);
@@ -97,7 +97,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase?> Get(MySqlConnection connection, int purchaseId)
+        public static async Task<Purchase?> Get(SqlConnection connection, int purchaseId)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM compra" +
+                var cmd = new SqlCommand("SELECT * FROM compra" +
                                             " WHERE id = @id;", connection);
 
                 cmd.Parameters.AddWithValue("@id", purchaseId);;
@@ -114,7 +114,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
 
                 return await reader.ReadAsync() ? 
-                    await LoadPurchase(reader, true, connection.Clone()) : 
+                    await LoadPurchase(reader, true, connection) : 
                     null;
             }
             finally
@@ -123,7 +123,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        private static async Task<Purchase> LoadPurchase(MySqlDataReader reader, bool loadItems, MySqlConnection? connection)
+        private static async Task<Purchase> LoadPurchase(SqlDataReader reader, bool loadItems, SqlConnection? connection)
         {
             var purchase = new Purchase()
             {
@@ -142,7 +142,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     await connection.OpenAsync();
 
-                    using var cmd = new MySqlCommand("SELECT * FROM compra_produto" +
+                    using var cmd = new SqlCommand("SELECT * FROM compra_produto" +
                                         " WHERE idcompra = @idcompra;", connection);
 
                     cmd.Parameters.AddWithValue("@idcompra", purchase.Id);
@@ -166,7 +166,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             return purchase;
         }
 
-        public static async Task<Purchase?> Get(MySqlConnection connection, int collectionId, int storeId, bool loadItems = true)
+        public static async Task<Purchase?> Get(SqlConnection connection, int collectionId, int storeId, bool loadItems = true)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM compra" +
+                var cmd = new SqlCommand("SELECT * FROM compra" +
                                         " WHERE idcolecao = @idcolecao" +
                                             " AND idloja = @idloja;", connection);
 
@@ -185,7 +185,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
 
                 return await reader.ReadAsync() ?
-                    await LoadPurchase(reader, loadItems, connection.Clone()) :
+                    await LoadPurchase(reader, loadItems, connection) :
                     null;
             }
             finally
@@ -194,7 +194,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase[]> GetPurchases(MySqlConnection connection, int collectionId)
+        public static async Task<Purchase[]> GetPurchases(SqlConnection connection, int collectionId)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM compra" +
+                var cmd = new SqlCommand("SELECT * FROM compra" +
                                         " WHERE idcolecao = @idcolecao;", connection);
 
                 cmd.Parameters.AddWithValue("@idcolecao", collectionId);
@@ -211,7 +211,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
                 var list = new List<Purchase>();
                 while (await reader.ReadAsync())
-                    list.Add(await LoadPurchase(reader, true, connection.Clone()));
+                    list.Add(await LoadPurchase(reader, true, connection));
 
                 return list.ToArray();
             }
@@ -221,7 +221,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> HasOpenedPurchase(MySqlConnection connection, int collectionId)
+        public static async Task<bool> HasOpenedPurchase(SqlConnection connection, int collectionId)
         {
             try
             {
@@ -230,7 +230,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT id FROM compra" +
+                var cmd = new SqlCommand("SELECT id FROM compra" +
                                             " WHERE idcolecao = @idcolecao" +
                                                 " AND situacao = 0;", connection);
 
@@ -244,7 +244,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Reverse(MySqlConnection connection, int purchaseId)
+        public static async Task Reverse(SqlConnection connection, int purchaseId)
         {
             try
             {
@@ -253,7 +253,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new MySqlCommand("UPDATE compra" +
+                using var cmd = new SqlCommand("UPDATE compra" +
                                                 " SET situacao = 0" +
                                                 " WHERE id = @id;", connection);
 

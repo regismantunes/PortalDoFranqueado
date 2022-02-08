@@ -1,12 +1,12 @@
-﻿using MySqlConnector;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class CollectionRepository
     {
-        public static async Task<CollectionInfo> GetInfo(MySqlConnection connection)
+        public static async Task<CollectionInfo> GetInfo(SqlConnection connection)
         {
             try
             {
@@ -15,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new MySqlCommand("SELECT fim FROM colecao" +
+                using var cmd = new SqlCommand("SELECT fim FROM colecao" +
                                                 " WHERE excluido = 0" +
                                                     " AND situacao = 1;", connection);
 
@@ -63,7 +63,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection[]> GetCollections(MySqlConnection connection, bool onlyActives = true)
+        public static async Task<Collection[]> GetCollections(SqlConnection connection, bool onlyActives = true)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM colecao" +
+                var cmd = new SqlCommand("SELECT * FROM colecao" +
                                             " WHERE excluido = 0" +
                                 (onlyActives ? " AND situacao IN (0,1);" : string.Empty), connection);
 
@@ -90,7 +90,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection?> Get(MySqlConnection connection, int id)
+        public static async Task<Collection?> Get(SqlConnection connection, int id)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM colecao" +
+                var cmd = new SqlCommand("SELECT * FROM colecao" +
                                             " WHERE excluido = 0" +
                                                 " AND id = @id;", connection);
 
@@ -118,7 +118,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> HasOpenedCollection(MySqlConnection connection)
+        public static async Task<bool> HasOpenedCollection(SqlConnection connection)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT id FROM colecao" +
+                var cmd = new SqlCommand("SELECT id FROM colecao" +
                                             " WHERE excluido = 0" +
                                                 " AND situacao = 1;", connection);
 
@@ -139,7 +139,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection?> GetOpenedCollection(MySqlConnection connection)
+        public static async Task<Collection?> GetOpenedCollection(SqlConnection connection)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("SELECT * FROM colecao" +
+                var cmd = new SqlCommand("SELECT * FROM colecao" +
                                             " WHERE excluido = 0" +
                                                 " AND situacao = 1;", connection);
 
@@ -165,7 +165,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        private static Collection CreateCollection(MySqlDataReader reader)
+        private static Collection CreateCollection(SqlDataReader reader)
             => new()
             {
                 Id = reader.GetInt32("id"),
@@ -175,7 +175,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Status = (CollectionStatus)reader.GetInt32("situacao")
             };
 
-        public static async Task ChangeStatus(MySqlConnection connection, int id, CollectionStatus status)
+        public static async Task ChangeStatus(SqlConnection connection, int id, CollectionStatus status)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    using var cmd = new MySqlCommand("SELECT situacao" +
+                    using var cmd = new SqlCommand("SELECT situacao" +
                                                     " FROM colecao" +
                                                     " WHERE excluido = 0" +
                                                         " AND id = @id;", connection);
@@ -238,7 +238,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(MySqlConnection connection, Collection colecao)
+        public static async Task<int> Insert(SqlConnection connection, Collection colecao)
         {
             try
             {
@@ -247,7 +247,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("INSERT INTO colecao (inicio, fim, situacao, pasta, excluido)" +
+                var cmd = new SqlCommand("INSERT INTO colecao (inicio, fim, situacao, pasta, excluido)" +
                                                 " VALUES (@inicio, @fim, @situacao, @pasta, 0);", connection);
 
                 cmd.Parameters.AddWithValue("@inicio", colecao.StartDate);
@@ -270,7 +270,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(MySqlConnection connection, int id)
+        public static async Task<bool> Delete(SqlConnection connection, int id)
         {
             try
             {
@@ -279,7 +279,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("UPDATE colecao" +
+                var cmd = new SqlCommand("UPDATE colecao" +
                                             " SET excluido = 1" +
                                             " WHERE id = @id;", connection);
 
@@ -293,7 +293,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(MySqlConnection connection, Collection colecao)
+        public static async Task Update(SqlConnection connection, Collection colecao)
         {
             try
             {
@@ -302,7 +302,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new MySqlCommand("UPDATE colecao" +
+                var cmd = new SqlCommand("UPDATE colecao" +
                                             " SET inicio = @inicio" +
                                                 ", fim = @fim" +
                                                 ", pasta = @pasta" +

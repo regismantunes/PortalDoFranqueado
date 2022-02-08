@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MySqlConnector;
 using PortalDoFranqueadoAPI.Repositories;
+using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -9,9 +9,9 @@ namespace PortalDoFranqueadoAPI.Controllers
     [ApiController]
     public class FamilyController : Controller
     {
-        private readonly MySqlConnection _connection;
+        private readonly SqlConnection _connection;
 
-        public FamilyController(MySqlConnection connection)
+        public FamilyController(SqlConnection connection)
             => _connection = connection;
 
         [HttpGet]
