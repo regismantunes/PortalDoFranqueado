@@ -15,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM campanha WHERE situacao = 1", connection);
+                var cmd = new SqlCommand("SELECT * FROM MarketingCampaign WHERE Status = 1", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -24,9 +24,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                     list.Add(new MarketingCampaign()
                     {
                         Id = reader.GetInt32("Id"),
-                        Title = reader.GetString("titulo"),
-                        FolderId = reader.GetString("pasta"),
-                        Status = reader.GetInt32("situacao")
+                        Title = reader.GetString("Title"),
+                        FolderId = reader.GetString("FolderId"),
+                        Status = reader.GetInt32("Status")
                     });
 
                 return list.ToArray();

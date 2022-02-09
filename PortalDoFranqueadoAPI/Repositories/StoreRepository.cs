@@ -15,12 +15,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT loja.*" +
-                                            " FROM loja" +
-                                                " INNER JOIN usuario_loja" +
-                                                    " ON loja.id = usuario_loja.idloja" +
-                                            " WHERE usuario_loja.idusuario = @idusuario;", connection);
-                cmd.Parameters.AddWithValue("@idusuario", idUser);
+                var cmd = new SqlCommand("SELECT Store.*" +
+                                            " FROM Store" +
+                                                " INNER JOIN User_Store" +
+                                                    " ON Store.Id = User_Store.StoreId" +
+                                            " WHERE User_Store.UserId = @UserId;", connection);
+                cmd.Parameters.AddWithValue("@UserId", idUser);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -29,7 +29,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     list.Add(new Store()
                     {
                         Id = reader.GetInt32("id"),
-                        Name = reader.GetString("nome")
+                        Name = reader.GetString("Name")
                     });
 
                 return list.ToArray();
@@ -49,7 +49,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM loja;", connection);
+                var cmd = new SqlCommand("SELECT * FROM Store;", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -57,8 +57,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync())
                     list.Add(new Store()
                     {
-                        Id = reader.GetInt32("id"),
-                        Name = reader.GetString("nome")
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name")
                     });
 
                 return list.ToArray();
@@ -78,18 +78,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM loja" +
-                                        " WHERE id = @id;", connection);
+                var cmd = new SqlCommand("SELECT * FROM Store" +
+                                        " WHERE Id = @Id;", connection);
 
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@Id", id);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
                 if (await reader.ReadAsync())
                     return new Store()
                     {
-                        Id = reader.GetInt32("id"),
-                        Name = reader.GetString("nome")
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name")
                     };
 
                 return null;

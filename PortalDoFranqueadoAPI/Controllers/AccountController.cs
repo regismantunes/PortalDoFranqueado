@@ -27,7 +27,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                 // Verifica se o usuário existe
                 if (user == null)
-                    return NotFound(new { message = "Usuário ou senha inválidos" });
+                    return BadRequest(new { message = "Usuário ou senha inválidos" });
                 
                 // Gera o Token
                 var authenticateData = TokenService.GerarTokenJwt(_configuration["AppSettings:SecretToken"], user);

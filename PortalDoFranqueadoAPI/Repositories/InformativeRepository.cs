@@ -17,18 +17,19 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM informativo LIMIT 1", connection);
+                using var cmd = new SqlCommand("SELECT TOP 1 * FROM Informative", connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                using var reader = await cmd.ExecuteReaderAsync();
+
+                var result = new Informative();
 
                 if (await reader.ReadAsync())
-                    return new Informative()
-                    {
-                        Title = reader.GetString("titulo"),
-                        Text = reader.GetString("texto")
-                    };
+                {
+                    result.Title = reader.GetString("Title");
+                    result.Text = reader.GetString("Text");
+                }
 
-                throw new Exception(RecordNotFoundException);
+                return result;
             }
             finally
             {
@@ -45,15 +46,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE informativo" +
-                                                " SET titulo = @titulo" +
-                                                    ", texto = @texto", connection);
+                using var cmd = new SqlCommand("UPDATE Informative" +
+                                                " SET Title = @Title" +
+                                                    ", Text = @Text", connection);
 
-                cmd.Parameters.AddWithValue("@titulo", informative.Title);
-                cmd.Parameters.AddWithValue("@texto", informative.Text);
+                cmd.Parameters.AddWithValue("@Title", informative.Title);
+                cmd.Parameters.AddWithValue("@Text", informative.Text);
 
-                if (await cmd.ExecuteNonQueryAsync() > 0)
-                    throw new Exception(RecordNotFoundException);
+                if (await cmd.ExecuteNonQueryAsync() == 0)
+                {
+                    cmd.CommandText = "INSERT INTO Informative (Title, Text) VALUES (@Title, @Text)";
+                    await cmd.ExecuteNonQueryAsync();
+                }
             }
             finally
             {

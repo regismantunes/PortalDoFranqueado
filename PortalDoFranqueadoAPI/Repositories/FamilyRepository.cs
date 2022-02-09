@@ -15,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM familia", connection);
+                var cmd = new SqlCommand("SELECT * FROM Family", connection);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -23,22 +23,22 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync())
                     list.Add(new Family()
                     {
-                        Id = reader.GetInt32("id"),
-                        Name = reader.GetString("nome")
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name")
                     });
 
                 if (loadSizes)
                 {
                     await reader.CloseAsync();
 
-                    cmd.CommandText = "SELECT * FROM familia_tamanho";
+                    cmd.CommandText = "SELECT * FROM Family_Size";
                     reader = await cmd.ExecuteReaderAsync();
 
                     var tamanhos = new List<KeyValuePair<int, string>>();
                     while (await reader.ReadAsync())
                         tamanhos.Add(new KeyValuePair<int, string>(
-                            reader.GetInt32("idfamilia"),
-                            reader.GetString("idtamanho")));
+                            reader.GetInt32("FamilyId"),
+                            reader.GetString("SizeId")));
 
                     foreach (var familia in list)
                         familia.Sizes = (from item in tamanhos

@@ -57,6 +57,8 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tabelas" />
+    <Folder Include="Populate" />
+    <Folder Include="Populate\Development" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tabelas\Store.sql" />
@@ -73,5 +75,12 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Populate\Family.sql" />
+    <None Include="Populate\Family_Size.sql" />
+    <None Include="Populate\Development\Store.sql" />
+    <None Include="Populate\Development\User.sql" />
+    <None Include="Populate\Development\User_Store.sql" />
   </ItemGroup>
 </Project>

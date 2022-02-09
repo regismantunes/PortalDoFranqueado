@@ -1,7 +1,9 @@
 ﻿CREATE TABLE [dbo].[Collection]
 (
   [Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-  [StatDate] DATE NOT NULL,
+  [StartDate] DATE NOT NULL,
   [EndDate] DATE NOT NULL,
-  [Status] INT NOT NULL
+  [FolderId] CHAR(33) NULL,
+  [Status] INT NOT NULL,
+  [Excluded] BIT NOT NULL,
 )

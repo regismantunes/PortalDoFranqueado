@@ -17,13 +17,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM produto" +
-                                        " WHERE idcolecao = @idcolecao" +
-                    (familyId.HasValue ? " AND idfamilia = @idfamilia" : string.Empty), connection);
+                var cmd = new SqlCommand("SELECT * FROM Product" +
+                                        " WHERE CollectionId = @CollectionId" +
+                    (familyId.HasValue ? " AND FamilyId = @FamilyId" : string.Empty), connection);
                 
-                cmd.Parameters.AddWithValue("@idcolecao", collectionId);
+                cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 if (familyId.HasValue)
-                    cmd.Parameters.AddWithValue("@idfamilia", familyId);
+                    cmd.Parameters.AddWithValue("@FamilyId", familyId);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -31,10 +31,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync())
                     list.Add(new Product()
                     {
-                        Id = reader.GetInt32("id"),
-                        FileId = reader.GetString("foto"),
-                        Price = reader.GetDecimal("preco"),
-                        FamilyId = reader.GetInt32("idfamilia")
+                        Id = reader.GetInt32("Id"),
+                        FileId = reader.GetString("PhotoId"),
+                        Price = reader.GetDecimal("Price"),
+                        FamilyId = reader.GetInt32("FamilyId")
                     });
 
                 return list.ToArray();
@@ -56,19 +56,19 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO produto (idcolecao, idfamilia, foto, preco)" +
-                                                " VALUES (@idcolecao, @idfamilia, @foto, @preco);", connection);
+                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price)" +
+                                                " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price);", connection);
 
-                cmd.Parameters.AddWithValue("@idcolecao", collectionId);
-                cmd.Parameters.AddWithValue("@idfamilia", product.FamilyId.ToDBValue());
-                cmd.Parameters.AddWithValue("@foto", product.FileId.ToDBValue());
-                cmd.Parameters.AddWithValue("@preco", product.Price.ToDBValue());
+                cmd.Parameters.AddWithValue("@CollectionId", collectionId);
+                cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
+                cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
 
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.InsertFailException);
 
                 cmd.Parameters.Clear();
-                cmd.CommandText = "SELECT LAST_INSERT_ID();";
+                cmd.CommandText = "SELECT SCOPE_IDENTITY();";
 
                 var newid = (ulong)await cmd.ExecuteScalarAsync();
                 return Convert.ToInt32(newid);
@@ -90,16 +90,16 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE produto" +
-                                            " SET idfamilia = @idfamilia" +
-                                                ", foto = @foto" +
-                                                ", preco = @preco" +
-                                        " WHERE id = @id;", connection);
+                var cmd = new SqlCommand("UPDATE Product" +
+                                            " SET FamilyId = @FamilyId" +
+                                                ", PhotoId = @PhotoId" +
+                                                ", Price = @Price" +
+                                        " WHERE Id = @Id;", connection);
 
-                cmd.Parameters.AddWithValue("@idfamilia", product.FamilyId.ToDBValue());
-                cmd.Parameters.AddWithValue("@foto", product.FileId.ToDBValue());
-                cmd.Parameters.AddWithValue("@preco", product.Price.ToDBValue());
-                cmd.Parameters.AddWithValue("@id", product.Id);
+                cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
+                cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
+                cmd.Parameters.AddWithValue("@Id", product.Id);
                 
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
@@ -119,10 +119,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("DELETE FROM produto" +
-                                        " WHERE id = @id;", connection);
+                var cmd = new SqlCommand("DELETE FROM Product" +
+                                        " WHERE Id = @Id;", connection);
 
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@Id", id);
 
                 return await cmd.ExecuteNonQueryAsync() > 0;
             }

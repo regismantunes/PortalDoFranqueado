@@ -16,26 +16,26 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM usuario" +
-                                            " WHERE email = @username" +
-                                                " AND situacao = 1", connection);
+                var cmd = new SqlCommand("SELECT * FROM [User]" +
+                                            " WHERE Email = @username" +
+                                                " AND Status = 1", connection);
                 cmd.Parameters.AddWithValue("@username", username);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
                 if (await reader.ReadAsync())
                 {
-                    var passwordHash = reader.GetString("senha");
+                    var passwordHash = reader.GetString("Password");
 
                     if (HashService.VerifyHash(password, "SHA256", passwordHash))
                         return new User()
                         {
-                            Email = reader.GetString("email"),
-                            Id = reader.GetInt32("id"),
-                            Name = reader.GetString("nome"),
-                            Role = reader.GetInt16("nivel") == 9 ? "manager" : "low",
+                            Email = reader.GetString("Email"),
+                            Id = reader.GetInt32("Id"),
+                            Name = reader.GetString("Name"),
+                            Role = reader.GetInt16("Role") == 9 ? "manager" : "low",
                             Active = true,
-                            Treatment = reader.GetString("tratamento")
+                            Treatment = reader.GetString("Treatment")
                         };
                 }
 
