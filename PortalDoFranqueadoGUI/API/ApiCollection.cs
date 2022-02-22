@@ -29,9 +29,9 @@ namespace PortalDoFranqueadoGUI.API
             => await BaseApi.GetSimpleHttpClientRequest<bool>($"collections/{id}")
                             .Delete();
 
-        public static async Task ChangeStatus(int id, CollectionStatus situacao)
+        public static async Task ChangeStatus(int id, CollectionStatus status)
             => await BaseApi.GetSimpleHttpClientRequest($"collections/changestatus/{id}")
-                            .Put((int)situacao);
+                            .Put((int)status);
 
         public static async Task Update(Collection colecao)
             => await BaseApi.GetSimpleHttpClientRequest("collections")

@@ -1,10 +1,10 @@
 ﻿namespace PortalDoFranqueadoAPI.Models
 {
-    public class MarketingCampaign
+    public class Campaign
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string FolderId { get; set; }
-        public int Status { get; set; }
+        public CampaignStatus Status { get; set; }
     }
 }

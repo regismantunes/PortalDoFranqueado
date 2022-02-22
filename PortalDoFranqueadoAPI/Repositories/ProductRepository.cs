@@ -41,7 +41,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -57,25 +57,23 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price)" +
-                                                " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price);", connection);
+                                            " OUTPUT INSERTED.ID" +
+                                            " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
                 cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
+                var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
-                cmd.Parameters.Clear();
-                cmd.CommandText = "SELECT SCOPE_IDENTITY();";
-
-                var newid = (ulong)await cmd.ExecuteScalarAsync();
-                return Convert.ToInt32(newid);
+                return Convert.ToInt32(dbid);
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -106,7 +104,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -128,7 +126,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
     }

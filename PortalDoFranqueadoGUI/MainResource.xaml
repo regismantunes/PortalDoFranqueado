@@ -4,6 +4,7 @@
                     xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util">
     <repository:LocalRepository x:Key="Cache"/>
     <util:EnumConverter x:Key="EnumConverter"/>
+    <util:PurchaseItemGroupDescriptionConverter x:Key="PurchaseItemGroupDescriptionConverter"/>
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Style.xaml"/>
     </ResourceDictionary.MergedDictionaries>

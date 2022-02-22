@@ -71,7 +71,7 @@
     <Build Include="Tabelas\Family.sql" />
     <Build Include="Tabelas\Family_Size.sql" />
     <Build Include="Tabelas\Product.sql" />
-    <Build Include="Tabelas\MarketingCampaign.sql" />
+    <Build Include="Tabelas\Campaign.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />

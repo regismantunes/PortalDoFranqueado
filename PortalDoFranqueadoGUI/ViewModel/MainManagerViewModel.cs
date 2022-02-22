@@ -5,6 +5,7 @@ using System;
 using PortalDoFranqueadoGUI.Util;
 using GalaSoft.MvvmLight.CommandWpf;
 using PortalDoFranqueadoGUI.View;
+using System.Windows.Controls;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
@@ -16,6 +17,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private Visibility _visibilityInformativeText;
         private string _informativeTitle;
         private string _informativeText;
+
+        private ContentControl? _currentViewControl;
+        private bool _currentViewControlFocused;
 
         public string WellcomeMessage { get; private set; }
         public string InformativeTitle
@@ -186,9 +190,42 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
+        public ContentControl? CurrentViewControl
+        {
+            get => _currentViewControl;
+            set
+            {
+                _currentViewControl = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentViewControlVisibility));
+                CurrentViewControlFocused = _currentViewControl != null;
+            }
+        }
+
+        public Visibility CurrentViewControlVisibility => CurrentViewControl == null ? Visibility.Collapsed : Visibility.Visible;
+
+        public bool CurrentViewControlFocused
+        {
+            get => _currentViewControlFocused;
+            set
+            {
+                _currentViewControlFocused = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void OpenCampaigns()
         {
+            try
+            {
+                DesableContent();
 
+                Navigator.NextNavigate(new ManagerCampaigns());
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private void UpdateSessionInformation()

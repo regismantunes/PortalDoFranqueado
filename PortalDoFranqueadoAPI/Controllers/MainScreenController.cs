@@ -35,7 +35,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 var photosFolderId = _configuration["AppSettings:FotosFolderId"];
                 var supportFolderId = _configuration["AppSettings:ApoioFolderId"];
 
-                var campaigns = await MarketingCampaignRepository.GetActiveMarketingCampaigns(_connection);
+                var campaigns = await CampaignRepository.GetList(_connection, true);
 
                 var stores = await StoreRepository.GetStoresByUser(_connection, int.Parse(User.Identity.Name));
 

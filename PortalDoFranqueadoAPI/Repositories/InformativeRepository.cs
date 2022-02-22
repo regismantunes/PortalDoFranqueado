@@ -33,7 +33,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -56,12 +56,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                 {
                     cmd.CommandText = "INSERT INTO Informative (Title, Text) VALUES (@Title, @Text)";
-                    await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
                 }
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
     }

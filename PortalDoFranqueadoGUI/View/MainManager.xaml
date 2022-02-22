@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
              d:DataContext="{d:DesignInstance Type=viewmodel:MainManagerViewModel}"
              mc:Ignorable="d" 
              Background="White"
@@ -108,8 +109,7 @@
             </Button>
             <Button Grid.Column="4"
                 Style="{StaticResource MainButton}"
-                Command="{Binding PurchaseCommand}"
-                IsEnabled="False">
+                Command="{Binding CampaignsCommand}">
                 <StackPanel>
                     <Label Content="CAMPANHAS" 
                     Style="{StaticResource LabelButton}"/>
@@ -118,5 +118,14 @@
                 </StackPanel>
             </Button>
         </Grid>
+        <ScrollViewer Grid.Row="0" Grid.RowSpan="4"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="15,5"
+                      Name="ContentScrollViewer"
+                      Visibility="Hidden">
+            <ContentControl Content="{Binding CurrentViewControl}"
+                            util:FocusExtension.IsFocused="{Binding CurrentViewControlFocused}"/>
+        </ScrollViewer>
     </Grid>
 </UserControl>

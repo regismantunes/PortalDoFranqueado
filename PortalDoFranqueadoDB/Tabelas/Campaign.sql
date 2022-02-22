@@ -1,7 +1,7 @@
-﻿CREATE TABLE [dbo].[MarketingCampaign]
+﻿CREATE TABLE [dbo].[Campaign]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     [Title] VARCHAR(45) NOT NULL, 
     [FolderId] CHAR(33) NULL, 
-    [Status] INT NOT NULL
+    [Status] SMALLINT NOT NULL
 )

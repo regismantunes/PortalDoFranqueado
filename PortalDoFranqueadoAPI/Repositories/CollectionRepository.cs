@@ -19,9 +19,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 " WHERE Excluded = 0" +
                                                     " AND Status = 1", connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
 
-                bool compraHabilitada = await reader.ReadAsync();
+                bool compraHabilitada = await reader.ReadAsync().ConfigureAwait(false);
                 var text = "Sem previsão";
 
                 if (compraHabilitada)
@@ -59,7 +59,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -76,7 +76,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE Excluded = 0" +
                                 (onlyActives ? " AND Status IN (0,1);" : string.Empty), connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
 
                 var list = new List<Collection>();
                 while (await reader.ReadAsync())
@@ -86,7 +86,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -105,16 +105,16 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
 
-                if (!await reader.ReadAsync())
+                if (!await reader.ReadAsync().ConfigureAwait(false))
                     return CreateCollection(reader);
 
                 return null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -131,11 +131,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE Excluded = 0" +
                                                 " AND Status = 1;", connection);
 
-                return await cmd.ExecuteScalarAsync() is not null;
+                return await cmd.ExecuteScalarAsync().ConfigureAwait(false) is not null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -152,16 +152,16 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE Excluded = 0" +
                                                 " AND Status = 1;", connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
 
-                if (await reader.ReadAsync())
+                if (await reader.ReadAsync().ConfigureAwait(false))
                     return CreateCollection(reader);
 
                 return null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -172,7 +172,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 StartDate = reader.GetDateTime("StartDate"),
                 EndDate = reader.GetDateTime("EndDate"),
                 FolderId = reader["FolderId"].GetType() == typeof(DBNull) ? string.Empty : reader.GetString("FolderId"),
-                Status = (CollectionStatus)reader.GetInt32("Status")
+                Status = (CollectionStatus)reader.GetInt16("Status")
             };
 
         public static async Task ChangeStatus(SqlConnection connection, int id, CollectionStatus status)
@@ -188,20 +188,20 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    using var cmd = new SqlCommand("SELECT Status" +
+                    using var cmd = new SqlCommand("SELECT [Status]" +
                                                     " FROM [Collection]" +
                                                     " WHERE Excluded = 0" +
-                                                        " AND Id = @Id;", connection);
+                                                        " AND Id = @Id;", connection, (SqlTransaction)transaction);
 
                     cmd.Parameters.AddWithValue("@Id", id);
 
-                    var previusStatus = (CollectionStatus?)await cmd.ExecuteScalarAsync();
+                    var previusStatus = (CollectionStatus?)(int?)await cmd.ExecuteScalarAsync();
 
                     if (previusStatus == null)
                         throw new Exception(MessageRepositories.UpdateFailException);
 
                     cmd.CommandText = "UPDATE [Collection]" +
-                                        $" SET Status = {(int)status}" +
+                                        $" SET [Status] = {(int)status}" +
                                         " WHERE Excluded = 0" +
                                             " AND Id = @Id;";
 
@@ -218,27 +218,27 @@ namespace PortalDoFranqueadoAPI.Repositories
                     if (purchaseStatus != null)
                     {
                         cmd.CommandText = "UPDATE Purchase" +
-                                            $" SET Status = {(int)purchaseStatus}" +
+                                            $" SET [Status] = {(int)purchaseStatus}" +
                                             " WHERE CollectionId = @Id;";
 
                         await cmd.ExecuteNonQueryAsync();
                     }
 
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
                 catch
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync().ConfigureAwait(false);
                     throw;
                 }
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, Collection colecao)
+        public static async Task<int> Insert(SqlConnection connection, Collection collection)
         {
             try
             {
@@ -248,25 +248,23 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("INSERT INTO Collection (StartDate, EndDate, Status, FolderId, Excluded)" +
-                                                " VALUES (@StartDate, @EndDate, @Status, @FolderId, 0);", connection);
+                                            " OUTPUT INSERTED.ID" +
+                                            " VALUES (@StartDate, @EndDate, @Status, @FolderId, 0);", connection);
 
-                cmd.Parameters.AddWithValue("@StartDate", colecao.StartDate);
-                cmd.Parameters.AddWithValue("@EndDate", colecao.EndDate);
-                cmd.Parameters.AddWithValue("@FolderId", colecao.FolderId);
-                cmd.Parameters.AddWithValue("@Status", (int)colecao.Status);
+                cmd.Parameters.AddWithValue("@StartDate", collection.StartDate);
+                cmd.Parameters.AddWithValue("@EndDate", collection.EndDate);
+                cmd.Parameters.AddWithValue("@FolderId", collection.FolderId);
+                cmd.Parameters.AddWithValue("@Status", (int)collection.Status);
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
+                var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
-                cmd.Parameters.Clear();
-                cmd.CommandText = "SELECT SCOPE_IDENTITY();";
-
-                var dbid = (ulong)await cmd.ExecuteScalarAsync();
                 return Convert.ToInt32(dbid);
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -285,11 +283,11 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
-                return await cmd.ExecuteNonQueryAsync() > 0;
+                return await cmd.ExecuteNonQueryAsync().ConfigureAwait(false) > 0;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -314,12 +312,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@EndDate", colecao.EndDate);
                 cmd.Parameters.AddWithValue("@FolderId", colecao.FolderId);
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
+                if (await cmd.ExecuteNonQueryAsync().ConfigureAwait(false) == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
     }

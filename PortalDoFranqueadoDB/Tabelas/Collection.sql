@@ -4,6 +4,6 @@
   [StartDate] DATE NOT NULL,
   [EndDate] DATE NOT NULL,
   [FolderId] CHAR(33) NULL,
-  [Status] INT NOT NULL,
+  [Status] SMALLINT NOT NULL,
   [Excluded] BIT NOT NULL,
 )

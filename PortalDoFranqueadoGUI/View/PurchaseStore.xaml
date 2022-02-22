@@ -30,7 +30,7 @@
         </Grid.RowDefinitions>
         <Label Grid.Row="0"
                Content="PERÍODO DE COMPRA ABERTO"
-               FontWeight="Bold"/>
+               FontWeight="Bold" IsTabStop="False"/>
         <Grid Grid.Row="1"
               Margin="0,0,5,5">
             <Grid.RowDefinitions>
@@ -66,7 +66,7 @@
                       Margin="0,5"
                       Cursor="Arrow"
                       Visibility="{Binding VisibilityComboBoxStore}"
-                      ItemsSource="{Binding Stores, Source={StaticResource Cache}}"/>
+                      ItemsSource="{Binding Stores, Source={StaticResource Cache}}" IsTabStop="True"/>
             <TextBlock Grid.Row="0" Grid.RowSpan="2"
                        Grid.Column="1"
                        Text="{Binding Store.Name}"
@@ -76,9 +76,9 @@
                     Grid.Row="0" Grid.RowSpan="2"
                     Style="{StaticResource DefaultBlackBorder}"
                     Width="330"/>
-            <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+            <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+            <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+            <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
             <TextBlock Grid.Row="1" Grid.Column="4" 
                        Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
                        Margin="5"
@@ -99,13 +99,13 @@
                     Content="Salvar"
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveCommand}"
-                    Visibility="{Binding VisibilityButtonSave}"/>
+                    Visibility="{Binding VisibilityButtonSave}" IsTabStop="False"/>
             <Button Grid.Row="0" Grid.RowSpan="2"
                     Grid.Column="9"
                     Width="78"
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveAndCloseCommand}"
-                    Visibility="{Binding VisibilityButtonSave}">
+                    Visibility="{Binding VisibilityButtonSave}" IsTabStop="False">
                 <TextBlock Text="Fechar compra" TextWrapping="Wrap"/>
             </Button>
         </Grid>
@@ -115,7 +115,8 @@
                   Width="895"
                   HorizontalAlignment="Left"
                   Style="{StaticResource ListViewUnfocusable}"
-                  IsEnabled="{Binding EnabledContent}">
+                  IsEnabled="{Binding EnabledContent}"
+                  Name="lvPurchase" IsTabStop="True">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Foto" Width="100">
@@ -125,7 +126,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Família" Width="80">
+                    <GridViewColumn Header="Familia" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Product.Family.Name}"
@@ -159,20 +160,30 @@
                                                 <Label Content="{Binding Value.Size}"
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
-                                                       Width="42"/>
+                                                       Width="42" IsTabStop="False"/>
                                                 <Label Content=":"
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
-                                                       Margin="-8,-1,0,0"/>
+                                                       Margin="-8,-1,0,0" IsTabStop="False"/>
                                                 <TextBox Text="{Binding Value.Quantity}"
+                                                         IsTabStop="True"
                                                          Width="30"
                                                          util:FocusExtension.IsFocused="{Binding IsFocused}"
-                                                         Visibility="{Binding Value.VisibilityTextBoxQuantity}"/>
+                                                         Visibility="{Binding Value.VisibilityTextBoxQuantity}">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="GotFocus">
+                                                            <i:InvokeCommandAction Command="{Binding OnGotFocus}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="LostFocus">
+                                                            <i:InvokeCommandAction Command="{Binding OnLostFocus}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </TextBox>
                                                 <Label Content="{Binding Value.Quantity}"
                                                        Width="30"
                                                        Visibility="{Binding Value.VisibilityTextBlockQuantity}"
                                                        BorderBrush="Gray"
-                                                       BorderThickness="1"/>
+                                                       BorderThickness="1" IsTabStop="False"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
@@ -182,6 +193,34 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="{Binding Items[0].IsExpanded}" VerticalAlignment="Bottom" VerticalContentAlignment="Bottom">
+                                            <!-- Header Panel of the Expander control -->
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" 
+                                                               FontWeight="Bold" Foreground="Black" FontSize="20"/>
+                                                    <TextBlock Text="{Binding Converter={StaticResource PurchaseItemGroupDescriptionConverter}}" 
+                                                               Foreground="Silver" FontStyle="Italic" FontSize="20"/>
+                                                </StackPanel>
+                                            </Expander.Header>
+
+                                            <!-- Items panel to hold items inside the Expander control -->
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
         </ListView>
     </Grid>
 </UserControl>

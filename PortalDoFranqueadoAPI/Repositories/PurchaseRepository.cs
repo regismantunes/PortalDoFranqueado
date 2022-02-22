@@ -24,39 +24,36 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    using var cmd = new SqlCommand()
-                    {
-                        Connection = connection,
-                        CommandText = newPurchase ?
-                                    "INSERT INTO Purchase (StoreId, CollectionId, Status)" +
-                                        " VALUES (@StoreId, @CollectionId, @Status);" :
-                                    "UPDATE Purchase" +
-                                        " SET StoreId = @StoreId" +
-                                            ", CollectionId = @CollectionId" +
-                                            ", Status = @Status" +
-                                        " WHERE Id = @Id;",
-                        Transaction = (SqlTransaction)transaction
-                    };
+                    var command = newPurchase ?
+                                "INSERT INTO Purchase (StoreId, CollectionId, Status)" +
+                                    " OUTPUT INSERTED.ID" +
+                                    " VALUES (@StoreId, @CollectionId, @Status);" :
+                                "UPDATE Purchase" +
+                                    " SET StoreId = @StoreId" +
+                                        ", CollectionId = @CollectionId" +
+                                        ", Status = @Status" +
+                                    " WHERE Id = @Id;";
+
+                    using var cmd = new SqlCommand(command, connection, (SqlTransaction)transaction);
 
                     cmd.Parameters.AddWithValue("@StoreId", purchase.StoreId);
                     cmd.Parameters.AddWithValue("@CollectionId", purchase.CollectionId);
                     cmd.Parameters.AddWithValue("@Status", (int)purchase.Status);
-                    if (!newPurchase)
-                        cmd.Parameters.AddWithValue("@Id", purchase.Id);
-
-                    if (await cmd.ExecuteNonQueryAsync() == 0)
-                        throw new Exception(MessageRepositories.UpdateFailException);
-
                     if (newPurchase)
                     {
-                        cmd.Parameters.Clear();
-                        cmd.CommandText = "SELECT SCOPE_IDENTITY();";
+                        var dbid = (int?)await cmd.ExecuteScalarAsync();
+                        if (dbid == null)
+                            throw new Exception(MessageRepositories.InsertFailException);
 
-                        var dbid = (ulong)await cmd.ExecuteScalarAsync();
                         purchase.Id = Convert.ToInt32(dbid);
                     }
                     else
                     {
+                        cmd.Parameters.AddWithValue("@Id", purchase.Id);
+
+                        if (await cmd.ExecuteNonQueryAsync() == 0)
+                            throw new Exception(MessageRepositories.UpdateFailException);
+
                         cmd.Parameters.Clear();
                         cmd.CommandText = "DELETE FROM Purchase_Product" +
                                         " WHERE PurchaseId = @PurchaseId;";
@@ -83,17 +80,17 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.InsertFailException);
                     }
 
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync().ConfigureAwait(false);
                 }
                 catch
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync().ConfigureAwait(false);
                     throw;
                 }
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -113,57 +110,67 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                return await reader.ReadAsync() ? 
-                    await LoadPurchase(reader, true, connection) : 
-                    null;
+                if (await reader.ReadAsync())
+                {
+                    var purchase = LoadPurchase(reader);
+                    await reader.CloseAsync();
+                    await purchase.LoadPurchaseItems(connection);
+                }
+
+                return null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
-        private static async Task<Purchase> LoadPurchase(SqlDataReader reader, bool loadItems, SqlConnection? connection)
-        {
-            var purchase = new Purchase()
+        private static Purchase LoadPurchase(SqlDataReader reader)
+            => new()
             {
                 Id = reader.GetInt32("Id"),
                 CollectionId = reader.GetInt32("CollectionId"),
                 StoreId = reader.GetInt32("StoreId"),
-                Status = (PurchaseStatus)reader.GetInt32("Status")
+                Status = (PurchaseStatus)reader.GetInt16("Status")
             };
 
-            if (loadItems &&
-                connection != null)
-            {
-                var listItems = new List<PurchaseItem>();
+        private static async Task LoadPurchaseItems(this Purchase purchase, SqlConnection connection)
+        {
+            var listItems = new List<PurchaseItem>();
+            var connectionWasClosed = false;
 
-                try
+            try
+            {
+                if (connection.State != ConnectionState.Open)
                 {
                     await connection.OpenAsync();
-
-                    using var cmd = new SqlCommand("SELECT * FROM Purchase_Product" +
-                                                " WHERE PurchaseId = @PurchaseId;", connection);
-
-                    cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
-                    using var reader2 = await cmd.ExecuteReaderAsync();
-                    while (await reader2.ReadAsync())
-                        listItems.Add(new PurchaseItem()
-                        {
-                            ProductId = reader2.GetInt32("ProductId"),
-                            Size = reader2.GetString("SizeId"),
-                            Quantity = reader2.GetInt32("Quantity")
-                        });
+                    if (connection.State != ConnectionState.Open)
+                        throw new Exception(MessageRepositories.ConnectionNotOpenException);
+                    connectionWasClosed = true;
                 }
-                finally
-                {
-                    await connection.CloseAsync();
-                }
+
+                using var cmd = new SqlCommand("SELECT * FROM Purchase_Product" +
+                                            " WHERE PurchaseId = @PurchaseId;", connection);
+
+                cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
+                using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                    listItems.Add(new PurchaseItem()
+                    {
+                        ProductId = reader.GetInt32("ProductId"),
+                        Size = reader.GetString("SizeId"),
+                        Quantity = reader.GetInt32("Quantity")
+                    });
+
+                await reader.CloseAsync();
 
                 purchase.Items = listItems.ToArray();
             }
-
-            return purchase;
+            finally
+            {
+                if (connectionWasClosed)
+                    await connection.CloseAsync();
+            }
         }
 
         public static async Task<Purchase?> Get(SqlConnection connection, int collectionId, int storeId, bool loadItems = true)
@@ -184,13 +191,21 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var reader = await cmd.ExecuteReaderAsync();
 
-                return await reader.ReadAsync() ?
-                    await LoadPurchase(reader, loadItems, connection) :
-                    null;
+                if (await reader.ReadAsync())
+                {
+                    var purchase = LoadPurchase(reader);
+                    await reader.CloseAsync();
+                    if (loadItems)
+                        await purchase.LoadPurchaseItems(connection);
+
+                    return purchase;
+                }
+
+                return null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -211,13 +226,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var reader = await cmd.ExecuteReaderAsync();
                 var list = new List<Purchase>();
                 while (await reader.ReadAsync())
-                    list.Add(await LoadPurchase(reader, true, connection));
+                    list.Add(LoadPurchase(reader));
+
+                await reader.CloseAsync();
+
+                foreach (var purchase in list)
+                    await purchase.LoadPurchaseItems(connection);
 
                 return list.ToArray();
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -236,11 +256,11 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
 
-                return await cmd.ExecuteScalarAsync() is not null;
+                return await cmd.ExecuteScalarAsync().ConfigureAwait(false) != null;
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -259,12 +279,12 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@Id", purchaseId);
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
+                if (await cmd.ExecuteNonQueryAsync().ConfigureAwait(false) == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
     }

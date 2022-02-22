@@ -13,7 +13,7 @@
         public string PhotosFolderId { get; set; }
         public string SupportFolderId { get; set; }
 
-        public MarketingCampaign[] Campaigns { get; set; }
+        public Campaign[] Campaigns { get; set; }
         public Store[] Stores { get; set; }
     }
 }

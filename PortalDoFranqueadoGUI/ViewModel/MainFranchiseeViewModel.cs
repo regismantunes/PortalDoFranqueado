@@ -29,11 +29,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public bool EnabledPurchase { get; private set; }
         public string TextPurchase { get; private set; }
 
-        public MarketingCampaign[] Campaigns { get; private set; }
+        public Campaign[] Campaigns { get; private set; }
 
         public RelayCommand PhotosCommand { get; }
         public RelayCommand SupportCommand { get; }
-        public RelayCommand<MarketingCampaign> CampaignCommand { get; }
+        public RelayCommand<Campaign> CampaignCommand { get; }
         public RelayCommand UpdateInfosCommand { get; }
         public RelayCommand PurchaseCommand { get; }
 
@@ -72,7 +72,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             set
             {
                 _stackPanelCampaigns = value; 
-                LoadMarketingCampaigns(); 
+                LoadCampaigns(); 
                 OnPropertyChanged();
             }
         }
@@ -90,7 +90,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             PhotosCommand = new RelayCommand(OpenPhotos);
             SupportCommand = new RelayCommand(OpenSupport);
-            CampaignCommand = new RelayCommand<MarketingCampaign>(OpenCampaign);
+            CampaignCommand = new RelayCommand<Campaign>(OpenCampaign);
             UpdateInfosCommand = new RelayCommand(UpdateInformative);
             PurchaseCommand = new RelayCommand(OpenPurchases);
         }
@@ -181,7 +181,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        public void OpenCampaign(MarketingCampaign campaign)
+        public void OpenCampaign(Campaign campaign)
         {
             if (campaign == null)
                 return;
@@ -249,7 +249,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     _cache.Stores = mainInfos.Stores;
 
-                    LoadMarketingCampaigns();
+                    LoadCampaigns();
 
                     OnPropertyChanged(nameof(InformativeTitle));
                     OnPropertyChanged(nameof(InformativeText));
@@ -268,7 +268,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private void LoadMarketingCampaigns()
+        private void LoadCampaigns()
         {
             if (StackPanelCampaigns is null ||
                 Campaigns is null)
@@ -286,7 +286,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             image.UriSource = new Uri("/PortalDoFranqueadoGUI;component/Media/media.png", UriKind.Relative);
             image.EndInit();
 
-            foreach (MarketingCampaign campaign in Campaigns)
+            foreach (Campaign campaign in Campaigns)
             {
                 var stackPanelContent = new StackPanel()
                 {

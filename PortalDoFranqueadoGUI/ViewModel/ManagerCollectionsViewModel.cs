@@ -51,6 +51,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         }
 
         public RelayCommand AddCollectionCommand { get; }
+        public RelayCommand LoadedCommand { get; }
         public RelayCommand<Collection> ListViewEditCommand { get; }
         public RelayCommand<Collection> ListViewViewCommand { get; }
         public RelayCommand<Collection> ListViewOpenCommand { get; }
@@ -66,6 +67,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             CollectionToAdd = new NewCollection();
 
             AddCollectionCommand = new RelayCommand(AddCollection);
+            LoadedCommand = new RelayCommand(LoadCollections);
             ListViewEditCommand = new RelayCommand<Collection>(EditCollection);
             ListViewViewCommand = new RelayCommand<Collection>(ViewCollection);
             ListViewOpenCommand = new RelayCommand<Collection>(OpenCollection);
@@ -73,8 +75,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
             ListViewReverseCommand = new RelayCommand<Collection>(ReverseCollection);
             ListViewDeleteCommand = new RelayCommand<Collection>(DeleteCollection);
             ViewPurchasesCommand = new RelayCommand<Collection>(ViewPurchases);
-
-            LoadCollections();
         }
 
         private void ViewPurchases(Collection collection)
@@ -147,7 +147,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             => ChangeStatus(collection, CollectionStatus.Closed);
 
         private void ReverseCollection(Collection collection)
-            => ChangeStatus(collection, CollectionStatus.Closed);
+            => ChangeStatus(collection, CollectionStatus.Pendding);
 
         private async void DeleteCollection(Collection collection)
         {

@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    internal abstract class BaseViewModel : BaseNotifyPropertyChanged, INavigableViewModel
+    public abstract class BaseViewModel : BaseNotifyPropertyChanged, INavigableViewModel
     {
         public event Action? CloseRequest;
         public INavigatorViewModel Navigator { get; set; }

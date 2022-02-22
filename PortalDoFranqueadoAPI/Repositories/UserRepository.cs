@@ -43,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().ConfigureAwait(false);
             }
         }
     }
