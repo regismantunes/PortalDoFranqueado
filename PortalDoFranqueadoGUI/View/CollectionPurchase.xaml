@@ -107,7 +107,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto">
+                    <GridViewColumn Width="625">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ListView ItemsSource="{Binding Items}"
@@ -122,7 +122,7 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
-                                                <Label Content="{Binding Size}"
+                                                <Label Content="{Binding Value.Size}"
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
                                                        Width="42"/>
@@ -130,7 +130,7 @@
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
                                                        Margin="-8,-1,0,0"/>
-                                                <Label Content="{Binding Quantity}"
+                                                <Label Content="{Binding Value.Quantity}"
                                                        Width="30"
                                                        BorderBrush="Gray"
                                                        BorderThickness="1"/>
@@ -143,6 +143,34 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="False" VerticalAlignment="Bottom" VerticalContentAlignment="Bottom">
+                                            <!-- Header Panel of the Expander control -->
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Name}" 
+                                                               FontWeight="Bold" Foreground="Black" FontSize="20"/>
+                                                    <TextBlock Text="{Binding Converter={StaticResource PurchaseItemGroupDescriptionConverter}}" 
+                                                               Foreground="Silver" FontStyle="Italic" FontSize="20"/>
+                                                </StackPanel>
+                                            </Expander.Header>
+
+                                            <!-- Items panel to hold items inside the Expander control -->
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
         </ListView>
     </Grid>
 </UserControl>

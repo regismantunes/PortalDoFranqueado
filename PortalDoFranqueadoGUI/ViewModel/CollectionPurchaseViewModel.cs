@@ -5,12 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
     internal class CollectionPurchaseViewModel : BaseViewModel
     {
-        public class ProductViewModel
+        /*public class ProductViewModel
         {
             public ProductViewModel(Product product, PurchaseItem[]? items = null)
             {
@@ -39,7 +40,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public FileView? FileView { get; set; }
             public PurchaseItem[] Items { get; }
             public decimal Amount { get; }
-        }
+        }*/
 
         private readonly LocalRepository _cache;
 
@@ -64,19 +65,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
             try
             {
                 DesableContent();
-
-                /*if (Purchase == null)
-                {
-                    var purchase = await API.ApiPurchase.Get(_purchaseId);
-                    if (purchase == null)
-                    {
-                        MessageBox.Show("A compra não foi encontrada.", "BROTHERS - Falha ao carregar compras", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Navigator.PreviousNavigate();
-                        return;
-                    }
-
-                    Purchase = purchase;
-                }*/
 
                 Store = _cache.Stores.First(store => store.Id == Purchase.StoreId);
                 OnPropertyChanged(nameof(Store));
@@ -106,6 +94,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 Products = productsVM.ToArray();
                 Amount = productsVM.Sum(p => p.Amount);
+
+                var view = (CollectionView)CollectionViewSource.GetDefaultView(Products);
+                view.GroupDescriptions.Add(new PropertyGroupDescription("FamilyName"));
 
                 OnPropertyChanged(nameof(Products));
                 OnPropertyChanged(nameof(Amount));

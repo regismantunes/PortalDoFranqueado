@@ -45,6 +45,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -72,13 +73,14 @@
                        Text="{Binding Store.Name}"
                        Visibility="{Binding VisibilityTextBlockStore}"
                        Style="{StaticResource TextBlockSubTitle}"/>
-            <Border Grid.Column="3" Grid.ColumnSpan="5"
+            <Border Grid.Column="3" Grid.ColumnSpan="6"
                     Grid.Row="0" Grid.RowSpan="2"
                     Style="{StaticResource DefaultBlackBorder}"
-                    Width="330"/>
+                    Width="440"/>
             <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
             <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
             <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+            <Label Grid.Row="0" Grid.Column="7" Content="Valor total" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
             <TextBlock Grid.Row="1" Grid.Column="4" 
                        Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
                        Margin="5"
@@ -94,14 +96,19 @@
                        Margin="5"
                        Foreground="White"
                        Width="100"/>
+            <TextBlock Grid.Row="1" Grid.Column="7" 
+                       Text="{Binding Amount, StringFormat=C, ConverterCulture=pt-BR}"
+                       Margin="5"
+                       Foreground="White"
+                       Width="100"/>
             <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="8"
+                    Grid.Column="9"
                     Content="Salvar"
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveCommand}"
                     Visibility="{Binding VisibilityButtonSave}" IsTabStop="False"/>
             <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="9"
+                    Grid.Column="10"
                     Width="78"
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveAndCloseCommand}"

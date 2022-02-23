@@ -18,6 +18,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private int _indexFocus;
         private FieldViewModel<PurchaseItemViewModel>[] _fields;
         private Store? _store;
+        private decimal _amount;
         
         public Visibility VisibilityComboBoxStore => _store == null ? Visibility.Visible : Visibility.Hidden;
         public Visibility VisibilityTextBlockStore => _store == null ? Visibility.Hidden : Visibility.Visible;
@@ -40,6 +41,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public ProductViewModel[] Products { get; set; }
         public PurchaseStatus? Status { get; private set; }
         public Visibility VisibilityButtonSave { get; private set; }
+        public decimal Amount
+        {
+            get => _amount;
+            private set { _amount = value; OnPropertyChanged(); }
+        }
 
         public RelayCommand LoadedCommand { get; }
         public RelayCommand GoToNextFieldCommand { get; }
@@ -258,7 +264,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                     item.Value.PropertyChanged += (sender, args) =>
                                     {
                                         if (args.PropertyName == "Quantity")
+                                        {
                                             propertyGroup.CallPropertyChange("GroupNames");
+                                            UpdateAmount();
+                                        }
                                     };
                                 });
                             
@@ -289,6 +298,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 view.GroupDescriptions.Add(propertyGroup);
 
                 OnPropertyChanged(nameof(Products));
+                UpdateAmount();
             }
             catch (Exception ex)
             {
@@ -299,6 +309,18 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 EnableContent();
                 GoToFirstField();
             }
+        }
+
+        private void UpdateAmount()
+        {
+            Amount = Products
+                .Select(productVM =>
+                        new
+                        {
+                            Price = productVM?.Product.Price ?? 0m,
+                            Quantity = productVM?.Items.Sum(item => item.Value.Quantity) ?? 0
+                        })
+                .Sum(item => item.Price * item.Quantity);
         }
 
         public void Reload() => LoadCollection();

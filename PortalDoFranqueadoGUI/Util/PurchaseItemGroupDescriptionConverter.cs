@@ -11,31 +11,37 @@ namespace PortalDoFranqueadoGUI.Util
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var group = value as CollectionViewGroup;
+            if (value == null)
+                return string.Empty;
 
-            var count = 0;
-            var totalQuantity = 0;
-            var totalValue = 0m;
-            foreach (var productObj in group.Items)
+            if (value is CollectionViewGroup group)
             {
-                var product = (ProductViewModel)productObj;
-                var price = product.Product.Price ?? 0;
-                var validItems = product.Items.Where(item => item.Value.Quantity > 0);
-                if (validItems.Any())
+                var count = 0;
+                var totalQuantity = 0;
+                var totalValue = 0m;
+                foreach (var productObj in group.Items)
                 {
-                    count++;
-                    validItems
-                        .ToList()
-                        .ForEach(item =>
-                        {
-                            var quantity = item.Value.Quantity ?? 0;
-                            totalQuantity += quantity;
-                            totalValue += price * quantity;
-                        });
+                    var product = (ProductViewModel)productObj;
+                    var price = product.Product.Price ?? 0;
+                    var validItems = product.Items.Where(item => item.Value.Quantity > 0);
+                    if (validItems.Any())
+                    {
+                        count++;
+                        validItems
+                            .ToList()
+                            .ForEach(item =>
+                            {
+                                var quantity = item.Value.Quantity ?? 0;
+                                totalQuantity += quantity;
+                                totalValue += price * quantity;
+                            });
+                    }
                 }
+
+                return $" ({count}/{group.ItemCount} itens / {totalQuantity:D} peças / {totalValue:C})";
             }
 
-            return $" ({count}/{group.ItemCount} itens / {totalQuantity:D} peças / {totalValue:C})";
+            return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

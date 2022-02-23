@@ -5,6 +5,7 @@
     <repository:LocalRepository x:Key="Cache"/>
     <util:EnumConverter x:Key="EnumConverter"/>
     <util:PurchaseItemGroupDescriptionConverter x:Key="PurchaseItemGroupDescriptionConverter"/>
+    <util:ExpandableConverter x:Key="ExpandableConverter"/>
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Style.xaml"/>
     </ResourceDictionary.MergedDictionaries>
