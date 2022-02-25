@@ -1,5 +1,6 @@
 ﻿using PortalDoFranqueadoGUI.Model;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 
 namespace PortalDoFranqueadoGUI.ViewModel
@@ -10,6 +11,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public Product? Product { get => Item.Product; set => Item.Product = value; }
         public string Size { get => Item.Size; set => Item.Size = value; }
         public int? Quantity { get => Item.Quantity; set { Item.Quantity = value; OnPropertyChanged(); } }
+        public bool IsEnabled { get => !Product?.LockedSizes?.Contains(Size) ?? true; }
 
         public Visibility VisibilityTextBlockQuantity => ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;
         public Visibility VisibilityTextBoxQuantity => !ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;

@@ -75,10 +75,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         protected void OnCloseRequest() => CloseRequest?.Invoke();
 
         public virtual void OnReturnToView()
-        {
-            if (this is IReloadable reloadable)
-                reloadable.Reload();
-        }
+        { }
 
         public void Dispose()
         {

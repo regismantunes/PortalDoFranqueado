@@ -98,14 +98,14 @@ namespace PortalDoFranqueadoGUI.API
                 if (result.StartsWith('{'))
                 {
                     var msgResult = JsonSerializer.Deserialize<MessageResult>(result, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-                    throw new Exception(msgResult is not null ? msgResult.Message : result);
+                    throw new Exception(msgResult != null ? msgResult.Message : result);
                 }
 
                 throw new Exception(result.Length > 1 ? result[1..^1] : result);
             }
 
             var deserialized = JsonSerializer.Deserialize<T>(result, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-            if (deserialized is null)
+            if (deserialized == null)
                 throw new Exception("Não foi possível deserializar o retorno.");
 
             return deserialized;

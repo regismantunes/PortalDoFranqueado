@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace PortalDoFranqueadoGUI.ViewModel
@@ -67,7 +68,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             CollectionToAdd = new NewCollection();
 
             AddCollectionCommand = new RelayCommand(AddCollection);
-            LoadedCommand = new RelayCommand(LoadCollections);
+            LoadedCommand = new RelayCommand(async() => await LoadCollections());
             ListViewEditCommand = new RelayCommand<Collection>(EditCollection);
             ListViewViewCommand = new RelayCommand<Collection>(ViewCollection);
             ListViewOpenCommand = new RelayCommand<Collection>(OpenCollection);
@@ -179,12 +180,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 const string messageCaption = "BROTHERS - Falta informação";
                 DesableContent();
 
-                if(CollectionToAdd.StartDate.Value is null)
+                if(CollectionToAdd.StartDate.Value == null)
                 {
                     MessageBox.Show("Informe a data de início!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CollectionToAdd.StartDate.IsFocused = true;
                 }
-                else if (CollectionToAdd.EndDate.Value is null)
+                else if (CollectionToAdd.EndDate.Value == null)
                 {
                     MessageBox.Show("Informe a data final!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CollectionToAdd.EndDate.IsFocused = true;
@@ -280,9 +281,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 });
         }
 
-        public void Reload() => LoadCollections();
+        public async void Reload() => await LoadCollections();
 
-        private async void LoadCollections()
+        private async Task LoadCollections()
         {
             try
             {

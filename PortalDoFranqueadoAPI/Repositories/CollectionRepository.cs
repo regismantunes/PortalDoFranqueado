@@ -131,7 +131,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE Excluded = 0" +
                                                 " AND Status = 1;", connection);
 
-                return await cmd.ExecuteScalarAsync().ConfigureAwait(false) is not null;
+                return await cmd.ExecuteScalarAsync().ConfigureAwait(false) != null;
             }
             finally
             {

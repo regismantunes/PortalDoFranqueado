@@ -34,7 +34,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                         Id = reader.GetInt32("Id"),
                         FileId = reader.GetString("PhotoId"),
                         Price = reader.GetDecimal("Price"),
-                        FamilyId = reader.GetInt32("FamilyId")
+                        FamilyId = reader.GetInt32("FamilyId"),
+                        LockedSizes = reader.GetStringArray("LockedSizes")
                     });
 
                 return list.ToArray();
@@ -56,14 +57,15 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price)" +
+                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price, LockedSizes)" +
                                             " OUTPUT INSERTED.ID" +
-                                            " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price);", connection);
+                                            " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price, @LockedSizes);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
                 cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
+                cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
                 if (dbid == null)
@@ -92,13 +94,15 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " SET FamilyId = @FamilyId" +
                                                 ", PhotoId = @PhotoId" +
                                                 ", Price = @Price" +
+                                                ", LockedSizes = @LockedSizes" +
                                         " WHERE Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
                 cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
+                cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
                 cmd.Parameters.AddWithValue("@Id", product.Id);
-                
+
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);
             }

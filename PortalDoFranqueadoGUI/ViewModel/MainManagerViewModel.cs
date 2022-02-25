@@ -43,6 +43,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
+        public RelayCommand LoadedCommand { get; }
         public RelayCommand PhotosCommand { get; }
         public RelayCommand SupportCommand { get; }
         public RelayCommand CampaignsCommand { get; }
@@ -84,9 +85,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             API.Configuration.Current.SessionConnected += SessionConnected;
 
-            UpdateSessionInformation();
-            UpdateInformative();
-
+            LoadedCommand = new RelayCommand(() =>
+            {
+                UpdateSessionInformation();
+                UpdateInformative();
+            });
             PhotosCommand = new RelayCommand(OpenPhotos);
             SupportCommand = new RelayCommand(OpenSupport);
             CampaignsCommand = new RelayCommand(OpenCampaigns);

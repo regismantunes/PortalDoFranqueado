@@ -278,7 +278,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                         _fields = PurchaseItemViewModel.ItemsReadyOnly ?
                             Array.Empty<FieldViewModel<PurchaseItemViewModel>>() :
-                            Products.SelectMany(p => p.Items).ToArray();
+                            Products.SelectMany(p => p.Items)
+                                    .Where(i => i.Value.IsEnabled)
+                                    .ToArray();
                         
                         for (var i = 0; i < _fields.Length; i++)
                         {

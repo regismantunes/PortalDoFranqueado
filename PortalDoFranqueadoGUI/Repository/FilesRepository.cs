@@ -32,7 +32,7 @@ namespace PortalDoFranqueadoGUI.Repository
         public FileView? GetFile(string fileId)
         {
             var file = Drive.GetFile(fileId);
-            return file is null ? null : new FileView(file);
+            return file == null ? null : new FileView(file);
         }
     }
 }

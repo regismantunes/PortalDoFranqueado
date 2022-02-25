@@ -24,7 +24,7 @@ namespace PortalDoFranqueadoGUI.Repository
 
         public async Task<IReadOnlyList<Family>> LoadFamilies()
         {
-            if (Families is null)
+            if (Families == null)
             {
                 Families = await ApiFamily.GetFamilies(true);
                 OnPropertyChanged(nameof(Families));

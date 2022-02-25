@@ -31,6 +31,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         public Campaign[] Campaigns { get; private set; }
 
+        public RelayCommand LoadedCommand { get; }
         public RelayCommand PhotosCommand { get; }
         public RelayCommand SupportCommand { get; }
         public RelayCommand<Campaign> CampaignCommand { get; }
@@ -85,9 +86,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             API.Configuration.Current.SessionConnected += SessionConnected;
 
-            UpdateSessionInformations();
-            UpdateInformative();
-
+            LoadedCommand = new RelayCommand(() =>
+            {
+                UpdateSessionInformations();
+                UpdateInformative();
+            });
             PhotosCommand = new RelayCommand(OpenPhotos);
             SupportCommand = new RelayCommand(OpenSupport);
             CampaignCommand = new RelayCommand<Campaign>(OpenCampaign);
@@ -270,8 +273,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         private void LoadCampaigns()
         {
-            if (StackPanelCampaigns is null ||
-                Campaigns is null)
+            if (StackPanelCampaigns == null ||
+                Campaigns == null)
                 return;
 
             var oldButtons = (from UIElement b in StackPanelCampaigns.Children

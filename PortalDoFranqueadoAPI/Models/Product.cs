@@ -6,5 +6,6 @@
         public string FileId { get; set; }
         public decimal? Price { get; set; }
         public int? FamilyId { get; set; }
+        public string[]? LockedSizes { get; set; }
     }
 }

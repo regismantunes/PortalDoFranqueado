@@ -79,7 +79,7 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="643"
+                  Width="1168"
                   HorizontalAlignment="Left"
                   IsEnabled="{Binding ItemsEnabled}">
             <ListView.View>
@@ -118,6 +118,29 @@
                                     <TextBox Text="{Binding Price, StringFormat='C', ConverterCulture=pt-BR}"
                                              Width="88"/>
                                 </DockPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="325">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ListView ItemsSource="{Binding LockedSizes}"
+                                          BorderBrush="Transparent"
+                                          Style="{StaticResource ListViewUnfocusable}"
+                                          BorderThickness="0">
+                                    <ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Value.Size}"
+                                                      IsChecked="{Binding Value.IsEnabled}"
+                                                      Foreground="{Binding Value.TextColor}"/>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

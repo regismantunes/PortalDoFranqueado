@@ -11,37 +11,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
 {
     internal class CollectionPurchaseViewModel : BaseViewModel
     {
-        /*public class ProductViewModel
-        {
-            public ProductViewModel(Product product, PurchaseItem[]? items = null)
-            {
-                Product = product;
-
-                if (Product.Family != null)
-                {
-                    Items = (from s in Product.Family.Sizes
-                             select new PurchaseItem
-                             {
-                                 ProductId = Product.Id.Value,
-                                 Product = Product,
-                                 Size = s,
-                                 Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
-                                                                       i.Size == s)?.Quantity
-                             })
-                            .ToList()
-                            .OrderBy(i => i.GetValueToOrder())
-                            .ToArray();
-
-                    Amount = Items.Sum(item => (item.Quantity ?? 0) * (item.Product?.Price ?? 0));
-                }
-            }
-
-            public Product Product { get; set; }
-            public FileView? FileView { get; set; }
-            public PurchaseItem[] Items { get; }
-            public decimal Amount { get; }
-        }*/
-
         private readonly LocalRepository _cache;
 
         public Purchase Purchase { get; private set; }

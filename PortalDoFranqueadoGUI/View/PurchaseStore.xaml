@@ -163,7 +163,7 @@
                                     </ListView.ItemsPanel>
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
+                                            <StackPanel Orientation="Horizontal" IsEnabled="{Binding Value.IsEnabled}">
                                                 <Label Content="{Binding Value.Size}"
                                                        Style="{StaticResource LabelCell}"
                                                        HorizontalContentAlignment="Right"
