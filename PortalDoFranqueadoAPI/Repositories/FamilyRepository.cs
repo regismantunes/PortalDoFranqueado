@@ -6,7 +6,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class FamilyRepository
     {
-        public static async Task<Family[]> GetFamilies(SqlConnection connection, bool loadSizes)
+        public static async Task<Family[]> GetList(SqlConnection connection, bool loadSizes)
         {
             try
             {

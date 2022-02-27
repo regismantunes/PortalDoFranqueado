@@ -16,5 +16,13 @@ namespace PortalDoFranqueadoGUI.API
 
             Configuration.Current.SetConectedSession(session);
         }
+
+        public static async Task<User[]> GetUsers()
+            => await BaseApi.GetSimpleHttpClientRequest<User[]>("account/users/all")
+                            .Get();
+
+        public static async Task<int> Insert(User user)
+            => await BaseApi.GetSimpleHttpClientRequest<int>("users")
+                            .Post(user);
     }
 }

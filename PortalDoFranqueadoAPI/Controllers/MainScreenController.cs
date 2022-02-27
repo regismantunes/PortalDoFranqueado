@@ -37,7 +37,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                 var campaigns = await CampaignRepository.GetList(_connection, true);
 
-                var stores = await StoreRepository.GetStoresByUser(_connection, int.Parse(User.Identity.Name));
+                var stores = await StoreRepository.GetListByUser(_connection, int.Parse(User.Identity.Name));
 
                 return new
                 {

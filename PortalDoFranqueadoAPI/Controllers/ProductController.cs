@@ -26,7 +26,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var products = await ProductRepository.GetProducts(_connection, collectionId);
+                var products = await ProductRepository.GetList(_connection, collectionId);
 
                 return Ok(products);
             }

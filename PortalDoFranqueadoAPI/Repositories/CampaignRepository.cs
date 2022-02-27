@@ -48,7 +48,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("INSERT INTO Campaign (Title, FolderId, Status)" +
-                                            " OUTPUT INSERTED.ID" +
+                                            " OUTPUT INSERTED.Id" +
                                             " VALUES (@Title, @FolderId, @Status)", connection);
 
                 cmd.Parameters.AddWithValue("@Title", campaign.Title);

@@ -8,7 +8,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class ProductRepository
     {
-        public static async Task<Product[]> GetProducts(SqlConnection connection, int collectionId, int? familyId = null)
+        public static async Task<Product[]> GetList(SqlConnection connection, int collectionId, int? familyId = null)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price, LockedSizes)" +
-                                            " OUTPUT INSERTED.ID" +
+                                            " OUTPUT INSERTED.Id" +
                                             " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price, @LockedSizes);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);

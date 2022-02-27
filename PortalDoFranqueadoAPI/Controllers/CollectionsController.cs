@@ -22,7 +22,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collections = await CollectionRepository.GetCollections(_connection);
+                var collections = await CollectionRepository.GetList(_connection);
 
                 return Ok(collections);
             }
@@ -39,7 +39,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collections = await CollectionRepository.GetCollections(_connection, false);
+                var collections = await CollectionRepository.GetList(_connection, false);
 
                 return Ok(collections);
             }

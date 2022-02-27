@@ -63,7 +63,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection[]> GetCollections(SqlConnection connection, bool onlyActives = true)
+        public static async Task<Collection[]> GetList(SqlConnection connection, bool onlyActives = true)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("INSERT INTO Collection (StartDate, EndDate, Status, FolderId, Excluded)" +
-                                            " OUTPUT INSERTED.ID" +
+                                            " OUTPUT INSERTED.Id" +
                                             " VALUES (@StartDate, @EndDate, @Status, @FolderId, 0);", connection);
 
                 cmd.Parameters.AddWithValue("@StartDate", collection.StartDate);

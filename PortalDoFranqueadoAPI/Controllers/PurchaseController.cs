@@ -56,7 +56,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchases = await PurchaseRepository.GetPurchases(_connection, collectionId);
+                var purchases = await PurchaseRepository.GetList(_connection, collectionId);
 
                 return Ok(purchases);
             }

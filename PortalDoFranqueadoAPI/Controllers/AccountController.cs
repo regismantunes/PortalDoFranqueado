@@ -3,6 +3,7 @@ using PortalDoFranqueadoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -42,6 +43,40 @@ namespace PortalDoFranqueadoAPI.Controllers
                     Expires = authenticateData.Expires,
                     User = user
                 };
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("users/all")]
+        [Authorize(Roles = "manager")]
+        public async Task<ActionResult<dynamic>> GetUsers()
+        {
+            try
+            {
+                var users = await UserRepository.GetList(_connection);
+
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("users")]
+        [Authorize(Roles = "manager")]
+        public async Task<ActionResult<dynamic>> Insert([FromBody] User user)
+        {
+            try
+            {
+                var id = await UserRepository.Insert(_connection, user);
+
+                return Ok(id);
             }
             catch (Exception ex)
             {

@@ -30,7 +30,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var families = await FamilyRepository.GetFamilies(_connection, withSizes);
+                var families = await FamilyRepository.GetList(_connection, withSizes);
 
                 return Ok(families);
             }

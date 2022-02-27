@@ -26,7 +26,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     var command = newPurchase ?
                                 "INSERT INTO Purchase (StoreId, CollectionId, Status)" +
-                                    " OUTPUT INSERTED.ID" +
+                                    " OUTPUT INSERTED.Id" +
                                     " VALUES (@StoreId, @CollectionId, @Status);" :
                                 "UPDATE Purchase" +
                                     " SET StoreId = @StoreId" +
@@ -209,7 +209,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase[]> GetPurchases(SqlConnection connection, int collectionId)
+        public static async Task<Purchase[]> GetList(SqlConnection connection, int collectionId)
         {
             try
             {
@@ -241,7 +241,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> HasOpenedPurchase(SqlConnection connection, int collectionId)
+        public static async Task<bool> HasOpened(SqlConnection connection, int collectionId)
         {
             try
             {

@@ -1,0 +1,131 @@
+﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.ManagerUsers"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View" 
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             xmlns:model="clr-namespace:PortalDoFranqueadoGUI.Model"
+             xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             d:DataContext="{d:DesignInstance Type=viewmodel:ManagerUsersViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="White"
+             Cursor="{Binding CurrentCursor}">
+    <Grid>
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Content="GERENCIAR USUÁRIOS"
+               FontWeight="Bold"/>
+        <ListView Grid.Row="1"
+                  ItemsSource="{Binding Users}"
+                  SelectionMode="Single"
+                  Width="809"
+                  HorizontalAlignment="Left"
+                  IsEnabled="{Binding EnabledContent}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Nome" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Name}"
+                                             util:FocusExtension.IsFocused="{Binding NameFocus}"
+                                             Visibility="{Binding VisibitityEditControls}"/>
+                                    <TextBlock Text="{Binding Name}"
+                                               Style="{StaticResource TextBlockCell}"
+                                               Visibility="{Binding VisibitityReadControls}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Trat." Width="45">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Treatment}"
+                                             Visibility="{Binding VisibitityEditControls}"/>
+                                    <TextBlock Text="{Binding Treatment}"
+                                               Style="{StaticResource TextBlockCell}"
+                                               Visibility="{Binding VisibitityReadControls}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Papel" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.Roles}"
+                                              SelectedItem="{Binding Role}"/>
+                                    <TextBlock Text="{Binding Role, Converter={StaticResource EnumConverter}}"
+                                               Style="{StaticResource TextBlockCell}"
+                                               Visibility="{Binding VisibitityReadControls}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Email" Width="175">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBox Text="{Binding Email}"
+                                             Visibility="{Binding VisibitityEditControls}"/>
+                                    <TextBlock Text="{Binding Email}"
+                                               Style="{StaticResource TextBlockCell}"
+                                               Visibility="{Binding VisibitityReadControls}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Loja" Width="225">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <ComboBox ItemsSource="{Binding Stores, Source={StaticResource Cache}}"
+                                              SelectedItem="{Binding Store}"/>
+                                    <TextBlock Text="{Binding Store.Name}"
+                                               Style="{StaticResource TextBlockCell}"
+                                               Visibility="{Binding VisibitityReadControls}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{Binding StartEditAction}"
+                                            IsEnabled="{Binding EnabledSatartEdit}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding StartEditCommand}"/>
+                                    <Button Content="Salvar"
+                                            IsEnabled="{Binding IsEditing}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding SaveCommand}"/>
+                                    <Button Content="Cancelar"
+                                            IsEnabled="{Binding IsEditing}"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding CancelCommand}"/>
+                                    <Button Content="Excluir"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding DeleteCommand}"
+                                            Background="#FF0009"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

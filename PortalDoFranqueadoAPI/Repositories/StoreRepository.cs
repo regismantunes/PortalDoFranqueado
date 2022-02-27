@@ -6,7 +6,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class StoreRepository
     {
-        public static async Task<Store[]> GetStoresByUser(SqlConnection connection, int idUser)
+        public static async Task<Store[]> GetListByUser(SqlConnection connection, int idUser)
         {
             try
             {
@@ -40,11 +40,16 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Store[]> GetStores(SqlConnection connection)
+        public static async Task<Store[]> GetList(SqlConnection connection)
         {
+            bool connectionWasClosed = false;
             try
             {
-                await connection.OpenAsync();
+                if (connection.State != ConnectionState.Open)
+                {
+                    connectionWasClosed = true;
+                    await connection.OpenAsync();
+                }
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -65,7 +70,8 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                if (connectionWasClosed)
+                    await connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
