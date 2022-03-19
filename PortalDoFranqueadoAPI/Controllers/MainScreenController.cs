@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
-using System.Reflection;
 using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Controllers
@@ -25,18 +24,12 @@ namespace PortalDoFranqueadoAPI.Controllers
             try
             {
                 var informative = await InformativeRepository.Get(_connection);
-                
                 var infoCompras = await CollectionRepository.GetInfo(_connection);
 
-                var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                var googleDriveClientSecret = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "client_secret.json"));
-                var googleDriveServiceCredentials = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"));
-                var googleDriveApplicationName = _configuration["AppSettings:GoogleDriveApplication"];
-                var photosFolderId = _configuration["AppSettings:FotosFolderId"];
-                var supportFolderId = _configuration["AppSettings:ApoioFolderId"];
+                var auxiliarySupportId = int.Parse(_configuration["AppSettings:AuxiliaryApoioId"]);
+                var auxiliaryPhotoId = int.Parse(_configuration["AppSettings:AuxiliaryFotosId"]);
 
                 var campaigns = await CampaignRepository.GetList(_connection, true);
-
                 var stores = await StoreRepository.GetListByUser(_connection, int.Parse(User.Identity.Name));
 
                 return new
@@ -45,11 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
                     InformativeText = informative.Text,
                     EnabledPurchase = infoCompras.EnabledPurchase,
                     TextPurchase = infoCompras.TextPurchase,
-                    GoogleDriveClientSecret = googleDriveClientSecret,
-                    GoogleDriveServiceCredentials = googleDriveServiceCredentials,
-                    GoogleDriveApplicationName = googleDriveApplicationName,
-                    PhotosFolderId = photosFolderId,
-                    SupportFolderId = supportFolderId,
+                    AuxiliarySupportId = auxiliarySupportId,
+                    AuxiliaryPhotoId = auxiliaryPhotoId,
                     Campaigns = campaigns,
                     Stores = stores
                 };
@@ -69,22 +59,15 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 var informative = await InformativeRepository.Get(_connection);
 
-                var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                var googleDriveClientSecret = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "client_secret.json"));
-                var googleDriveServiceCredentials = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"));
-                var googleDriveApplicationName = _configuration["AppSettings:GoogleDriveApplication"];
-                var photosFolderId = _configuration["AppSettings:FotosFolderId"];
-                var supportFolderId = _configuration["AppSettings:ApoioFolderId"];
+                var auxiliarySupportId = int.Parse(_configuration["AppSettings:AuxiliaryApoioId"]);
+                var auxiliaryPhototId = int.Parse(_configuration["AppSettings:AuxiliaryFotosId"]);
 
                 return new
                 {
                     InformativeTitle = informative.Title,
                     InformativeText = informative.Text,
-                    GoogleDriveClientSecret = googleDriveClientSecret,
-                    GoogleDriveServiceCredentials = googleDriveServiceCredentials,
-                    GoogleDriveApplicationName = googleDriveApplicationName,
-                    PhotosFolderId = photosFolderId,
-                    SupportFolderId = supportFolderId
+                    AuxiliarySupportId = auxiliarySupportId,
+                    AuxiliaryPhotoId = auxiliaryPhototId,
                 };
             }
             catch (Exception ex)
@@ -115,41 +98,16 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpGet]
-        [Route("googledrive")]
-        [Authorize]
-        public async Task<ActionResult<dynamic>> GetGoogleDriveScrets()
-        {
-            try
-            {
-                var currentDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                var googleDriveClientSecret = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "client_secret.json"));
-                var googleDriveServiceCredentials = System.IO.File.ReadAllText(Path.Combine(currentDirectory, "Google.Apis.Auth.OAuth2.Responses.TokenResponse-user"));
-                var googleDriveApplicationName = _configuration["AppSettings:GoogleDriveApplication"];
-
-                return new
-                {
-                    GoogleDriveClientSecret = googleDriveClientSecret,
-                    GoogleDriveServiceCredentials = googleDriveServiceCredentials,
-                    GoogleDriveApplicationNa = googleDriveApplicationName
-                };
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("folderid/{folderType}")]
+        [Route("auxiliary/{folderType}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetFolderId(string folderType)
         {
             try
             {
                 var folderTypeName = string.Concat(folderType[0].ToString().ToUpper(), folderType[1..].ToLower());
-                var folderId = _configuration[$"AppSettings:{folderTypeName}FolderId"];
+                var auxiliaryId = int.Parse(_configuration[$"AppSettings:Auxiliary{folderTypeName}Id"]);
 
-                return Ok(folderId);
+                return Ok(auxiliaryId);
             }
             catch (Exception ex)
             {

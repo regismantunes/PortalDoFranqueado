@@ -1,9 +1,0 @@
-{
-  "access_token": "ya29.A0ARrdaM9WEgx608_XoHPybi5WyRGs1k0A28kZBXkwJmv1rLyrlkg5EqRxjx1cRzazYg7k5SericCKtHL2VBGWPZkDteMy2vG6h7J_g7gORwkNQcPxGt8EYtMhODbRhTdWsKZu5PdCJUzMyt0qPFNK9vQpFxFB",
-  "token_type": "Bearer",
-  "expires_in": 3599,
-  "refresh_token": "1//0hbR6qfeG9YbxCgYIARAAGBESNwF-L9IrXEpXrVQegVnchQKlagAZsmDqYJWzNqG1hCXaE-gbjw4-94Zo5ScbIIF69bB4Bf_vzVo",
-  "scope": "https://www.googleapis.com/auth/drive",
-  "Issued": "2022-02-24T07:39:52.784-04:00",
-  "IssuedUtc": "2022-02-24T11:39:52.784Z"
-}

@@ -14,4 +14,46 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Email" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="d3590a1a-45fb-45fc-95d6-b6709f447ec6" ChangeDateTime="03/05/2022 20:56:29">
+    <Property Name="ElementName" Value="[dbo].[File].[Content]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Blob" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9dd474d1-2f6e-4281-89c0-6411b830eb90" ChangeDateTime="03/05/2022 20:58:01">
+    <Property Name="ElementName" Value="[dbo].[File].[ContentType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b50489eb-0122-483c-9d9d-70aa72c01926" ChangeDateTime="03/05/2022 21:39:39">
+    <Property Name="ElementName" Value="[dbo].[File].[Blob]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Content" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ecf53d6f-2790-4de5-a14c-0a1fe2c412a9" ChangeDateTime="03/08/2022 01:51:00">
+    <Property Name="ElementName" Value="[dbo].[Auxiliary_File].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Auxiliary_File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AuxiliaryId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="19ddbe3e-ede3-429c-9b22-fe0df4de00a7" ChangeDateTime="03/08/2022 01:51:11">
+    <Property Name="ElementName" Value="[dbo].[Auxiliary_File].[FileIf]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Auxiliary_File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FileId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="90677373-ad33-466a-83b3-c84a3d1d1867" ChangeDateTime="03/08/2022 22:53:32">
+    <Property Name="ElementName" Value="[dbo].[File].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Extension" />
+  </Operation>
 </Operations>

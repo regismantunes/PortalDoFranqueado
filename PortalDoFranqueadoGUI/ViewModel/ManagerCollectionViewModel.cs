@@ -1,9 +1,11 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
+using Microsoft.Win32;
 using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -58,12 +60,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 FileView = file;
                 FamilyId = 0;
                 FamilyName = string.Empty;
-                CanDelete = false;
                 ViewModel = owner;
                 HasChange = false;
             }
 
-            public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView? file, Product product)
+            public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file, Product product)
             {
                 _lockedSizes = new List<string>();
                 if (product.LockedSizes != null)
@@ -75,7 +76,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 FileId = product.FileId;
                 Price = product.Price;
                 FileView = file;
-                CanDelete = file == null;
                 ViewModel = owner;
                 HasChange = false;
             }
@@ -116,11 +116,13 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     return field;
                 }).ToArray();
+
+                OnPropertyChanged(nameof(LockedSizes));
             }
 
             public int? Id { get; set; }
-            public string FileId { get; }
-            public FileView? FileView { get; }
+            public int FileId { get; }
+            public FileView FileView { get; }
             public decimal? Price { get => _price; set { _price = value; HasChange = true; OnPropertyChanged(); } }
             public int? FamilyId { get => _familyId; 
                 set 
@@ -135,7 +137,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public FieldViewModel<LockedSizeViewModel>[] LockedSizes { get; private set; }
             public bool HasChange { get => _hasChange; set { _hasChange = value; OnPropertyChanged(); } }
             public bool Focused { get => _focused; set { _focused = value; OnPropertyChanged(); } }
-            public bool CanDelete { get; }
 
             public ManagerCollectionViewModel ViewModel { get; set; }
 
@@ -144,7 +145,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         private DateTime _collectionStartDate;
         private DateTime _collectionEndDate;
-        private string _collectionFolderId;
         private readonly Collection _collection;
         private bool _itemsEnabled;
 
@@ -170,16 +170,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 UpdateCollection();
             }
         }
-        public string CollectionFolderId
-        {
-            get => _collectionFolderId;
-            set
-            {
-                _collectionFolderId = value;
-                OnPropertyChanged();
-                UpdateCollection();
-            }
-        }
         public CollectionStatus CollectionStatus { get; set; }
 
         public bool ItemsEnabled
@@ -197,6 +187,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand<CollectionProductViewModel> SaveCommand { get; }
         public RelayCommand<CollectionProductViewModel> DeleteCommand { get; }
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand AddFilesCommand { get; }
 
         public ManagerCollectionViewModel(Collection colecao, bool canEdit)
         {
@@ -204,7 +195,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             CollectionStartDate = colecao.StartDate;
             CollectionEndDate = colecao.EndDate;
-            CollectionFolderId = colecao.FolderId;
             _collection = colecao;
 
             Products = new ObservableCollection<CollectionProductViewModel>();
@@ -212,6 +202,63 @@ namespace PortalDoFranqueadoGUI.ViewModel
             SaveCommand = new RelayCommand<CollectionProductViewModel>(SaveProduct);
             DeleteCommand = new RelayCommand<CollectionProductViewModel>(DeleteProduct);
             LoadedCommand = new RelayCommand(async () => await LoadProducts());
+            AddFilesCommand = new RelayCommand(async () => await AddFiles());
+        }
+
+        private async Task AddFiles()
+        {
+            try
+            {
+                DesableContent();
+
+                var openFileDialog = new OpenFileDialog()
+                {
+                    Multiselect = true,
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                };
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    if (openFileDialog.FileNames.Length == 0)
+                        return;
+
+                    for (var i = 0; i < openFileDialog.FileNames.Length; i++)
+                    {
+                        Legendable?.SendMessage($"Carregando arquivo {i + 1} de {openFileDialog.FileNames.Length}...");
+                        var selectedFile = openFileDialog.FileNames[i];
+                        var fileInfo = new FileInfo(selectedFile);
+                        var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
+
+                        var myFile = new MyFile()
+                        {
+                            Name = fileInfo.Name[..^fileInfo.Extension.Length],
+                            Extension = fileInfo.Extension,
+                            CreatedDate = fileInfo.CreationTime,
+                            Size = fileInfo.Length,
+                            ContentType = mimeType
+                        };
+
+                        var file = new FileView(myFile);
+                        file.LoadImage(selectedFile);
+                        Products.Add(new CollectionProductViewModel(this, file));
+
+                        var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
+                        myFile.Id = id[0];
+                        var bytes = File.ReadAllBytes(selectedFile);
+                        await API.ApiFile.UploadFile(myFile, bytes);
+                        file.Id = id[0];
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "BROTHERS - Falha ao carregar fotos", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Legendable?.SendMessage(string.Empty);
+                EnableContent();
+            }
         }
 
         private async void UpdateCollection()
@@ -225,7 +272,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 _collection.StartDate = CollectionStartDate;
                 _collection.EndDate = CollectionEndDate;
-                _collection.FolderId = CollectionFolderId;
 
                 await API.ApiCollection.Update(_collection);
             }
@@ -290,12 +336,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             try
             {
-                if (!produto.Id.HasValue)
-                    return;
-
                 DesableContent();
 
-                await API.ApiProduct.Delete(produto.Id.Value);
+                if (produto.Id.HasValue)
+                    await API.ApiProduct.Delete(produto.Id.Value);
+                else if (produto.FileView.Id != 0)
+                    await API.ApiFile.Delete(produto.FileView.Id);
 
                 Products.Remove(produto);
 
@@ -319,18 +365,30 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 DesableContent();
                 ItemsEnabled = false;
 
+                Legendable?.SendMessage("Carregando fotos...");
+                var myFiles = await API.ApiFile.GetFromCollection(_collection.Id);
+                
+                var files = new List<FileView>();
+                for(int i = 0; i < myFiles.Length; i++)
+                {
+                    Legendable?.SendMessage($"Carregando fotos {i + 1} de {myFiles.Length}...");
+                    var fileView = new FileView(myFiles[i]);
+                    await fileView.StartDownload();
+                    files.Add(fileView);
+                }
+                
+                Legendable?.SendMessage("Carregando produtos...");
                 var products = await API.ApiProduct.Get(_collection.Id);
 
-                var repository = API.Configuration.Current.Session.FilesRepository;
-                var files = repository.GetFilesOnFolder(CollectionFolderId);
-                foreach (var file in files)
-                    file.StartDownload(repository.Drive);
-
+                Legendable?.SendMessage("Carregando famílias...");
                 var cache = (LocalRepository)App.Current.Resources["Cache"];
                 var families = await cache.LoadFamilies();
 
+                Legendable?.SendMessage("Configurando itens...");
                 products.ToList()
-                        .ForEach(product => product.Family = product.FamilyId.HasValue ? families.First(f => f.Id == product.FamilyId) : null);
+                        .ForEach(product => product.Family = product.FamilyId.HasValue ? 
+                                                            families.First(f => f.Id == product.FamilyId) : 
+                                                            null);
 
                 Products.Clear();
                 var listTmp = new List<CollectionProductViewModel>();
@@ -338,6 +396,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     listTmp.AddRange(products.Select(product => 
                     {
                         var fileView = files.FirstOrDefault(file => file.Id == product.FileId);
+
                         if (fileView != null)
                             files.Remove(fileView);
 
@@ -370,6 +429,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 if (firstEmpty != null)
                     firstEmpty.Focused = true;
 
+                Legendable?.SendMessage(string.Empty);
                 EnableContent();
             }
         }

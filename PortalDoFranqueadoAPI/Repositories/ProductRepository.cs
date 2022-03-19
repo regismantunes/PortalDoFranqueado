@@ -17,26 +17,32 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Product" +
-                                        " WHERE CollectionId = @CollectionId" +
-                    (familyId.HasValue ? " AND FamilyId = @FamilyId" : string.Empty), connection);
-                
-                cmd.Parameters.AddWithValue("@CollectionId", collectionId);
-                if (familyId.HasValue)
-                    cmd.Parameters.AddWithValue("@FamilyId", familyId);
-
-                var reader = await cmd.ExecuteReaderAsync();
-
                 var list = new List<Product>();
-                while (await reader.ReadAsync())
-                    list.Add(new Product()
-                    {
-                        Id = reader.GetInt32("Id"),
-                        FileId = reader.GetString("PhotoId"),
-                        Price = reader.GetDecimal("Price"),
-                        FamilyId = reader.GetInt32("FamilyId"),
-                        LockedSizes = reader.GetStringArray("LockedSizes")
-                    });
+                using (var cmd = new SqlCommand("SELECT * FROM Product" +
+                                        " WHERE CollectionId = @CollectionId" +
+                    (familyId.HasValue ? " AND FamilyId = @FamilyId" : string.Empty), connection))
+                {
+                    cmd.Parameters.AddWithValue("@CollectionId", collectionId);
+                    if (familyId.HasValue)
+                        cmd.Parameters.AddWithValue("@FamilyId", familyId);
+
+                    using var reader = await cmd.ExecuteReaderAsync();
+
+                    while (await reader.ReadAsync())
+                        list.Add(new Product()
+                        {
+                            Id = reader.GetInt32("Id"),
+                            FileId = reader.GetInt32("FileId"),
+                            Price = reader.GetDecimal("Price"),
+                            FamilyId = reader.GetInt32("FamilyId"),
+                            LockedSizes = reader.GetStringArray("LockedSizes")
+                        });
+
+                    await reader.CloseAsync();
+                }
+
+                /*foreach (var product in list)
+                    product.File = await FileRepository.GetFile(connection, product.FileId);*/
 
                 return list.ToArray();
             }
@@ -57,13 +63,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, PhotoId, Price, LockedSizes)" +
+                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, FileId, Price, LockedSizes)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@CollectionId, @FamilyId, @PhotoId, @Price, @LockedSizes);", connection);
+                                            " VALUES (@CollectionId, @FamilyId, @FileId, @Price, @LockedSizes);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
-                cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@FileId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
 
@@ -92,13 +98,13 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var cmd = new SqlCommand("UPDATE Product" +
                                             " SET FamilyId = @FamilyId" +
-                                                ", PhotoId = @PhotoId" +
+                                                ", FileId = @FileId" +
                                                 ", Price = @Price" +
                                                 ", LockedSizes = @LockedSizes" +
                                         " WHERE Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
-                cmd.Parameters.AddWithValue("@PhotoId", product.FileId.ToDBValue());
+                cmd.Parameters.AddWithValue("@FileId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
                 cmd.Parameters.AddWithValue("@Id", product.Id);
@@ -121,12 +127,35 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("DELETE FROM Product" +
-                                        " WHERE Id = @Id;", connection);
+                var transaction = await connection.BeginTransactionAsync();
 
-                cmd.Parameters.AddWithValue("@Id", id);
+                try
+                {
+                    var cmd = new SqlCommand("SELECT FileId" +
+                                            " FROM Product" +
+                                            " WHERE Id = @Id;", connection, (SqlTransaction)transaction);
 
-                return await cmd.ExecuteNonQueryAsync() > 0;
+                    cmd.Parameters.AddWithValue("@Id", id);
+
+                    var fileIdObj = await cmd.ExecuteScalarAsync();
+
+                    cmd.CommandText = "DELETE FROM Product WHERE Id = @Id;";
+
+                    var sucess = await cmd.ExecuteNonQueryAsync() > 0;
+
+                    if (sucess &&
+                        fileIdObj is int fileId)
+                        await FileRepository.DeleteFile(connection, fileId);
+                    
+                    await transaction.CommitAsync().ConfigureAwait(false);
+
+                    return sucess;
+                }
+                catch
+                {
+                    await transaction.RollbackAsync().ConfigureAwait(false);
+                    throw;
+                }
             }
             finally
             {

@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.ManagerAuxiliary"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             d:DataContext="{d:DesignInstance Type=viewmodel:ManagerAuxiliaryViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="White"
+             Cursor="{Binding CurrentCursor}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Content="{Binding TitleMessage}"
+               FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="1"
+                    Visibility="{Binding VisibilityChangeButtons}">
+            <Button Content="Adicionar"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding AddFilesCommand}"/>
+            <Button Content="Excluir"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding DeleteCommand}"
+                    CommandParameter="{Binding ElementName=listFiles, Path=SelectedItems}"
+                    Background="#FF0009"/>
+            <Button Content="Limpar"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding DeleteAllCommand}"
+                    Background="#FF0009"/>
+            <Button Content="Salvar"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SaveCommand}"/>
+        </StackPanel>
+        <ListView Grid.Row="2"
+                  ItemsSource="{Binding Files}"
+                  SelectionMode="Extended"
+                  IsEnabled="{Binding EnabledContent}"
+                  HorizontalAlignment="Stretch"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  MaxWidth="{Binding Me.ActualWidth}"
+                  x:Name="listFiles">
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                    <MenuItem Header="Baixar" Command="{Binding Path=DataContext.SaveLocalCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
+                                              CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                              Background="WhiteSmoke"/>
+                </ContextMenu>
+            </ListView.Resources>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="ContextMenu" Value="{StaticResource ResourceKey=ItemContextMenu}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel IsEnabled="{Binding Removed, Converter={StaticResource ReverseBooleanConverter}}">
+                        <Image Source="{Binding ImageData}"
+                               Width="100"
+                               Height="100"/>
+                        <TextBlock Text="{Binding Name}"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="100"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

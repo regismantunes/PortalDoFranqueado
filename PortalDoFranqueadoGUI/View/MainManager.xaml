@@ -9,8 +9,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:MainManagerViewModel}"
              mc:Ignorable="d" 
              Background="White"
-             Cursor="{Binding CurrentCursor}"
-             Loaded="UserControl_Loaded">
+             Cursor="{Binding CurrentCursor}">
     <Grid>
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">
@@ -28,15 +27,26 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Column="0" Grid.Row="0"
                     Content="{Binding WellcomeMessage}"
                     FontSize="12"/>
-            <Label Grid.Column="1"
+            <Label Grid.Column="1" Grid.Row="0"
                     Content="Última atualização: 04/01/2021"
                     HorizontalAlignment="Right"
                     FontFamily="Open Sans"
                     FontSize="10"
                     Visibility="Hidden"/>
+            <StackPanel Grid.Column="1" Grid.Row="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="USUÁRIOS"
+                        Style="{StaticResource DefaultButton}"
+                        Command="{Binding UsersCommand}"/>
+            </StackPanel>
         </Grid>
         <DockPanel Grid.Row="1"
                     Background="Black">
@@ -93,8 +103,7 @@
             </Button>
             <Button Grid.Column="2"
                 Style="{StaticResource MainButton}"
-                Command="{Binding PhotosCommand}"
-                IsEnabled="False">
+                Command="{Binding PhotosCommand}">
                 <StackPanel>
                     <Label Content="FOTOS E VÍDEOS" 
                     Style="{StaticResource LabelButton}"/>
@@ -104,8 +113,7 @@
             </Button>
             <Button Grid.Column="3"
                 Style="{StaticResource MainButton}"
-                Command="{Binding SupportCommand}"
-                IsEnabled="False">
+                Command="{Binding SupportCommand}">
                 <StackPanel>
                     <Label Content="MATERIAL DE APOIO" 
                     Style="{StaticResource LabelButton}"/>

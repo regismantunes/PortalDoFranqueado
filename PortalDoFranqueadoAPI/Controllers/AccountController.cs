@@ -23,8 +23,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
+                var resetPasswordMaxAttempts = short.Parse(_configuration["AppSettings:ResetPasswordAttempts"]);
                 // Recupera o usuário
-                var user = await UserRepository.Get(_connection, model.Username, model.Password);
+                var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts);
 
                 // Verifica se o usuário existe
                 if (user == null)
@@ -41,6 +42,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 {
                     Token = authenticateData.Token,
                     Expires = authenticateData.Expires,
+                    ResetPassword = resetPassword,
                     User = user
                 };
             }
@@ -52,7 +54,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         [HttpGet]
         [Route("users/all")]
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> GetUsers()
         {
             try
@@ -69,7 +71,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         [HttpPost]
         [Route("users")]
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Insert([FromBody] User user)
         {
             try
@@ -77,6 +79,80 @@ namespace PortalDoFranqueadoAPI.Controllers
                 var id = await UserRepository.Insert(_connection, user);
 
                 return Ok(id);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("users/{id}")]
+        [Authorize(Roles = "Manager")]
+        public async Task<ActionResult<dynamic>> Delete(int id)
+        {
+            try
+            {
+                var sucess = await UserRepository.Delete(_connection, id);
+
+                return Ok(sucess);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        [Route("users")]
+        [Authorize(Roles = "Manager")]
+        public async Task<ActionResult<dynamic>> Update([FromBody] User user)
+        {
+            try
+            {
+                await UserRepository.Update(_connection, user);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        [Route("users/pswreset")]
+        [Authorize(Roles = "Manager")]
+        public async Task<ActionResult<dynamic>> ResetPassword([FromBody] int id)
+        {
+            try
+            {
+                var resetCode = Random.Shared.Next(0, 999999).ToString("000000");
+
+                if (await UserRepository.ResetPassword(_connection, id, resetCode))
+                    return Ok(resetCode);
+
+                return BadRequest(new { message = "O usuário não foi encontrado." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut]
+        [Route("users/pswchange")]
+        [Authorize]
+        public async Task<ActionResult<dynamic>> ChangePassword([FromBody] UserChangePassword changePassword)
+        {
+            try
+            {
+                if (!User.Identity.Name.Equals(changePassword.Id.ToString()))
+                    throw new Exception("O código do usuário informado deve ser igual ao código do usuário atual.");
+
+                await UserRepository.ChangePassword(_connection, changePassword.Id, changePassword.NewPassword, changePassword.NewPasswordConfirmation, changePassword.CurrentPassword);
+
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -101,7 +177,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         [HttpGet]
         [Route("manager")]
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = "Manager")]
         public string Manager() => "Gerente";*/
     }
 }

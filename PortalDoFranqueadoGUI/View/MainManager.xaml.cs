@@ -15,10 +15,5 @@ namespace PortalDoFranqueadoGUI.View
 
             DataContext = new MainManagerViewModel();
         }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            ((MainManagerViewModel)DataContext).SetWindow(Window.GetWindow(this));
-        }
     }
 }

@@ -31,7 +31,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             public FieldViewModel<DateTime?> StartDate { get; } = new FieldViewModel<DateTime?>();
             public FieldViewModel<DateTime?> EndDate { get; } = new FieldViewModel<DateTime?>();
-            public FieldViewModel<string?> FolderId { get; } = new FieldViewModel<string?>();
         }
 
         private bool _showClosed;
@@ -84,7 +83,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new CollectionPurchases(collection));
+                Navigator.NavigateTo(new CollectionPurchases(collection));
             }
             finally
             {
@@ -98,7 +97,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new ManagerCollection(collection, true));
+                Navigator.NavigateTo(new ManagerCollection(collection, true));
             }
             finally
             {
@@ -112,7 +111,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new ManagerCollection(collection, false));
+                Navigator.NavigateTo(new ManagerCollection(collection, false));
             }
             finally
             {
@@ -190,23 +189,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     MessageBox.Show("Informe a data final!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CollectionToAdd.EndDate.IsFocused = true;
                 }
-                else if (string.IsNullOrEmpty(CollectionToAdd.FolderId.Value))
-                {
-                    MessageBox.Show("Informe a pasta das fotos!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-                    CollectionToAdd.FolderId.IsFocused = true;
-                }
-                else if (CollectionToAdd.FolderId.Value.Length != 33)
-                {
-                    MessageBox.Show("O código da pasta deve ter 33 caracteres!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-                    CollectionToAdd.FolderId.IsFocused = true;
-                }
                 else
                 {
                     var newCollection = new Collection
                     {
                         StartDate = (DateTime)CollectionToAdd.StartDate.Value,
                         EndDate = (DateTime)CollectionToAdd.EndDate.Value,
-                        FolderId = (string)CollectionToAdd.FolderId.Value,
                         Status = CollectionStatus.Pendding
                     };
 
@@ -219,7 +207,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     CollectionToAdd.StartDate.Value = null;
                     CollectionToAdd.EndDate.Value = null;
-                    CollectionToAdd.FolderId.Value = null;
                 }
             }
             catch(Exception ex)

@@ -13,34 +13,63 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White"
              Cursor="{Binding CurrentCursor}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0"
                Content="GERENCIAR USUÁRIOS"
                FontWeight="Bold"/>
-        <ListView Grid.Row="1"
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="1">
+            <Button Content="{Binding StartEditAction}"
+                    IsEnabled="{Binding EnabledSatartEdit}"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SelectedUser.StartEditCommand}"/>
+            <Button Content="Salvar"
+                    IsEnabled="{Binding IsEditing}"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SelectedUser.SaveCommand}"/>
+            <Button Content="Cancelar"
+                    IsEnabled="{Binding IsEditing}"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SelectedUser.CancelEditCommand}"/>
+            <Button Content="Resetar senha"
+                    IsEnabled="{Binding EnabledDelete}"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SelectedUser.ResetPasswordCommand}"
+                    Background="#FF0009"/>
+            <Button Content="Excluir"
+                    IsEnabled="{Binding EnabledDelete}"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding SelectedUser.DeleteCommand}"
+                    Background="#FF0009"/>
+        </StackPanel>
+        <ListView Grid.Row="2"
                   ItemsSource="{Binding Users}"
                   SelectionMode="Single"
-                  Width="809"
+                  Width="850"
                   HorizontalAlignment="Left"
-                  IsEnabled="{Binding EnabledContent}">
+                  IsEnabled="{Binding EnabledContent}"
+                  SelectedItem="{Binding SelectedUser}"
+                  SelectedIndex="{Binding SelectedIndex}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Nome" Width="150">
+                    <GridViewColumn Header="Nome" Width="175">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel>
+                                <StackPanel HorizontalAlignment="Stretch">
                                     <TextBox Text="{Binding Name}"
                                              util:FocusExtension.IsFocused="{Binding NameFocus}"
-                                             Visibility="{Binding VisibitityEditControls}"/>
+                                             Visibility="{Binding VisibitityEditControls}"
+                                             HorizontalAlignment="Stretch"/>
                                     <TextBlock Text="{Binding Name}"
                                                Style="{StaticResource TextBlockCell}"
                                                Visibility="{Binding VisibitityReadControls}"/>
@@ -61,12 +90,19 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Papel" Width="100">
+                    <GridViewColumn Header="Papel" Width="125">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel>
                                     <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.Roles}"
-                                              SelectedItem="{Binding Role}"/>
+                                              SelectedItem="{Binding Role}"
+                                              Visibility="{Binding VisibitityEditControls}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Converter={StaticResource EnumConverter}}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
                                     <TextBlock Text="{Binding Role, Converter={StaticResource EnumConverter}}"
                                                Style="{StaticResource TextBlockCell}"
                                                Visibility="{Binding VisibitityReadControls}"/>
@@ -74,7 +110,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Email" Width="175">
+                    <GridViewColumn Header="Email" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -87,39 +123,24 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Loja" Width="225">
+                    <GridViewColumn Header="Loja" Width="300">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel>
-                                    <ComboBox ItemsSource="{Binding Stores, Source={StaticResource Cache}}"
-                                              SelectedItem="{Binding Store}"/>
+                                    <ComboBox DisplayMemberPath="Name"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding StoreId}"
+                                              Visibility="{Binding VisibitityEditControls}">
+                                        <ComboBox.ItemsSource>
+                                            <CompositeCollection>
+                                                <model:Store Id="0" Name="&lt;Selecione>"/>
+                                                <CollectionContainer Collection="{Binding Stores, Source={StaticResource Cache}}" />
+                                            </CompositeCollection>
+                                        </ComboBox.ItemsSource>
+                                    </ComboBox>
                                     <TextBlock Text="{Binding Store.Name}"
                                                Style="{StaticResource TextBlockCell}"
                                                Visibility="{Binding VisibitityReadControls}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content="{Binding StartEditAction}"
-                                            IsEnabled="{Binding EnabledSatartEdit}"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding StartEditCommand}"/>
-                                    <Button Content="Salvar"
-                                            IsEnabled="{Binding IsEditing}"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding SaveCommand}"/>
-                                    <Button Content="Cancelar"
-                                            IsEnabled="{Binding IsEditing}"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding CancelCommand}"/>
-                                    <Button Content="Excluir"
-                                            Style="{StaticResource CellButton}"
-                                            Command="{Binding DeleteCommand}"
-                                            Background="#FF0009"/>
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

@@ -38,22 +38,35 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 Store = _cache.Stores.First(store => store.Id == Purchase.StoreId);
                 OnPropertyChanged(nameof(Store));
 
+                Legendable?.SendMessage("Carregando produtos...");
                 var products = (await API.ApiProduct.Get(Purchase.CollectionId))
                                                     .Where(p => Purchase.Items.Any(i => i.ProductId == p.Id))
                                                     .ToList();
 
+                Legendable?.SendMessage("Carregando fotos...");
+                var myFiles = await API.ApiFile.GetFromCollection(Purchase.CollectionId);
+
+                var files = new List<FileView>();
+                for (int i = 0; i < myFiles.Length; i++)
+                {
+                    Legendable?.SendMessage($"Carregando fotos {i + 1} de {myFiles.Length}...");
+                    var fileView = new FileView(myFiles[i]);
+                    await fileView.StartDownload();
+                    files.Add(fileView);
+                }
+
+                Legendable?.SendMessage("Carregando famílias...");
                 var families = await _cache.LoadFamilies();
                 products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
 
-                var repository = API.Configuration.Current.Session.FilesRepository;
-
+                Legendable?.SendMessage("Configurando itens...");
                 var productsVM = new List<ProductViewModel>();
                 foreach (var product in products.OrderBy(p => p.FileId)
                                                 .OrderBy(p => p.Price)
                                                 .OrderBy(p => p.Family?.Name))
                 {
-                    var fileView = repository?.GetFile(product.FileId);
-                    fileView?.StartDownload(repository.Drive);
+                    var fileView = files.First(f => f.Id == product.FileId);
+                    fileView?.StartDownload();
                     productsVM.Add(new ProductViewModel(product, Purchase.Items.Where(i => i.ProductId == product.Id)
                                                                                .ToArray())
                     {
@@ -77,6 +90,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             finally
             {
                 EnableContent();
+                Legendable?.SendMessage(string.Empty);
             }
         }
     }

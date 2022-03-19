@@ -45,11 +45,10 @@
             <Border Grid.Column="0" Grid.ColumnSpan="6"
                        Grid.Row="0" Grid.RowSpan="2"
                        Style="{StaticResource DefaultBlackBorder}"
-                    Width="643"/>
+                    Width="506"/>
             <Label Grid.Row="0" Grid.Column="1" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
             <Label Grid.Row="0" Grid.Column="2" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="3" Content="Identificação da pasta" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="4" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
+            <Label Grid.Row="0" Grid.Column="3" Content="Situação" Style="{StaticResource LabelTituloCampo}"/>
             <DatePicker Grid.Row="1" Grid.Column="1" 
                         SelectedDate="{Binding CollectionStartDate}"
                         Margin="5"
@@ -60,21 +59,16 @@
                         Margin="5"
                         BorderThickness="0"
                         IsEnabled="{Binding CanEdit}"/>
-            <TextBox Grid.Row="1" Grid.Column="3" 
-                     Text="{Binding CollectionFolderId}"
-                     MaxLength="33"
-                     Margin="5"
-                     Width="237"
-                     Background="Black"
-                     Foreground="White"
-                     BorderBrush="White"
-                     Height="22"
-                     IsEnabled="{Binding CanEdit}"/>
-            <TextBlock Grid.Row="1" Grid.Column="4"
+            <TextBlock Grid.Row="1" Grid.Column="3"
                        Text="{Binding CollectionStatus, Converter={StaticResource EnumConverter}}"
                        Margin="5"
                        Foreground="White"
                        Width="60"/>
+            <Button Grid.Row="1" Grid.Column="4"
+                    Content="Adicionar fotos"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding AddFilesCommand}"/>
         </Grid>
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
@@ -155,7 +149,6 @@
                                             CommandParameter="{Binding}"
                                             IsDefault="True"/>
                                     <Button Content="Excluir"
-                                            IsEnabled="{Binding CanDelete}"
                                             Style="{StaticResource CellButton}"
                                             Command="{Binding ViewModel.DeleteCommand}"
                                             CommandParameter="{Binding}"

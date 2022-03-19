@@ -8,8 +8,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:MainFranchiseeViewModel}"
              mc:Ignorable="d" 
              Background="White"
-             Cursor="{Binding CurrentCursor}"
-             Loaded="UserControl_Loaded">
+             Cursor="{Binding CurrentCursor}">
     <Grid>
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="Loaded">

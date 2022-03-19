@@ -16,17 +16,8 @@ namespace PortalDoFranqueadoGUI.API
             var mainInfos = await BaseApi.GetSimpleHttpClientRequest<MainInfos>($"main/info/{uriComplement}")
                 .Get();
 
-            var repository = new Repository.FilesRepository(
-                Configuration.Current.Session.User.Role != "manager",
-                mainInfos.GoogleDriveClientSecret,
-                mainInfos.GoogleDriveServiceCredentials,
-                mainInfos.GoogleDriveApplicationName)
-            {
-                ApoioFolderId = mainInfos.SupportFolderId,
-                FotosFolderId = mainInfos.PhotosFolderId
-            };
-
-            Configuration.Current.Session.FilesRepository = repository;
+            Configuration.Current.Session.AuxiliarySupportId = mainInfos.AuxiliarySupportId;
+            Configuration.Current.Session.AuxiliaryPhotoId = mainInfos.AuxiliaryPhotoId;
 
             return mainInfos;
         }

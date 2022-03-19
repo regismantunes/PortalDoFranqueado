@@ -72,6 +72,11 @@
     <Build Include="Tabelas\Family_Size.sql" />
     <Build Include="Tabelas\Product.sql" />
     <Build Include="Tabelas\Campaign.sql" />
+    <Build Include="Tabelas\Campaign_File.sql" />
+    <Build Include="Tabelas\File.sql" />
+    <Build Include="Tabelas\Auxiliary.sql" />
+    <Build Include="Tabelas\Auxiliary_File.sql" />
+    <Build Include="Tabelas\Collection_File.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />
@@ -82,5 +87,6 @@
     <None Include="Populate\Development\Store.sql" />
     <None Include="Populate\Development\User.sql" />
     <None Include="Populate\Development\User_Store.sql" />
+    <None Include="Populate\Auxiliary.sql" />
   </ItemGroup>
 </Project>

@@ -54,9 +54,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Store;", connection);
+                using var cmd = new SqlCommand("SELECT * FROM Store;", connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                using var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<Store>();
                 while (await reader.ReadAsync())
@@ -65,6 +65,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                         Id = reader.GetInt32("Id"),
                         Name = reader.GetString("Name")
                     });
+
+                await reader.CloseAsync();
 
                 return list.ToArray();
             }

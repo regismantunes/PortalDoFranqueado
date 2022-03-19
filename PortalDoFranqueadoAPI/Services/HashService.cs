@@ -29,8 +29,8 @@ namespace PortalDoFranqueadoAPI.Services
         /// Hash value formatted as a base64-encoded string.
         /// </returns>
         public static string ComputeHash(string plainText,
-                                         string hashAlgorithm,
-                                         byte[] saltBytes)
+                                     string hashAlgorithm,
+                                     byte[]? saltBytes = null)
         {
             // If salt is not specified, generate it on the fly.
             if (saltBytes == null)
@@ -77,7 +77,7 @@ namespace PortalDoFranqueadoAPI.Services
                 "SHA512" => SHA512.Create(),
                 _ => MD5.Create(),
             };
-            
+
             // Compute hash value of our plain text with appended salt.
             byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
 

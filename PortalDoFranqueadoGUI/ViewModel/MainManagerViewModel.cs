@@ -6,6 +6,7 @@ using PortalDoFranqueadoGUI.Util;
 using GalaSoft.MvvmLight.CommandWpf;
 using PortalDoFranqueadoGUI.View;
 using System.Windows.Controls;
+using System.Linq;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
@@ -49,6 +50,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand CampaignsCommand { get; }
         public RelayCommand UpdateInformativeCommand { get; }
         public RelayCommand PurchaseCommand { get; }
+        public RelayCommand UsersCommand { get; }
 
         public double MaxWidthInformativeText
         {
@@ -87,6 +89,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             LoadedCommand = new RelayCommand(() =>
             {
+                MaxWidthInformativeText = Me.ActualWidth - 70;
+                Me.SizeChanged += Me_SizeChanged;
+
                 UpdateSessionInformation();
                 UpdateInformative();
             });
@@ -95,13 +100,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             CampaignsCommand = new RelayCommand(OpenCampaigns);
             UpdateInformativeCommand = new RelayCommand(UpdateInformative);
             PurchaseCommand = new RelayCommand(OpenPurchase);
-        }
-
-        public void SetWindow(Window main)
-        {
-            Me = main;
-            MaxWidthInformativeText = Me.ActualWidth - 70;
-            Me.SizeChanged += Me_SizeChanged;
+            UsersCommand = new RelayCommand(OpenUsers);
         }
 
         private void Me_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -131,13 +130,27 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
+        private void OpenUsers()
+        {
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerUsers());
+            }
+            finally
+            {
+                EnableContent();
+            }
+        }
+
         private void OpenPurchase()
         {
             try
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new ManagerCollections());
+                Navigator.NavigateTo(new ManagerCollections());
             }
             finally
             {
@@ -147,49 +160,29 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         private void OpenPhotos()
         {
-            if (MessageBox.Show("Deseja fazer o download das fotos e vídeos para uso nas redes sociais?", "BROTHERS - Fotos e Vídeos", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            try
             {
-                try
-                {
-                    DesableContent();
+                DesableContent();
 
-                    var files = API.Configuration.Current.Session.FilesRepository.GetFilesOnFotosFolder();
-                    var directoryToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Fotos e Vídeos");
-                    DirectoryExtensions.CreateDirectoryChain(directoryToSave);
-
-                    foreach (var file in files)
-                        file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
-
-                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
-                }
-                finally
-                {
-                    EnableContent();
-                }
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "GERENCIAR FOTOS E VÍDEOS"));
+            }
+            finally
+            {
+                EnableContent();
             }
         }
 
         private void OpenSupport()
         {
-            if (MessageBox.Show("Deseja fazer o download do material de apoio da marca?", "BROTHERS - Material de Apoio", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            try
             {
-                try
-                {
-                    DesableContent();
+                DesableContent();
 
-                    var files = API.Configuration.Current.Session.FilesRepository.GetFilesOnApoioFolder();
-                    var directoryToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Material de Apoio");
-                    DirectoryExtensions.CreateDirectoryChain(directoryToSave);
-
-                    foreach (var file in files)
-                        file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
-
-                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
-                }
-                finally
-                {
-                    EnableContent();
-                }
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "GERENCIAR MATERIAL DE APOIO"));
+            }
+            finally
+            {
+                EnableContent();
             }
         }
 
@@ -223,7 +216,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new ManagerCampaigns());
+                Navigator.NavigateTo(new ManagerCampaigns());
             }
             finally
             {

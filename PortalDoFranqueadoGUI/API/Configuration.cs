@@ -45,6 +45,11 @@ namespace PortalDoFranqueadoGUI.API
         public event EventHandler SessionConnected;
         public event EventHandler SessionChanged;
 
+        public void NotifySessionChange()
+        {
+            SessionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         public static Configuration Current { get; } = new Configuration();
     }
 }

@@ -22,7 +22,29 @@ namespace PortalDoFranqueadoGUI.API
                             .Get();
 
         public static async Task<int> Insert(User user)
-            => await BaseApi.GetSimpleHttpClientRequest<int>("users")
+            => await BaseApi.GetSimpleHttpClientRequest<int>("account/users")
                             .Post(user);
+
+        public static async Task<bool> Delete(int id)
+            => await BaseApi.GetSimpleHttpClientRequest<bool>($"account/users/{id}")
+                            .Delete();
+
+        public static async Task Update(User user)
+            => await BaseApi.GetSimpleHttpClientRequest("account/users")
+                            .Put(user);
+
+        public static async Task<string> ResetPassword(int id)
+            => await BaseApi.GetSimpleHttpClientRequest<string>("account/users/pswreset")
+                            .Put(id);
+        
+        public static async Task ChangePassword(string currentPassword, string newPassword, string newPasswordConfirmation)
+            => await BaseApi.GetSimpleHttpClientRequest("account/users/pswchange")
+                            .Put(new
+                            {
+                                Id = Configuration.Current.Session.User.Id,
+                                CurrentPassword = currentPassword,
+                                NewPassword = newPassword,
+                                NewPasswordConfirmation = newPasswordConfirmation
+                            });
     }
 }

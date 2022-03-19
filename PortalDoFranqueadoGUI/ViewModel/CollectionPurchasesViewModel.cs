@@ -59,7 +59,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NextNavigate(new CollectionPurchase(purchase));
+                Navigator.NavigateTo(new CollectionPurchase(purchase));
             }
             finally
             {

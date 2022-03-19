@@ -16,23 +16,13 @@
         Cursor="{Binding CurrentCursor}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"
+                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding ReloadCurrentViewCommand}"/>
     </Window.InputBindings>
-    <!--<Window.Resources>
-        <DataTemplate DataType="{x:Type viewmodel:LoginViewModel}">
-            <view:Login/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodel:MainFranchiseeViewModel}">
-            <view:MainFranchisee/>
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type viewmodel:MainManagerViewModel}">
-            <view:MainManager/>
-        </DataTemplate>
-    </Window.Resources>-->
     <DockPanel Background="Black">
         <Grid Grid.Row="0" Margin="15,5"
               Background="Black"
@@ -56,6 +46,14 @@
             </Button>
             <Image Grid.Column="1"
                     Source="/PortalDoFranqueadoGUI;component/Media/cabecalho.png"/>
+            <Button Grid.Column="3" 
+                    Visibility="{Binding VisibilityLogout}"
+                    Command="{Binding LogoutCommand}"
+                    Background="Transparent"
+                    Width="40"
+                    BorderBrush="Transparent">
+                <Image Source="/PortalDoFranqueadoGUI;component/Media/logout.png"/>
+            </Button>
         </Grid>
         <Label Content="{Binding StatusMessage}"
                DockPanel.Dock="Bottom"

@@ -25,26 +25,29 @@ namespace PortalDoFranqueadoGUI.API
         public async Task<T> Post<TValue>(TValue value)
             => await Post(RequestUri, value, BearerToken);
 
+        public async Task<T> PostFile(byte[] bytes, string contentType)
+            => await PostFile(RequestUri, bytes, contentType, BearerToken);
+
         public async Task<T> Put<TValue>(TValue value)
             => await Put(RequestUri, value, BearerToken);
 
         public static async Task<T> Delete(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             using var response = await client.DeleteAsync(requestUri);
             return await GetResult(response);
         }
 
         public static async Task<T> Get(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             using var response = await client.GetAsync(requestUri);
             return await GetResult(response);
         }
 
         public static async Task<T> Patch<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             using var response = await client.PatchAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             return await GetResult(response);
@@ -52,7 +55,7 @@ namespace PortalDoFranqueadoGUI.API
 
         public static async Task<T> Post<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             using var response = await client.PostAsync(requestUri, new StringContent(
                     JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             return await GetResult(response);
@@ -60,21 +63,44 @@ namespace PortalDoFranqueadoGUI.API
 
         public static async Task<T> Put<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             using var response = await client.PutAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             return await GetResult(response);
         }
 
+        public static async Task<T> PostFile(string? requestUri, byte[] bytes, string contentType, string? bearerToken = null)
+        {
+            using var client = CreateHttpClient(bearerToken);
+            var requestContent = new MultipartFormDataContent();
+            var content = new ByteArrayContent(bytes);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+
+            requestContent.Add(content);
+
+            var response = await client.PostAsync(requestUri, content);
+            return await GetResult(response);
+        }
+
         private static HttpClient CreateHttpClient(string? bearerToken)
         {
-            var client = new HttpClient();
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var client = new HttpClient()
+            { 
+                Timeout = new TimeSpan(0, 5, 0) 
+            };
 
             if (!string.IsNullOrEmpty(bearerToken))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            return client;
+        }
+
+        private static HttpClient CreateJsonHttpClient(string? bearerToken)
+        {
+            var client = CreateHttpClient(bearerToken);
+
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             return client;
         }

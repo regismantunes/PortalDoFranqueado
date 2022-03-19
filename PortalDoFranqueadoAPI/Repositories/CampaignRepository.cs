@@ -6,7 +6,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class CampaignRepository
     {
-        public static async Task<Campaign[]> GetList(SqlConnection connection, bool onlyActives = false)
+        public static async Task<Campaign[]> GetList(SqlConnection connection, bool onlyActives = false, bool loadFiles = false)
         {
             try
             {
@@ -15,10 +15,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Campaign" +
-                        ( onlyActives ? " WHERE Status = 1" : string.Empty), connection);
+                using var cmd = new SqlCommand("SELECT * FROM Campaign" +
+                            (onlyActives ? " WHERE Status = 1" : string.Empty), connection);
 
-                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<Campaign>();
                 while (await reader.ReadAsync())
@@ -26,10 +26,15 @@ namespace PortalDoFranqueadoAPI.Repositories
                     {
                         Id = reader.GetInt32("Id"),
                         Title = reader.GetString("Title"),
-                        FolderId = reader.GetString("FolderId"),
                         Status = (CampaignStatus)reader.GetInt16("Status")
                     });
 
+                await reader.CloseAsync();
+
+                if (loadFiles)
+                    foreach (var campaign in list)
+                        campaign.Files = await FileRepository.GetFilesFromCampaign(connection, campaign.Id);
+                
                 return list.ToArray();
             }
             finally
@@ -47,12 +52,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Campaign (Title, FolderId, Status)" +
+                var cmd = new SqlCommand("INSERT INTO Campaign (Title, Status)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Title, @FolderId, @Status)", connection);
+                                            " VALUES (@Title, @Status)", connection);
 
                 cmd.Parameters.AddWithValue("@Title", campaign.Title);
-                cmd.Parameters.AddWithValue("@FolderId", campaign.FolderId);
                 cmd.Parameters.AddWithValue("@Status", (int)campaign.Status);
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);

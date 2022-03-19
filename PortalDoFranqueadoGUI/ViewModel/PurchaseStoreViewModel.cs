@@ -186,7 +186,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if (_cache.Stores.Count == 0)
                 {
-                    Navigator.PreviousNavigate();
+                    Navigator.ReturnNavigation();
                     return;
                 }
 
@@ -215,22 +215,25 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 
                 if (_store != null)
                 {
+                    Legendable?.SendMessage("Obtendo informações de compra...");
                     Collection = await API.ApiCollection.GetOpened();
                     OnPropertyChanged(nameof(Collection));
 
                     if (Collection == null)
                     {
                         MessageBox.Show("Não existe um período de compra aberto.", "BROTHERS - Fora do período de compras", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Navigator.PreviousNavigate();
+                        Navigator.ReturnNavigation();
                         return;
                     }
 
+                    Legendable?.SendMessage("Carregando produtos...");
                     var products = (await API.ApiProduct.Get(Collection.Id)).ToList();
 
                     if (products.Count > 0)
                     {
                         emptyProducts = false;
 
+                        Legendable?.SendMessage("Carregando informações salvas...");
                         var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
 
                         if (purchase == null || 
@@ -238,20 +241,30 @@ namespace PortalDoFranqueadoGUI.ViewModel
                             EnableSave();
                         else
                             DisableSave();
-                        
+
+                        Legendable?.SendMessage("Carregando fotos...");
+                        var myFiles = await API.ApiFile.GetFromCollection(Collection.Id);
+
+                        var files = new List<FileView>();
+                        for (int i = 0; i < myFiles.Length; i++)
+                        {
+                            Legendable?.SendMessage($"Carregando fotos {i + 1} de {myFiles.Length}...");
+                            var fileView = new FileView(myFiles[i]);
+                            await fileView.StartDownload();
+                            files.Add(fileView);
+                        }
+
+                        Legendable?.SendMessage("Carregando familias...");
                         var families = await _cache.LoadFamilies();
                         products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
 
-                        var repository = API.Configuration.Current.Session.FilesRepository;
-
-                        var tabIndex = 0;
+                        Legendable?.SendMessage("Configurando itens...");
                         var productsVM = new List<ProductViewModel>();
                         foreach(var product in products.OrderBy(p => p.FileId)
                                                        .OrderBy(p => p.Price)
                                                        .OrderBy(p => p.Family?.Name))
                         {
-                            var fileView = repository?.GetFile(product.FileId);
-                            fileView?.StartDownload(repository.Drive);
+                            var fileView = files.First(f => f.Id == product.FileId);
                             var productVM = new ProductViewModel(product, purchase?.Items.Where(i => i.ProductId == product.Id)
                                                                                         .ToArray())
                             {
@@ -259,17 +272,15 @@ namespace PortalDoFranqueadoGUI.ViewModel
                             };
                             productVM.Items
                                 .ToList()
-                                .ForEach(item =>
-                                {
-                                    item.Value.PropertyChanged += (sender, args) =>
-                                    {
-                                        if (args.PropertyName == "Quantity")
-                                        {
-                                            propertyGroup.CallPropertyChange("GroupNames");
-                                            UpdateAmount();
-                                        }
-                                    };
-                                });
+                                .ForEach(item => item.Value.PropertyChanged += (sender, args) =>
+                                                 {
+                                                     if (args.PropertyName == "Quantity")
+                                                     {
+                                                         propertyGroup.CallPropertyChange("GroupNames");
+                                                         UpdateAmount();
+                                                     }
+                                                 }
+                                );
                             
                             productsVM.Add(productVM);
                         }
@@ -310,6 +321,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 EnableContent();
                 GoToFirstField();
+                Legendable?.SendMessage(string.Empty);
             }
         }
 

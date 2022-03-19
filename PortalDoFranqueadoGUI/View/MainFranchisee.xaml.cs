@@ -16,10 +16,5 @@ namespace PortalDoFranqueadoGUI.View
             DataContext = new MainFranchiseeViewModel()
             { StackPanelCampaigns = stpCampanhas };
         }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            ((MainFranchiseeViewModel)DataContext).SetWindow(Window.GetWindow(this));
-        }
     }
 }

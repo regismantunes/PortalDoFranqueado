@@ -85,7 +85,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         [HttpPut]
         [Route("reverse")]
-        [Authorize(Roles = "manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Reverse([FromBody] int purchaseId)
         {
             try

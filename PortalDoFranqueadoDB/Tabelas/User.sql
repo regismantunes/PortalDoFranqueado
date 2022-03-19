@@ -6,7 +6,9 @@
   [Email] VARCHAR(100) NOT NULL,
   [Password] CHAR(52) NULL,
   [Role] SMALLINT NOT NULL,
-  [Treatment] VARCHAR(20) NULL
+  [Treatment] VARCHAR(20) NULL,
+  [ResetPasswordCode] CHAR(52) NULL, 
+  [ResetPasswordAttempts] SMALLINT NULL
 )
 
 GO

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,8 +18,14 @@ namespace PortalDoFranqueadoGUI.API
         public async Task Delete()
             => await Delete(RequestUri, BearerToken);
 
+        public async Task Delete<TValue>(TValue value)
+            => await Delete(RequestUri, value, BearerToken);
+
         public async Task Get()
             => await Get(RequestUri, BearerToken);
+
+        public async Task<string> GetFile()
+            => await GetFile(RequestUri, BearerToken);
 
         public async Task Patch<TValue>(TValue value)
             => await Patch(RequestUri, value, BearerToken);
@@ -25,26 +33,54 @@ namespace PortalDoFranqueadoGUI.API
         public async Task Post<TValue>(TValue value)
             => await Post(RequestUri, value, BearerToken);
 
+        public async Task PostFile(byte[] bytes, string contentType, string name, string fileName)
+            => await PostFile(RequestUri, bytes, contentType, name, fileName, BearerToken);
+
         public async Task Put<TValue>(TValue value)
             => await Put(RequestUri, value, BearerToken);
 
         public static async Task Delete(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             var response = await client.DeleteAsync(requestUri);
+            await GetResult(response);
+        }
+
+        public static async Task Delete<TValue>(string? requestUri, TValue value, string? bearerToken = null)
+        {
+            using var client = CreateJsonHttpClient(bearerToken);
+            var request = new HttpRequestMessage(HttpMethod.Delete, requestUri)
+            {
+                Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+
             await GetResult(response);
         }
 
         public static async Task Get(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             var response = await client.GetAsync(requestUri);
             await GetResult(response);
         }
 
-        public static async Task Patch<TValue>(string? requestUri, TValue value, string? bearerToken = null)
+        public static async Task<string> GetFile(string? requestUri, string? bearerToken = null)
         {
             using var client = CreateHttpClient(bearerToken);
+            using var response = await client.GetAsync(requestUri);
+
+            var contentStream = await response.Content.ReadAsStreamAsync();
+            var tmpFile = Path.GetTempFileName();
+            using var fs = new FileStream(tmpFile, FileMode.Create);
+            await contentStream.CopyToAsync(fs);
+            
+            return tmpFile;
+        }
+
+        public static async Task Patch<TValue>(string? requestUri, TValue value, string? bearerToken = null)
+        {
+            using var client = CreateJsonHttpClient(bearerToken);
             var response = await client.PatchAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
@@ -52,7 +88,7 @@ namespace PortalDoFranqueadoGUI.API
 
         public static async Task Post<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             var response = await client.PostAsync(requestUri, new StringContent(
                     JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
@@ -60,21 +96,45 @@ namespace PortalDoFranqueadoGUI.API
 
         public static async Task Put<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = CreateJsonHttpClient(bearerToken);
             var response = await client.PutAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
         }
 
+        public static async Task PostFile(string? requestUri, byte[] bytes, string contentType, string name, string fileName, string? bearerToken = null)
+        {
+            using var client = CreateHttpClient(bearerToken);
+            
+            var multpartContent = new MultipartFormDataContent();
+            var content = new ByteArrayContent(bytes);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse(contentType);
+
+            multpartContent.Add(content, name, fileName);
+
+            var response = await client.PostAsync(requestUri, multpartContent);
+            await GetResult(response);
+        }
+
         private static HttpClient CreateHttpClient(string? bearerToken)
         {
-            var client = new HttpClient();
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var client = new HttpClient()
+            {
+                Timeout = new TimeSpan(0, 5, 0)
+            };
 
             if (!string.IsNullOrEmpty(bearerToken))
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            return client;
+        }
+
+        private static HttpClient CreateJsonHttpClient(string? bearerToken)
+        {
+            var client = CreateHttpClient(bearerToken);
+
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             return client;
         }

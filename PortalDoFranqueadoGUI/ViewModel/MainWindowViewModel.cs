@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
+using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Update;
 using PortalDoFranqueadoGUI.View;
 using System;
@@ -9,7 +10,7 @@ using System.Windows.Controls;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    internal class MainWindowViewModel : BaseViewModel, INavigatorViewModel
+    internal class MainWindowViewModel : BaseViewModel, INavigatorViewModel, ILegendable
     {
         private readonly Stack<ContentControl> _controls;
         private bool _currentViewControlFocused;
@@ -22,6 +23,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 if (value.DataContext is INavigableViewModel navigable)
                     navigable.Navigator = this;
+
+                if (value.DataContext is BaseViewModel baseViewModel)
+                    baseViewModel.Me = Me;
                 
                 _controls.Push(value);
                 OnPropertyChanged();
@@ -53,10 +57,14 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public string CurrentVersion { get; private set; }
         public string Title { get; private set; }
 
+        public Visibility _visibilityLogout;
+
         public Visibility VisibilityReturn => _controls.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility VisibilityLogout { get => _visibilityLogout; private set { _visibilityLogout = value; OnPropertyChanged(); } }
         public RelayCommand ReturnCommand { get; }
-        public RelayCommand LoadedCommand { get; }
+        public RelayCommand<Window> LoadedCommand { get; }
         public RelayCommand ReloadCurrentViewCommand { get; }
+        public RelayCommand LogoutCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -66,15 +74,23 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             ChangeCurrentView();
 
-            ReturnCommand = new RelayCommand(() => PreviousNavigate());
-            LoadedCommand = new RelayCommand(Loaded);
+            ReturnCommand = new RelayCommand(() => ReturnNavigation());
+            LoadedCommand = new RelayCommand<Window>(Loaded);
             ReloadCurrentViewCommand = new RelayCommand(ReloadCurrentView);
+            LogoutCommand = new RelayCommand(Logout);
 
+            _visibilityLogout = Visibility.Hidden;
             Title = "BROTHERS - Portal do Franqueado";
         }
 
-        private void Loaded()
+        private void Logout()
         {
+            API.Configuration.Current.DisconectSession();
+        }
+
+        private void Loaded(Window window)
+        {
+            Me = window;
             CurrentViewControlFocused = true;
             Task.Factory.StartNew(() => VerifyUpdate());
         }
@@ -113,6 +129,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         private void SessionChanged(object? sender, EventArgs e)
         {
+            VisibilityLogout = API.Configuration.Current.Session == null ? Visibility.Hidden : Visibility.Visible;
             ChangeCurrentView();
         }
 
@@ -125,17 +142,18 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private void ChangeCurrentView()
         {
             _controls.Clear();
-            CurrentViewControl = API.Configuration.Current.Session == null ?    new Login() :
-                API.Configuration.Current.Session.User.Role == "manager" ?      new MainManager() : 
-                                                                                new MainFranchisee();
+            CurrentViewControl = API.Configuration.Current.Session == null ? new Login() :
+                                 API.Configuration.Current.Session.ResetPassword ? new ChangePassword() :
+                                 API.Configuration.Current.Session.User.Role == UserRole.Manager ? new MainManager() : 
+                                                                                                   new MainFranchisee();
         }
 
-        public void NextNavigate(ContentControl control)
+        public void NavigateTo(ContentControl control)
         {
             CurrentViewControl = control;
         }
 
-        public ContentControl PreviousNavigate()
+        public ContentControl ReturnNavigation()
         {
             var previus = _controls.Pop();
 
@@ -150,6 +168,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 navigable.OnReturnToView();
 
             return current;
+        }
+
+        public void SendMessage(string message)
+        {
+            StatusMessage = message;
         }
     }
 }

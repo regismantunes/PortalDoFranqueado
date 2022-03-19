@@ -40,13 +40,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-/*app.UseStaticFiles(new StaticFileOptions()
-{
-    FileProvider = new PhysicalFileProvider(
-            Path.Combine(Directory.GetCurrentDirectory(), @"MyFiles")),
-    RequestPath = new PathString("/Files")
-});*/
-
 app.UseRouting();
 
 app.UseCors(x => x

@@ -33,9 +33,9 @@ namespace PortalDoFranqueadoGUI.Repository
             return Families;
         }
 
-        public async Task<IReadOnlyList<Store>> LoadStores()
+        public async Task<IReadOnlyList<Store>> LoadStores(bool reload = false)
         {
-            if (Stores == null)
+            if (Stores.Count == 0 || reload)
             {
                 Stores = await ApiStore.GetStores();
                 OnPropertyChanged(nameof(Stores));

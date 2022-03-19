@@ -171,7 +171,6 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Id = reader.GetInt32("Id"),
                 StartDate = reader.GetDateTime("StartDate"),
                 EndDate = reader.GetDateTime("EndDate"),
-                FolderId = reader["FolderId"].GetType() == typeof(DBNull) ? string.Empty : reader.GetString("FolderId"),
                 Status = (CollectionStatus)reader.GetInt16("Status")
             };
 
@@ -195,7 +194,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     cmd.Parameters.AddWithValue("@Id", id);
 
-                    var previusStatus = (CollectionStatus?)(int?)await cmd.ExecuteScalarAsync();
+                    var previusStatus = (CollectionStatus?)(short?)await cmd.ExecuteScalarAsync();
 
                     if (previusStatus == null)
                         throw new Exception(MessageRepositories.UpdateFailException);
@@ -247,13 +246,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Collection (StartDate, EndDate, Status, FolderId, Excluded)" +
+                var cmd = new SqlCommand("INSERT INTO Collection (StartDate, EndDate, Status, Excluded)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@StartDate, @EndDate, @Status, @FolderId, 0);", connection);
+                                            " VALUES (@StartDate, @EndDate, @Status, 0);", connection);
 
                 cmd.Parameters.AddWithValue("@StartDate", collection.StartDate);
                 cmd.Parameters.AddWithValue("@EndDate", collection.EndDate);
-                cmd.Parameters.AddWithValue("@FolderId", collection.FolderId);
                 cmd.Parameters.AddWithValue("@Status", (int)collection.Status);
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
@@ -303,14 +301,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var cmd = new SqlCommand("UPDATE Collection" +
                                             " SET StartDate = @StartDate" +
                                                 ", EndDate = @EndDate" +
-                                                ", FolderId = @FolderId" +
                                             " WHERE Excluded = 0" +
                                                 " AND Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@Id", colecao.Id);
                 cmd.Parameters.AddWithValue("@StartDate", colecao.StartDate);
                 cmd.Parameters.AddWithValue("@EndDate", colecao.EndDate);
-                cmd.Parameters.AddWithValue("@FolderId", colecao.FolderId);
 
                 if (await cmd.ExecuteNonQueryAsync().ConfigureAwait(false) == 0)
                     throw new Exception(MessageRepositories.UpdateFailException);

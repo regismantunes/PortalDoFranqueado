@@ -1,5 +1,4 @@
-﻿using PortalDoFranqueadoGUI.Repository;
-using System;
+﻿using System;
 
 namespace PortalDoFranqueadoGUI.Model
 {
@@ -8,6 +7,8 @@ namespace PortalDoFranqueadoGUI.Model
         public string Token { get; set; }
         public DateTime Expires { get; set; }
         public User User { get; set; }
-        public FilesRepository? FilesRepository { get; set; }
+        public bool ResetPassword { get; set; }
+        public int? AuxiliarySupportId { get; set; }
+        public int? AuxiliaryPhotoId { get; set; }
     }
 }

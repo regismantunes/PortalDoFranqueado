@@ -62,17 +62,15 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" Grid.ColumnSpan="6"
                        Grid.Row="0" Grid.RowSpan="2"
                        Style="{StaticResource DefaultBlackBorder}"
-                    Width="649"/>
+                    Width="402"/>
             <Label Grid.Row="0" Grid.Column="1" Content="Início" Style="{StaticResource LabelTituloCampo}"/>
             <Label Grid.Row="0" Grid.Column="2" Content="Fim" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="0" Grid.Column="3" Content="Identificação da pasta" Style="{StaticResource LabelTituloCampo}"/>
             <DatePicker Grid.Row="1" Grid.Column="1" 
                         SelectedDate="{Binding CollectionToAdd.StartDate.Value}"
                         util:FocusExtension.IsFocused="{Binding CollectionToAdd.StartDate.IsFocused}"
@@ -83,17 +81,7 @@
                         util:FocusExtension.IsFocused="{Binding CollectionToAdd.EndDate.IsFocused}"
                         Margin="5"
                         BorderThickness="0"/>
-            <TextBox Grid.Row="1" Grid.Column="3" 
-                     Text="{Binding CollectionToAdd.FolderId.Value}"
-                     util:FocusExtension.IsFocused="{Binding CollectionToAdd.FolderId.IsFocused}"
-                     MaxLength="33"
-                     Margin="5"
-                     Width="237"
-                     Background="Black"
-                     Foreground="White"
-                     BorderBrush="White"
-                     Height="22"/>
-            <Button Grid.Row="1" Grid.Column="4" 
+            <Button Grid.Row="1" Grid.Column="3" 
                     Content="ADICIONAR" 
                     Style="{StaticResource DefaultButton}"
                     Command="{Binding AddCollectionCommand}"/>

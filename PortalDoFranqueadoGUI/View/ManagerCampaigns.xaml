@@ -34,19 +34,17 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                Content="GERENCIAR CAMPANHAS"
                FontWeight="Bold"/>
-            <Border Grid.Column="0" Grid.ColumnSpan="5"
+            <Border Grid.Column="0" Grid.ColumnSpan="4"
                        Grid.Row="1" Grid.RowSpan="2"
                        Style="{StaticResource DefaultBlackBorder}"
-                    Width="593"/>
+                    Width="345"/>
             <Label Grid.Row="1" Grid.Column="1" Content="Título" Style="{StaticResource LabelTituloCampo}"/>
-            <Label Grid.Row="1" Grid.Column="2" Content="Identificação da pasta" Style="{StaticResource LabelTituloCampo}"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                      Text="{Binding CampaignToAdd.Title.Value}"
                      util:FocusExtension.IsFocused="{Binding CampaignToAdd.Title.IsFocused}"
@@ -57,17 +55,7 @@
                      Foreground="White"
                      BorderBrush="White"
                      Height="22"/>
-            <TextBox Grid.Row="2" Grid.Column="2" 
-                     Text="{Binding CampaignToAdd.FolderId.Value}"
-                     util:FocusExtension.IsFocused="{Binding CampaignToAdd.FolderId.IsFocused}"
-                     MaxLength="33"
-                     Margin="5"
-                     Width="237"
-                     Background="Black"
-                     Foreground="White"
-                     BorderBrush="White"
-                     Height="22"/>
-            <Button Grid.Row="2" Grid.Column="3" 
+            <Button Grid.Row="2" Grid.Column="2" 
                     Content="ADICIONAR" 
                     Style="{StaticResource DefaultButton}"
                     Command="{Binding AddCampaignCommand}"/>
@@ -88,14 +76,6 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Pasta" Width="200">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Campaign.FolderId}"
-                                            Style="{StaticResource TextBlockCell}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
                     <GridViewColumn Header="Situação" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -108,6 +88,10 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
+                                    <Button Content="Arquivos"
+                                            Style="{StaticResource CellButton}"
+                                            Command="{Binding FilesCommand}"
+                                            CommandParameter="{Binding Campaign}"/>
                                     <Button Content="{Binding NextStatusAction}"
                                             IsEnabled="{Binding EnabledNextStatus}"
                                             Style="{StaticResource CellButton}"

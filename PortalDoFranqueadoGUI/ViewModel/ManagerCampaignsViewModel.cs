@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +28,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 => _campaign = campaign ?? throw new ArgumentNullException(nameof(campaign));
 
             public Campaign Campaign { get => _campaign; set { _campaign = value; OnPropertyChanged(); } }
+            public RelayCommand<Campaign> FilesCommand { get; set; }
             public string NextStatusAction { get => _nextStatusAction; set { _nextStatusAction = value; OnPropertyChanged(); } }
             public bool EnabledNextStatus { get => _enabledNextStatus; set { _enabledNextStatus = value; OnPropertyChanged(); } }
             public RelayCommand<CampaignViewModel>? NextStatusCommand { get => _nextStatusCommand; set { _nextStatusCommand = value; OnPropertyChanged(); } }
@@ -39,7 +41,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public class NewCampaign
         {
             public FieldViewModel<string?> Title { get; } = new FieldViewModel<string?>();
-            public FieldViewModel<string?> FolderId { get; } = new FieldViewModel<string?>();
         }
 
         public ObservableCollection<CampaignViewModel> Campaigns { get; }
@@ -92,17 +93,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     MessageBox.Show("Informe o título da campanha!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CampaignToAdd.Title.IsFocused = true;
                 }
-                if (string.IsNullOrEmpty(CampaignToAdd.FolderId.Value))
-                {
-                    MessageBox.Show("Informe a pasta com o material da campanha!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
-                    CampaignToAdd.FolderId.IsFocused = true;
-                }
                 else
                 {
                     var campaign = new Campaign
                     {
                         Title = CampaignToAdd.Title.Value,
-                        FolderId = CampaignToAdd.FolderId.Value,
                         Status = CampaignStatus.Holding
                     };
 
@@ -111,7 +106,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     AddCampaign(campaign);
 
                     CampaignToAdd.Title.Value = null;
-                    CampaignToAdd.FolderId.Value = null;
                 }
             }
             catch (Exception ex)
@@ -130,6 +124,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private CampaignViewModel UpdateCampaign(CampaignViewModel campaignVM)
         {
             var campaign = campaignVM.Campaign;
+            campaignVM.FilesCommand = new RelayCommand<Campaign>(CampaignsFiles);
             campaignVM.NextStatusAction = campaign.Status switch
             {
                 CampaignStatus.Holding => "Abrir",
@@ -159,6 +154,20 @@ namespace PortalDoFranqueadoGUI.ViewModel
             campaignVM.DeleteCommand = new RelayCommand<CampaignViewModel>(DeleteCampaign);
             campaignVM.Campaign = campaign; //Set campaign to force update on ViewModel
             return campaignVM;
+        }
+
+        public void CampaignsFiles(Campaign campaign)
+        {
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Campaign, campaign.Id, $"GERENCIAR CAMPANHA {campaign.Title}"));
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private void OpenCampaign(CampaignViewModel campaignVM)

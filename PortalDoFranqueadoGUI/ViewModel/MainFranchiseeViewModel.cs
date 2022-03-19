@@ -98,13 +98,6 @@ namespace PortalDoFranqueadoGUI.ViewModel
             PurchaseCommand = new RelayCommand(OpenPurchases);
         }
 
-        public void SetWindow(Window main)
-        {
-            Me = main;
-            MaxWidthInformativeText = Me.ActualWidth - 70;
-            Me.SizeChanged += Me_SizeChanged;
-        }
-
         private void Me_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             MaxWidthInformativeText = e.NewSize.Width - 70;
@@ -120,7 +113,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     return;
                 }
 
-                Navigator.NextNavigate(new PurchaseStore());
+                Navigator.NavigateTo(new PurchaseStore());
             }
             catch (Exception ex)
             {
@@ -128,74 +121,97 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private void OpenPhotos()
+        private async void OpenPhotos()
         {
-            if (MessageBox.Show("Deseja fazer o download das fotos e vídeos para uso nas redes sociais?", "BROTHERS - Fotos e Vídeos", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "FOTOS E VÍDEOS"));
+            }
+            finally
+            {
+                EnableContent();
+            }
+
+            /*if (MessageBox.Show("Deseja fazer o download das fotos e vídeos para uso nas redes sociais?", "BROTHERS - Fotos e Vídeos", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
                     DesableContent();
 
-                    var files = API.Configuration.Current.Session.FilesRepository.GetFilesOnFotosFolder();
+                    var files = await API.ApiFile.GetFromAuxiliary(API.Configuration.Current.Session.AuxiliaryPhotoId.Value);
                     var directoryToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Fotos e Vídeos");
                     DirectoryExtensions.CreateDirectoryChain(directoryToSave);
 
-                    foreach (var file in files)
-                        file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
+                    files.AsParallel().ForAll(f => new FileView(f).StartDownload(directoryToSave));
 
-                    Process.Start("explorer.exe", $"\"{directoryToSave}\"");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao abrir fotos", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
                 finally
                 {
                     EnableContent();
                 }
-            }
+            }*/
         }
 
-        private void OpenSupport()
+        private async void OpenSupport()
         {
-            if (MessageBox.Show("Deseja fazer o download do material de apoio da marca?", "BROTHERS - Material de Apoio", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "MATERIAL DE APOIO"));
+            }
+            finally
+            {
+                EnableContent();
+            }
+
+            /*if (MessageBox.Show("Deseja fazer o download do material de apoio da marca?", "BROTHERS - Material de Apoio", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
                     DesableContent();
 
-                    var files = API.Configuration.Current.Session.FilesRepository.GetFilesOnApoioFolder();
+                    var files = await API.ApiFile.GetFromAuxiliary(API.Configuration.Current.Session.AuxiliarySupportId.Value);
                     var directoryToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Material de Apoio");
                     DirectoryExtensions.CreateDirectoryChain(directoryToSave);
 
-                    foreach (var file in files)
-                        file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
+                    files.AsParallel().ForAll(f => new FileView(f).StartDownload(directoryToSave));
 
-                    Process.Start("explorer.exe", $"\"{directoryToSave}\"");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao abrir material de apoio", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Diagnostics.Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
                 finally
                 {
                     EnableContent();
                 }
-            }
+            }*/
         }
 
-        public void OpenCampaign(Campaign campaign)
+        public async void OpenCampaign(Campaign campaign)
         {
             if (campaign == null)
                 return;
 
-            if (MessageBox.Show($"Deseja fazer o download do material da campanha {campaign.Title}?", "BROTHERS - Campanhas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Campaign, campaign.Id, $"CAMPANHA {campaign.Title}"));
+            }
+            finally
+            {
+                EnableContent();
+            }
+
+            /*if (MessageBox.Show($"Deseja fazer o download do material da campanha {campaign.Title}?", "BROTHERS - Campanhas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
                     DesableContent();
 
-                    var files = API.Configuration.Current.Session.FilesRepository.GetFilesOnFolder(campaign.FolderId);
+                    var files = await API.ApiFile.GetFromCampaign(campaign.Id);
 
                     var campaignDirName = string.Empty;
                     var invalidChars = Path.GetInvalidPathChars();
@@ -205,8 +221,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     DirectoryExtensions.CreateDirectoryChain(directoryToSave);
 
-                    foreach (var file in files)
-                        file.StartDownload(API.Configuration.Current.Session.FilesRepository.Drive, directoryToSave);
+                    files.AsParallel().ForAll(f => new FileView(f).StartDownload(directoryToSave));
 
                     Process.Start("explorer.exe", $"\"{directoryToSave}\"");
                 }
@@ -218,7 +233,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 {
                     EnableContent();
                 }
-            }
+            }*/
         }
 
         private void UpdateSessionInformations()
@@ -321,6 +336,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 StackPanelCampaigns.Children.Add(button);
             }
+
+            MaxWidthInformativeText = Me.ActualWidth - 70;
+            Me.SizeChanged += Me_SizeChanged;
         }
 
         private void SessionConnected(object? sender, EventArgs e)

@@ -4,7 +4,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 {
     public interface INavigatorViewModel
     {
-        void NextNavigate(ContentControl control);
-        ContentControl PreviousNavigate();
+        void NavigateTo(ContentControl control);
+        ContentControl ReturnNavigation();
     }
 }

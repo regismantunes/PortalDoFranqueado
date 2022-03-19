@@ -9,10 +9,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
     public abstract class BaseViewModel : BaseNotifyPropertyChanged, INavigableViewModel
     {
         public event Action? CloseRequest;
-        public INavigatorViewModel Navigator { get; set; }
-
+        
         private string _contentLocker = string.Empty;
         private Cursor _cursor = Cursors.Arrow;
+        private ImageSource? _icon;
+        private INavigatorViewModel _navigator;
 
         public Cursor CurrentCursor
         {
@@ -22,7 +23,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public bool EnabledContent { get; private set; } = true;
 
         public Window? Me { get; set; }
-        private ImageSource? _icon;
+
         public ImageSource? Icon
         {
             get
@@ -36,6 +37,23 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             set { _icon = value; OnPropertyChanged(); }
         }
+
+        public INavigatorViewModel Navigator
+        { 
+            get => _navigator;
+            set 
+            { 
+                _navigator = value; 
+                OnPropertyChanged();
+                if (_navigator is ILegendable legendable)
+                    Legendable = legendable;
+                else
+                    Legendable = null;
+                OnPropertyChanged(nameof(Legendable));
+            }
+        }
+
+        public ILegendable? Legendable { get; private set; }
 
         public void DesableContent([CallerMemberName] string? contentLocker = null)
         {
