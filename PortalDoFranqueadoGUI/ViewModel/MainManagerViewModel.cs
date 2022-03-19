@@ -164,7 +164,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "GERENCIAR FOTOS E VÍDEOS"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "GERENCIAR FOTOS E VÍDEOS"));
             }
             finally
             {
@@ -178,7 +178,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "GERENCIAR MATERIAL DE APOIO"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "GERENCIAR MATERIAL DE APOIO"));
             }
             finally
             {

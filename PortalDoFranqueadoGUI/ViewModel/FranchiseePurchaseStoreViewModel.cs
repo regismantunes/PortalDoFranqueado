@@ -11,7 +11,7 @@ using System.Windows.Data;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    public class PurchaseStoreViewModel : BaseViewModel, IReloadable
+    public class FranchiseePurchaseStoreViewModel : BaseViewModel, IReloadable
     {
         public bool ExpandGroups { get; set; } = true;
         private readonly LocalRepository _cache;
@@ -53,7 +53,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAndCloseCommand { get; }
 
-        public PurchaseStoreViewModel()
+        public FranchiseePurchaseStoreViewModel()
         {
             _cache = (LocalRepository)App.Current.Resources["Cache"];
 

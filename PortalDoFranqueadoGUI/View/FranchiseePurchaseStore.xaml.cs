@@ -6,13 +6,13 @@ namespace PortalDoFranqueadoGUI.View
     /// <summary>
     /// Interação lógica para FranquadoCompra.xam
     /// </summary>
-    public partial class PurchaseStore : UserControl
+    public partial class FranchiseePurchaseStore : UserControl
     {
-        public PurchaseStore()
+        public FranchiseePurchaseStore()
         {
             InitializeComponent();
 
-            DataContext = new PurchaseStoreViewModel();
+            DataContext = new FranchiseePurchaseStoreViewModel();
         }
     }
 }

@@ -5,15 +5,15 @@ using System.Windows.Controls;
 namespace PortalDoFranqueadoGUI.View
 {
     /// <summary>
-    /// Interação lógica para PurchaseCollection.xam
+    /// Interaction logic for ManagerPhotos.xaml
     /// </summary>
-    public partial class CollectionPurchase : UserControl
+    public partial class ManagerFiles : UserControl
     {
-        public CollectionPurchase(Purchase purchase)
+        public ManagerFiles(FileOwner ownerType, int id, string title)
         {
             InitializeComponent();
 
-            DataContext = new CollectionPurchaseViewModel(purchase);
+            DataContext = new ManagerFilesViewModel(ownerType, id, title);
         }
     }
 }

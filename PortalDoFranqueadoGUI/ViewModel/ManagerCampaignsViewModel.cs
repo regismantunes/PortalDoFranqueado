@@ -162,7 +162,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Campaign, campaign.Id, $"GERENCIAR CAMPANHA {campaign.Title}"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Campaign, campaign.Id, $"GERENCIAR CAMPANHA {campaign.Title}"));
             }
             finally
             {

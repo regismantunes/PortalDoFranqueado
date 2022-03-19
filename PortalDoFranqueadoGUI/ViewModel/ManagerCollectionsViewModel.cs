@@ -83,7 +83,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new CollectionPurchases(collection));
+                Navigator.NavigateTo(new ManagerCollectionPurchases(collection));
             }
             finally
             {

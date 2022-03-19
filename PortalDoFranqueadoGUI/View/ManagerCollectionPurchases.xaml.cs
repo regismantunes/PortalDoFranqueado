@@ -7,13 +7,13 @@ namespace PortalDoFranqueadoGUI.View
     /// <summary>
     /// Interação lógica para CollectionPurchase.xam
     /// </summary>
-    public partial class CollectionPurchases : UserControl
+    public partial class ManagerCollectionPurchases : UserControl
     {
-        public CollectionPurchases(Collection collection)
+        public ManagerCollectionPurchases(Collection collection)
         {
             InitializeComponent();
 
-            DataContext = new CollectionPurchasesViewModel(collection);
+            DataContext = new ManagerCollectionPurchasesViewModel(collection);
         }
     }
 }

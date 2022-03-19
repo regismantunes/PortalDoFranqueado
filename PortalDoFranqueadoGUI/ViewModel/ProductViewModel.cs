@@ -55,7 +55,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        public PurchaseStoreViewModel ViewModel { get; set; }
+        public FranchiseePurchaseStoreViewModel ViewModel { get; set; }
 
         private void UpdateAmount()
         {

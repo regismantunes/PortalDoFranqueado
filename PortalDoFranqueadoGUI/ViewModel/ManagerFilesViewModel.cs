@@ -11,7 +11,7 @@ using System.Windows;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    internal class ManagerAuxiliaryViewModel : BaseViewModel, IReloadable
+    internal class ManagerFilesViewModel : BaseViewModel, IReloadable
     {
         private readonly FileOwner _ownerType;
         private readonly int _id;
@@ -27,7 +27,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand SaveCommand { get; }
         public RelayCommand<IList> SaveLocalCommand { get; }
 
-        public ManagerAuxiliaryViewModel(FileOwner ownerType, int id, string title)
+        public ManagerFilesViewModel(FileOwner ownerType, int id, string title)
         {
             _ownerType = ownerType;
             _id = id;

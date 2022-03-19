@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    internal class CollectionPurchasesViewModel : BaseViewModel
+    internal class ManagerCollectionPurchasesViewModel : BaseViewModel
     {
         public class PurchaseViewModel : BaseNotifyPropertyChanged
         {
@@ -42,7 +42,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand<Purchase> ViewPurchaseCommand { get; }
         public RelayCommand<PurchaseViewModel> ReversePurchaseCommand { get; }
 
-        public CollectionPurchasesViewModel(Collection collection)
+        public ManagerCollectionPurchasesViewModel(Collection collection)
         {
             Collection = collection;
 
@@ -59,7 +59,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new CollectionPurchase(purchase));
+                Navigator.NavigateTo(new ManagerCollectionPurchase(purchase));
             }
             finally
             {

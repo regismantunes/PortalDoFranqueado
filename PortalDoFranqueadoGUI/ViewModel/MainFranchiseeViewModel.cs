@@ -113,7 +113,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     return;
                 }
 
-                Navigator.NavigateTo(new PurchaseStore());
+                Navigator.NavigateTo(new FranchiseePurchaseStore());
             }
             catch (Exception ex)
             {
@@ -127,7 +127,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "FOTOS E VÍDEOS"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "FOTOS E VÍDEOS"));
             }
             finally
             {
@@ -161,7 +161,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "MATERIAL DE APOIO"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "MATERIAL DE APOIO"));
             }
             finally
             {
@@ -198,7 +198,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerAuxiliary(FileOwner.Campaign, campaign.Id, $"CAMPANHA {campaign.Title}"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Campaign, campaign.Id, $"CAMPANHA {campaign.Title}"));
             }
             finally
             {

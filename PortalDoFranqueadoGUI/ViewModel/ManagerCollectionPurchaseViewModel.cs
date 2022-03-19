@@ -9,7 +9,7 @@ using System.Windows.Data;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
-    internal class CollectionPurchaseViewModel : BaseViewModel
+    internal class ManagerCollectionPurchaseViewModel : BaseViewModel
     {
         private readonly LocalRepository _cache;
 
@@ -20,7 +20,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
         public RelayCommand LoadedCommand { get; }
 
-        public CollectionPurchaseViewModel(Purchase purchase)
+        public ManagerCollectionPurchaseViewModel(Purchase purchase)
         {
             Purchase = purchase;
 
