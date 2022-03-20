@@ -10,6 +10,7 @@ namespace PortalDoFranqueadoGUI.Model
         public string ContentType { get; set; }
         public DateTime CreatedDate { get; set; }
         public long Size { get; set; }
+        public string CompressionType { get; set; } = "None";
 
         public MyFile Clone()
             => new()
@@ -20,6 +21,7 @@ namespace PortalDoFranqueadoGUI.Model
                 ContentType = ContentType,
                 CreatedDate = CreatedDate,
                 Size = Size,
+                CompressionType = CompressionType
             };
     }
 }

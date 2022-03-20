@@ -8,6 +8,5 @@
         public int? FamilyId { get; set; }
         public Family? Family { get; set; }
         public string[]? LockedSizes { get; set; }
-        public MyFile? File { get; set; }
     }
 }

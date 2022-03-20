@@ -1,5 +1,7 @@
 ﻿using PortalDoFranqueadoAPI.Models;
+using PortalDoFranqueadoAPI.Repositories.Util;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace PortalDoFranqueadoAPI.Repositories
@@ -25,6 +27,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", [Name]" +
                                                 ", Size" +
                                                 ", Extension" +
+                                                ", CompressionType" +
                                             " FROM [File]" +
                                             " WHERE Id = @Id", connection);
 
@@ -57,6 +60,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", [Name]" +
                                                 ", Size" +
                                                 ", Extension" +
+                                                ", CompressionType" +
                                             " FROM [File]" +
                                             $" WHERE Id IN ({criteriaIds})", connection);
 
@@ -89,6 +93,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.[Name]" +
                                                 ", f.Size" +
                                                 ", f.Extension" +
+                                                ", f.CompressionType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Campaign_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -126,6 +131,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.[Name]" +
                                                 ", f.Size" +
                                                 ", f.Extension" +
+                                                ", f.CompressionType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Collection_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -158,6 +164,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.[Name]" +
                                                 ", f.Size" +
                                                 ", f.Extension" +
+                                                ", f.CompressionType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Auxiliary_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -196,7 +203,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                 CreatedDate = reader.GetDateTime("CreatedDate"),
                 Name = reader.GetString("Name"),
                 Size = reader.GetInt64("Size"),
-                Extension = reader.GetString("Extension")
+                Extension = reader.GetString("Extension"),
+                CompressionType = reader.GetString("CompressionType")
             };
 
         public static async Task<int> Insert(SqlConnection connection, MyFile file)
@@ -213,14 +221,15 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO [File] ([Name], CreatedDate, Extension, Size)" +
+                var cmd = new SqlCommand("INSERT INTO [File] ([Name], CreatedDate, Extension, Size, CompressionType)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Name, @CreatedDate, @Extension, @Size)", connection);
+                                            " VALUES (@Name, @CreatedDate, @Extension, @Size, @CompressionType)", connection);
 
                 cmd.Parameters.AddWithValue("@Name", file.Name);
                 cmd.Parameters.AddWithValue("@CreatedDate", file.CreatedDate);
                 cmd.Parameters.AddWithValue("@Extension", file.Extension);
                 cmd.Parameters.AddWithValue("@Size", file.Size);
+                cmd.Parameters.AddWithValue("@CompressionType", file.CompressionType);
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
                 if (dbid == null)
@@ -340,7 +349,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task SaveFile(SqlConnection connection, int id, string contentType, string content)
+        public static async Task SaveFile(SqlConnection connection, int id, string contentType, string content, string compressionType)
         {
             try
             {
@@ -351,11 +360,13 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var cmd = new SqlCommand("UPDATE [File]" +
                                             " SET ContentType = @ContentType" +
-                                            ", Content = @Content" +
+                                                ", Content = @Content" +
+                                                ", CompressionType = @CompressionType" +
                                             " WHERE Id = @Id", connection);
 
                 cmd.Parameters.AddWithValue("@ContentType", contentType);
                 cmd.Parameters.AddWithValue("@Content", content);
+                cmd.Parameters.AddWithValue("@CompressionType", compressionType);
                 cmd.Parameters.AddWithValue("@Id", id);
 
                 if (await cmd.ExecuteNonQueryAsync() == 0)
@@ -398,10 +409,10 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task DeleteFile(SqlConnection connection, int id)
-            => await DeleteFiles(connection, new int[] { id });
+        public static async Task DeleteFile(SqlConnection connection, int id, IDbTransaction? transaction = null)
+            => await DeleteFiles(connection, new int[] { id }, transaction);
 
-        public static async Task DeleteFiles(SqlConnection connection, int[] ids)
+        public static async Task DeleteFiles(SqlConnection connection, int[] ids, IDbTransaction? transaction = null)
         {
             if (ids.Length == 0)
                 return;
@@ -421,7 +432,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 var criteria = string.Join(',', ids);
 
                 using var cmd = new SqlCommand("DELETE FROM [File]" +
-                                            $" WHERE Id IN ({criteria})", connection);
+                                            $" WHERE Id IN ({criteria})", connection, transaction as SqlTransaction);
 
                 await cmd.ExecuteNonQueryAsync();
             }

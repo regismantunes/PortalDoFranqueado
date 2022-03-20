@@ -7,4 +7,5 @@
     [CreatedDate] DATETIME NOT NULL, 
     [Extension] VARCHAR(50) NOT NULL, 
     [Size] BIGINT NOT NULL, 
+    [CompressionType] VARCHAR(50) NOT NULL, 
 )

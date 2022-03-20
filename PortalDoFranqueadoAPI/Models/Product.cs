@@ -7,6 +7,5 @@
         public int? FamilyId { get; set; }
         public string[]? LockedSizes { get; set; }
         public int FileId { get; set; }
-        public MyFile? File { get; set; }
     }
 }

@@ -56,4 +56,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Extension" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="003a8a0b-0156-499f-bf7a-cbf1c69898c2" ChangeDateTime="03/19/2022 20:48:05">
+    <Property Name="ElementName" Value="[dbo].[File].[CompactType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[File]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CompressionType" />
+  </Operation>
 </Operations>

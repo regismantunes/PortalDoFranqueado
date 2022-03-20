@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.Model.Order;
 using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 var cache = (LocalRepository)App.Current.Resources["Cache"];
                 var family = cache.Families.First(f => f.Id == FamilyId);
 
-                LockedSizes = family.Sizes.Select(size =>
+                LockedSizes = family.Sizes.OrderBy(size => OrderSize.GetValue(size))
+                                          .Select(size =>
                 {
                     var field = new FieldViewModel<LockedSizeViewModel>()
                     {
@@ -121,7 +123,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
 
             public int? Id { get; set; }
-            public int FileId { get; }
+            public int FileId { get; set; }
             public FileView FileView { get; }
             public decimal? Price { get => _price; set { _price = value; HasChange = true; OnPropertyChanged(); } }
             public int? FamilyId { get => _familyId; 
@@ -238,15 +240,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
                             ContentType = mimeType
                         };
 
+                        var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
+
+                        myFile.Id = id[0];
                         var file = new FileView(myFile);
                         file.LoadImage(selectedFile);
-                        Products.Add(new CollectionProductViewModel(this, file));
-
-                        var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
-                        myFile.Id = id[0];
+                        
+                        Products.Insert(0, new CollectionProductViewModel(this, file));
+                        
                         var bytes = File.ReadAllBytes(selectedFile);
                         await API.ApiFile.UploadFile(myFile, bytes);
-                        file.Id = id[0];
                     }
                 }
             }

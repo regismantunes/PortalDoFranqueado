@@ -8,5 +8,6 @@
         public string ContentType { get; set; }
         public DateTime CreatedDate { get; set; }
         public long Size { get; set; }
+        public string CompressionType { get; set; } = "None";
     }
 }

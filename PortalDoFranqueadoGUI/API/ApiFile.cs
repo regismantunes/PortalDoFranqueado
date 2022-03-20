@@ -39,7 +39,7 @@ namespace PortalDoFranqueadoGUI.API
                             .Get();
 
         public static async Task UploadFile(MyFile file, byte[] bytes)
-            => await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}")
+            => await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
                             .PostFile(bytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
 
         public static async Task<string> DownloadFile(int id)

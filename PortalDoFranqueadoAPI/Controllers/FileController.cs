@@ -152,9 +152,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         [HttpPost]
-        [Route("upload/{id}")]
+        [Route("upload/{id}/{compressionType}")]
         [Authorize(Roles = "Manager")]
-        public async Task<ActionResult<dynamic>> UploadFile(int id)//[FromForm] IFormFile file
+        public async Task<ActionResult<dynamic>> UploadFile(int id, string compressionType)//[FromForm] IFormFile file
         {
             try
             {
@@ -166,7 +166,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 
                 stream.Position = 0;
                 var reader = new BinaryReader(stream);
-                var buffer = new byte[1024000];
+                var buffer = new byte[2048000];
                 var allBytes = new byte[file.Length];
 
                 var i = 0;
@@ -184,7 +184,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                 var sb64 = Convert.ToBase64String(allBytes);
                 
-                await FileRepository.SaveFile(_connection, id, file.ContentType, sb64);
+                await FileRepository.SaveFile(_connection, id, file.ContentType, sb64, compressionType);
 
                 return Ok();
             }

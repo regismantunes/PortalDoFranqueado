@@ -41,9 +41,6 @@ namespace PortalDoFranqueadoAPI.Repositories
                     await reader.CloseAsync();
                 }
 
-                /*foreach (var product in list)
-                    product.File = await FileRepository.GetFile(connection, product.FileId);*/
-
                 return list.ToArray();
             }
             finally
@@ -145,7 +142,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     if (sucess &&
                         fileIdObj is int fileId)
-                        await FileRepository.DeleteFile(connection, fileId);
+                        await FileRepository.DeleteFile(connection, fileId, transaction);
                     
                     await transaction.CommitAsync().ConfigureAwait(false);
 
