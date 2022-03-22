@@ -73,7 +73,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao carregar campanhas", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar campanhas", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -90,7 +90,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if (string.IsNullOrEmpty(CampaignToAdd.Title.Value))
                 {
-                    MessageBox.Show("Informe o título da campanha!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Me,"Informe o título da campanha!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CampaignToAdd.Title.IsFocused = true;
                 }
                 else
@@ -110,7 +110,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao adicionar", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao adicionar", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -186,7 +186,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao alterar situação", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao alterar situação", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -206,7 +206,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                if (MessageBox.Show("Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+                if (MessageBox.Show(Me,"Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
                 {
                     await API.ApiCampaign.Delete(campaignVM.Campaign.Id);
                     Campaigns.Remove(campaignVM);
@@ -214,7 +214,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

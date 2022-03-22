@@ -86,7 +86,7 @@ namespace PortalDoFranqueadoGUI.API
         {
             var client = new HttpClient()
             { 
-                Timeout = new TimeSpan(0, 5, 0) 
+                Timeout = new TimeSpan(0, 10, 0) 
             };
 
             if (!string.IsNullOrEmpty(bearerToken))
@@ -117,8 +117,7 @@ namespace PortalDoFranqueadoGUI.API
                     throw new Exception("A sessão foi desconectada.");
                 }
 
-                if (response.StatusCode == HttpStatusCode.NotFound ||
-                    response.StatusCode == HttpStatusCode.NoContent)
+                if (response.StatusCode == HttpStatusCode.NoContent)
                     return default;
 
                 if (result.StartsWith('{'))
@@ -127,7 +126,7 @@ namespace PortalDoFranqueadoGUI.API
                     throw new Exception(msgResult != null ? msgResult.Message : result);
                 }
 
-                throw new Exception(result.Length > 1 ? result[1..^1] : result);
+                throw new Exception(string.IsNullOrEmpty(result) ? $"Falha - {response.StatusCode}" : result);
             }
 
             var deserialized = JsonSerializer.Deserialize<T>(result, new JsonSerializerOptions(JsonSerializerDefaults.Web));

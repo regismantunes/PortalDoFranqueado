@@ -77,6 +77,7 @@
     <Build Include="Tabelas\Auxiliary.sql" />
     <Build Include="Tabelas\Auxiliary_File.sql" />
     <Build Include="Tabelas\Collection_File.sql" />
+    <Build Include="Tabelas\File_Content.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />
@@ -88,5 +89,6 @@
     <None Include="Populate\Development\User.sql" />
     <None Include="Populate\Development\User_Store.sql" />
     <None Include="Populate\Auxiliary.sql" />
+    <None Include="Populate\Store.sql" />
   </ItemGroup>
 </Project>

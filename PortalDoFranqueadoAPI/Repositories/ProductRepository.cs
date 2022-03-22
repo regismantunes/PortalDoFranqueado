@@ -124,7 +124,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync();
 
                 try
                 {
@@ -144,13 +144,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                         fileIdObj is int fileId)
                         await FileRepository.DeleteFile(connection, fileId, transaction);
                     
-                    await transaction.CommitAsync().ConfigureAwait(false);
+                    await transaction.CommitAsync();
 
                     return sucess;
                 }
                 catch
                 {
-                    await transaction.RollbackAsync().ConfigureAwait(false);
+                    await transaction.RollbackAsync();
                     throw;
                 }
             }

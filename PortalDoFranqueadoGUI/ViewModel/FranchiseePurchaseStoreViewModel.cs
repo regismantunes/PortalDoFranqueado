@@ -95,7 +95,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao salvar", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao salvar", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -196,7 +196,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao carregar informações da loja", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar informações da loja", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -221,7 +221,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     if (Collection == null)
                     {
-                        MessageBox.Show("Não existe um período de compra aberto.", "BROTHERS - Fora do período de compras", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(Me,"Não existe um período de compra aberto.", "BROTHERS - Fora do período de compras", MessageBoxButton.OK, MessageBoxImage.Error);
                         Navigator.ReturnNavigation();
                         return;
                     }
@@ -315,7 +315,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao carregar informações para a compra", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar informações para a compra", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

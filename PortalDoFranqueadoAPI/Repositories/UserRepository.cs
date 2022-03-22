@@ -55,7 +55,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                             Name = reader.GetString("Name"),
                             Role = (UserRole)reader.GetInt16("Role"),
                             Active = true,
-                            Treatment = reader.GetString("Treatment")
+                            Treatment = reader.GetValue("Treatment") as string
                         };
                     }
                     

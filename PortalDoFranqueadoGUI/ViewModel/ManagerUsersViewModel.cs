@@ -74,6 +74,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             public RelayCommand SaveCommand { get; }
             public RelayCommand DeleteCommand { get; }
             public RelayCommand ResetPasswordCommand { get; }
+            public Window Window { get; set; }
 
             public event EventHandler? AfterInsert;
             public event EventHandler? AfterDelete;
@@ -168,14 +169,14 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                     if (string.IsNullOrEmpty(_name))
                     {
-                        MessageBox.Show("Informe o nome do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(Window, "Informe o nome do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
                         SetFocusAt(nameof(Name));
                         return;
                     }
 
                     if (string.IsNullOrEmpty(_email))
                     {
-                        MessageBox.Show("Informe o email do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(Window, "Informe o email do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
                         SetFocusAt(nameof(Email));
                         return;
                     }
@@ -183,7 +184,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     if (_store == null &&
                         _role == UserRole.Franchisee)
                     {
-                        MessageBox.Show("Informe a loja do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(Window, "Informe a loja do usuário", "BROTHERS - Erro ao salvar usuário", MessageBoxButton.OK, MessageBoxImage.Error);
                         SetFocusAt(nameof(Store));
                         return;
                     }
@@ -216,7 +217,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao salvar", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Window, ex.Message, "BROTHERS - Falha ao salvar", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -224,7 +225,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 try
                 {
-                    if (MessageBox.Show("Deseja realmente excluir esse usuário?", "BROTHERS - Excluir usuário", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    if (MessageBox.Show(Window, "Deseja realmente excluir esse usuário?", "BROTHERS - Excluir usuário", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                         return;
 
                     if (_user == null)
@@ -238,7 +239,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Window, ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -246,7 +247,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 try
                 {
-                    if (MessageBox.Show("Deseja realmente resetar a senha desse usuário?", "BROTHERS - Resetar senha", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    if (MessageBox.Show(Window, "Deseja realmente resetar a senha desse usuário?", "BROTHERS - Resetar senha", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                         return;
 
                     if (_user == null)
@@ -256,12 +257,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     }
 
                     var resetCode = await API.ApiAccount.ResetPassword(_user.Id);
-                    MessageBox.Show($"A senha do usuário {_email} foi resetada!{Environment.NewLine}" +
+                    MessageBox.Show(Window, $"A senha do usuário {_email} foi resetada!{Environment.NewLine}" +
                                     $"O código para reativação é: {resetCode}", "BRTHERS - Resetar senha", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao resetar senha", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Window, ex.Message, "BROTHERS - Falha ao resetar senha", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -360,7 +361,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao carregar usuários", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar usuários", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -372,6 +373,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             var userVM = user == null ? new UserViewModel() : 
                                         new UserViewModel(user);
+            userVM.Window = Me;
 
             userVM.AfterDelete += UserVM_AfterDelete;
             userVM.AfterInsert += UserVM_AfterInsert;

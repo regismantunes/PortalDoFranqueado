@@ -1,12 +1,9 @@
 ﻿using PortalDoFranqueadoGUI.Model;
 using System.Windows;
-using System.IO;
 using System;
-using PortalDoFranqueadoGUI.Util;
 using GalaSoft.MvvmLight.CommandWpf;
 using PortalDoFranqueadoGUI.View;
 using System.Windows.Controls;
-using System.Linq;
 
 namespace PortalDoFranqueadoGUI.ViewModel
 {
@@ -122,7 +119,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

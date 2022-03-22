@@ -14,7 +14,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly IConfiguration _configuration;
 
         public MainScreenController(SqlConnection connection, IConfiguration configuration)
-            => (_connection, _configuration) = (connection, configuration);
+            => (_connection, _configuration) = ((SqlConnection)(connection as ICloneable).Clone(), configuration);
 
         [HttpGet]
         [Route("info")]

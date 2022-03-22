@@ -20,7 +20,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 bool newPurchase = purchase.Id == null;
 
-                var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync();
 
                 try
                 {
@@ -80,11 +80,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.InsertFailException);
                     }
 
-                    await transaction.CommitAsync().ConfigureAwait(false);
+                    await transaction.CommitAsync();
                 }
                 catch
                 {
-                    await transaction.RollbackAsync().ConfigureAwait(false);
+                    await transaction.RollbackAsync();
                     throw;
                 }
             }

@@ -135,7 +135,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao alterar situação", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao alterar situação", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -155,7 +155,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 DesableContent();
 
-                if(MessageBox.Show("Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+                if(MessageBox.Show(Me,"Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
                 {
                     await API.ApiCollection.Delete(collection.Id);
                     _collections.Remove(collection);
@@ -164,7 +164,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao excluir", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -181,12 +181,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if(CollectionToAdd.StartDate.Value == null)
                 {
-                    MessageBox.Show("Informe a data de início!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Me,"Informe a data de início!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CollectionToAdd.StartDate.IsFocused = true;
                 }
                 else if (CollectionToAdd.EndDate.Value == null)
                 {
-                    MessageBox.Show("Informe a data final!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Me,"Informe a data final!", messageCaption, MessageBoxButton.OK, MessageBoxImage.Error);
                     CollectionToAdd.EndDate.IsFocused = true;
                 }
                 else
@@ -211,7 +211,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao adicionar", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao adicionar", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

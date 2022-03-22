@@ -12,7 +12,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly SqlConnection _connection;
 
         public StoreController(SqlConnection connection)
-            => _connection = connection;
+            => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
         [HttpGet]
         [Route("all")]

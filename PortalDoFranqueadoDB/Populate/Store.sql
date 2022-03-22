@@ -1,0 +1,7 @@
+﻿INSERT INTO Store ([Name]) 
+	VALUES	('Norte Sul Plaza')
+		,	('Rondon Plaza')
+		,	('Shopping Sinop')
+		,	('Shopping Campo Grande')
+		,	('Norte Shopping RJ')
+		,	('Porto Velho Shopping')

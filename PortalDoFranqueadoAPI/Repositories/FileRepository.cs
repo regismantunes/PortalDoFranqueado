@@ -8,6 +8,8 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class FileRepository
     {
+        private static object _lockerContent = new object();
+
         public static async Task<MyFile> GetFile(SqlConnection connection, int id)
         {
             bool connectionWasOpened = true;
@@ -349,63 +351,78 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task SaveFile(SqlConnection connection, int id, string contentType, string content, string compressionType)
+        public static void SaveFile(SqlConnection connection, int id, string compressionType, string contentType, string content)
         {
-            try
+            lock (_lockerContent)
             {
-                await connection.OpenAsync();
+                try
+                {
+                    connection.Open();
 
-                if (connection.State != ConnectionState.Open)
-                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+                    if (connection.State != ConnectionState.Open)
+                        throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE [File]" +
-                                            " SET ContentType = @ContentType" +
-                                                ", Content = @Content" +
-                                                ", CompressionType = @CompressionType" +
-                                            " WHERE Id = @Id", connection);
+                    using var cmd = new SqlCommand("UPDATE [File]" +
+                                                " SET CompressionType = @CompressionType" +
+                                                    ", ContentType = @ContentType" +
+                                                " WHERE Id = @Id", connection);
 
-                cmd.Parameters.AddWithValue("@ContentType", contentType);
-                cmd.Parameters.AddWithValue("@Content", content);
-                cmd.Parameters.AddWithValue("@CompressionType", compressionType);
-                cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@CompressionType", compressionType);
+                    cmd.Parameters.AddWithValue("@ContentType", contentType);
+                    cmd.Parameters.AddWithValue("@Id", id);
 
-                if (await cmd.ExecuteNonQueryAsync() == 0)
-                    throw new Exception(MessageRepositories.UpdateFailException);
-            }
-            finally
-            {
-                await connection.CloseAsync().ConfigureAwait(false);
+                    if (cmd.ExecuteNonQuery() == 0)
+                        throw new Exception(MessageRepositories.UpdateFailException);
+
+                    cmd.CommandText = "INSERT INTO File_Content (FileId, Content) VALUES (@Id, @Content)";
+
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@Content", content);
+
+                    if (cmd.ExecuteNonQuery() == 0)
+                        throw new Exception(MessageRepositories.UpdateFailException);
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
         }
 
-        public static async Task<(string,string)> GetFileContent(SqlConnection connection, int id)
+        public static (string, string) GetFileContent(SqlConnection connection, int id)
         {
-            try
+            lock (_lockerContent)
             {
-                await connection.OpenAsync();
+                try
+                {
+                    connection.Open();
 
-                if (connection.State != ConnectionState.Open)
-                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+                    if (connection.State != ConnectionState.Open)
+                        throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT ContentType, Content" +
-                                                " FROM [File]" +
-                                                " WHERE Id = @Id", connection);
+                    using var cmd = new SqlCommand("SELECT f.ContentType, c.Content" +
+                                                    " FROM [File] AS f" +
+                                                        " INNER JOIN File_Content AS c" +
+                                                            " ON c.FileId = f.Id" +
+                                                    " WHERE f.Id = @Id", connection);
 
-                cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@Id", id);
 
-                using var reader = await cmd.ExecuteReaderAsync();
+                    using var reader = cmd.ExecuteReader();
 
-                if (!await reader.ReadAsync())
-                    throw new Exception("File not found.");
+                    if (!reader.Read())
+                        throw new Exception("File not found.");
 
-                var contentType = reader.GetString("ContentType");
-                var content = reader.GetString("Content");
+                    var contentType = reader.GetString("ContentType");
+                    var content = reader.GetString("Content");
 
-                return (contentType, content);
-            }
-            finally
-            {
-                await connection.CloseAsync().ConfigureAwait(false);
+                    return (contentType, content);
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
         }
 

@@ -13,7 +13,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly SqlConnection _connection;
 
         public PurchaseController(SqlConnection connection)
-            => _connection = connection;
+            => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
         [HttpPut]
         [Route("")]

@@ -109,7 +109,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             {
                 if (_cache.Stores.Count == 0)
                 {
-                    MessageBox.Show("Nenhuma loja está vinculada ao seu perfil de usuário.");
+                    MessageBox.Show(Me,"Nenhuma loja está vinculada ao seu perfil de usuário.");
                     return;
                 }
 
@@ -117,7 +117,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "BROTHERS - Falha ao abrir compras", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao abrir compras", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -134,7 +134,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 EnableContent();
             }
 
-            /*if (MessageBox.Show("Deseja fazer o download das fotos e vídeos para uso nas redes sociais?", "BROTHERS - Fotos e Vídeos", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            /*if (MessageBox.Show(Me,"Deseja fazer o download das fotos e vídeos para uso nas redes sociais?", "BROTHERS - Fotos e Vídeos", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -168,7 +168,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 EnableContent();
             }
 
-            /*if (MessageBox.Show("Deseja fazer o download do material de apoio da marca?", "BROTHERS - Material de Apoio", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            /*if (MessageBox.Show(Me,"Deseja fazer o download do material de apoio da marca?", "BROTHERS - Material de Apoio", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -205,7 +205,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 EnableContent();
             }
 
-            /*if (MessageBox.Show($"Deseja fazer o download do material da campanha {campaign.Title}?", "BROTHERS - Campanhas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            /*if (MessageBox.Show(Me,$"Deseja fazer o download do material da campanha {campaign.Title}?", "BROTHERS - Campanhas", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
@@ -227,7 +227,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao abrir material de campanha", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao abrir material de campanha", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 finally
                 {
@@ -277,7 +277,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "BROTHERS - Falha ao atualizar informações", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao atualizar informações", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 finally
                 {

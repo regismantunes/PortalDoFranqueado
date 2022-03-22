@@ -120,7 +120,7 @@ namespace PortalDoFranqueadoGUI.API
         {
             var client = new HttpClient()
             {
-                Timeout = new TimeSpan(0, 5, 0)
+                Timeout = new TimeSpan(0, 10, 0)
             };
 
             if (!string.IsNullOrEmpty(bearerToken))
@@ -156,7 +156,7 @@ namespace PortalDoFranqueadoGUI.API
                     throw new Exception(msgResult != null ? msgResult.Message : result);
                 }
 
-                throw new Exception(result.Length > 1 ? result[1..^1] : result);
+                throw new Exception(string.IsNullOrEmpty(result) ? $"Falha - {response.StatusCode}" : result);
             }
         }
     }

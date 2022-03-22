@@ -1,6 +1,7 @@
 ﻿using Squirrel;
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoGUI.Update
@@ -8,6 +9,19 @@ namespace PortalDoFranqueadoGUI.Update
     internal static class Updater
     {
         private static readonly UpdateManager _manager = UpdateManager.GitHubUpdateManager(@"https://github.com/regismantunes/PortalDoFranqueado").Result;
+
+        public static void Initialize()
+        {
+            SquirrelAwareApp.HandleEvents(
+                  onInitialInstall: v => 
+                  {
+                      var assemblyName = Assembly.GetExecutingAssembly().FullName;
+                      _manager.CreateShortcutsForExecutable(assemblyName, ShortcutLocation.Desktop, false);
+                      _manager.CreateShortcutsForExecutable(assemblyName, ShortcutLocation.StartMenu, false);
+                  },
+                  onAppUpdate: v => _manager.CreateShortcutForThisExe(),
+                  onAppUninstall: v => _manager.RemoveShortcutForThisExe());
+        }
 
         public static async Task<bool> HasUpdateAvailable()
         {

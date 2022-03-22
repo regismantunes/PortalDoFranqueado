@@ -183,7 +183,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync();
 
                 try
                 {
@@ -223,11 +223,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                         await cmd.ExecuteNonQueryAsync();
                     }
 
-                    await transaction.CommitAsync().ConfigureAwait(false);
+                    await transaction.CommitAsync();
                 }
                 catch
                 {
-                    await transaction.RollbackAsync().ConfigureAwait(false);
+                    await transaction.RollbackAsync();
                     throw;
                 }
             }

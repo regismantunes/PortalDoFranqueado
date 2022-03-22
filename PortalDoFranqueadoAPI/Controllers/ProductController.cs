@@ -17,7 +17,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             => (_connection, _logger) = (connection, logger);*/
 
         public ProductController(SqlConnection connection)
-            => _connection = connection;
+            => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
         [HttpGet]
         [Route("{collectionId}")]

@@ -13,7 +13,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly SqlConnection _connection;
 
         public FileController(SqlConnection connection)
-            => _connection = connection;
+            => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
         [HttpGet]
         [Route("auxiliary/{id}")]
@@ -166,7 +166,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 
                 stream.Position = 0;
                 var reader = new BinaryReader(stream);
-                var buffer = new byte[2048000];
+                var buffer = new byte[4096000];
                 var allBytes = new byte[file.Length];
 
                 var i = 0;
@@ -184,7 +184,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                 var sb64 = Convert.ToBase64String(allBytes);
                 
-                await FileRepository.SaveFile(_connection, id, file.ContentType, sb64, compressionType);
+                FileRepository.SaveFile(_connection, id, compressionType, file.ContentType, sb64);
 
                 return Ok();
             }
@@ -197,11 +197,11 @@ namespace PortalDoFranqueadoAPI.Controllers
         [HttpGet]
         [Route("download/{id}")]
         [Authorize]
-        public async Task<ActionResult<dynamic>> DownloadFile(int id)
+        public ActionResult<dynamic> DownloadFile(int id)
         {
             try
             {
-                var (contentType, content) = await FileRepository.GetFileContent(_connection, id);
+                var (contentType, content) = FileRepository.GetFileContent(_connection, id);
 
                 var bytes = Convert.FromBase64String(content);
 
