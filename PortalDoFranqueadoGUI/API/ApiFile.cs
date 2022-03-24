@@ -1,5 +1,5 @@
 ﻿using PortalDoFranqueadoGUI.Model;
-using System;
+using PortalDoFranqueadoGUI.Util;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoGUI.API
@@ -39,18 +39,24 @@ namespace PortalDoFranqueadoGUI.API
                             .Get();
 
         public static async Task UploadFile(MyFile file, byte[] bytes)
-            => await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
-                            .PostFile(bytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
+        {
+            file.CompressionType = "GZip";
+            var compressedBytes = Compress.GZipCompress(bytes);
+            
+            await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
+                            .PostFile(compressedBytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
+        }
 
-        public static async Task<string> DownloadFile(int id)
-            => await BaseApi.GetSimpleHttpClientRequest($"files/download/{id}")
-                            .GetFile();
+        public static async Task<string> DownloadFile(MyFile file)
+            => await BaseApi.GetSimpleHttpClientRequest($"files/download/{file.Id}")
+                            .GetFile(file.CompressionType);
 
         public static async Task Delete(int[] ids)
             => await BaseApi.GetSimpleHttpClientRequest("files")
                             .Delete(ids);
 
         public static async Task Delete(int id)
-            => await Delete(new int[] { id });
+            => await BaseApi.GetSimpleHttpClientRequest($"files/{id}")
+                            .Delete();
     }
 }

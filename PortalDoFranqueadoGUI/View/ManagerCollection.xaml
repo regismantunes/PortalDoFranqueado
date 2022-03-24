@@ -73,9 +73,10 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="1168"
+                  Width="884"
                   HorizontalAlignment="Left"
-                  IsEnabled="{Binding ItemsEnabled}">
+                  IsEnabled="{Binding ItemsEnabled}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Foto" Width="100">

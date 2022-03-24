@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PortalDoFranqueadoGUI.Util;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -24,8 +25,8 @@ namespace PortalDoFranqueadoGUI.API
         public async Task Get()
             => await Get(RequestUri, BearerToken);
 
-        public async Task<string> GetFile()
-            => await GetFile(RequestUri, BearerToken);
+        public async Task<string> GetFile(string compressType)
+            => await GetFile(RequestUri, compressType, BearerToken);
 
         public async Task Patch<TValue>(TValue value)
             => await Patch(RequestUri, value, BearerToken);
@@ -65,15 +66,28 @@ namespace PortalDoFranqueadoGUI.API
             await GetResult(response);
         }
 
-        public static async Task<string> GetFile(string? requestUri, string? bearerToken = null)
+        public static async Task<string> GetFile(string? requestUri, string compressType, string? bearerToken = null)
         {
             using var client = CreateHttpClient(bearerToken);
             using var response = await client.GetAsync(requestUri);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
             var tmpFile = Path.GetTempFileName();
-            using var fs = new FileStream(tmpFile, FileMode.Create);
-            await contentStream.CopyToAsync(fs);
+
+            if (compressType == "GZip")
+            {
+                using var ms = new MemoryStream();
+                await contentStream.CopyToAsync(ms);
+                ms.Position = 0;
+                var compressedBytes = ms.ToArray();
+                var bytes = Compress.GZipDecompress(compressedBytes);
+                File.WriteAllBytes(tmpFile, bytes);
+            }
+            else
+            {
+                using var fs = new FileStream(tmpFile, FileMode.Create);
+                await contentStream.CopyToAsync(fs);
+            }
             
             return tmpFile;
         }

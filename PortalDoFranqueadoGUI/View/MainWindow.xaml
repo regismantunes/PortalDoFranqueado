@@ -13,7 +13,8 @@
         Title="{Binding Title}" Height="500" Width="1160"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Cursor="{Binding CurrentCursor}">
+        Cursor="{Binding CurrentCursor}"
+        Closing="Window_Closing">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}"
@@ -32,6 +33,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="45"/>
@@ -46,7 +48,12 @@
             </Button>
             <Image Grid.Column="1"
                     Source="/PortalDoFranqueadoGUI;component/Media/cabecalho.png"/>
-            <Button Grid.Column="3" 
+            <Button Grid.Column="3"
+                    Content="Alterar senha"
+                    Style="{StaticResource DefaultButton}"
+                    Command="{Binding ChangePasswordCommand}"
+                    Visibility="{Binding VisibilityChagePassword}"/>
+            <Button Grid.Column="4" 
                     Visibility="{Binding VisibilityLogout}"
                     Command="{Binding LogoutCommand}"
                     Background="Transparent"
@@ -60,7 +67,7 @@
                Foreground="White"/>
         <ScrollViewer Grid.Row="1"
                       HorizontalScrollBarVisibility="Auto"
-                      VerticalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled"
                       Padding="15,5"
                       Name="ContentScrollViewer"
                       Background="{Binding CurrentViewControl.Background}">

@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -37,7 +38,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             
             LoadedCommand = new RelayCommand(async() => await LoadFiles());
             AddFilesCommand = new RelayCommand(AddFiles);
-            SaveCommand = new RelayCommand(async () => await Save());
+            SaveCommand = new RelayCommand(Save);
             DeleteCommand = new RelayCommand<IList>(Delete);
             DeleteAllCommand = new RelayCommand(DeleteAll);
             SaveLocalCommand = new RelayCommand<IList>(SaveLocal);
@@ -51,19 +52,67 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 Files.Clear();
 
+                Legendable?.SendMessage("Carregando arquivos...");
                 var myFiles = _ownerType == FileOwner.Auxiliary ?
                     await API.ApiFile.GetFromAuxiliary(_id) :
                     await API.ApiFile.GetFromCampaign(_id);
-                
+
+                if (myFiles.Length == 0)
+                {
+                    Legendable?.SendMessage(string.Empty);
+                    return;
+                }
+
                 myFiles.ToList().ForEach(f => Files.Add(new FileView(f)));
 
-                //Files.AsParallel().ForAll(f => f.StartDownload());
-                foreach (var file in Files)
-                    await file.StartDownload();
+                _ = Task.Factory.StartNew(async () =>
+                {
+                    try
+                    {
+                        var i = 1;
+                        var updateMessageFilesLoaded = () =>
+                        {
+                            if (i < myFiles.Length)
+                                Legendable?.SendMessage($"Carregando arquivos {i++} de {myFiles.Length}...");
+                            else
+                                Legendable?.SendMessage(string.Empty);
+                        };
+
+                        await Task.Delay(100);
+
+                        foreach (var file in Files)
+                        {
+                            file.PrepareDirectory();
+                            if (!file.FileExists)
+                                _ = Task.Factory.StartNew(async () =>
+                                {
+                                    try { await file.Download(); }
+                                    catch { }
+
+                                    if (file.FileExists)
+                                        Worker.StartWork(Me.Dispatcher.BeginInvoke(() =>
+                                            file.LoadImageData()
+                                        ));
+
+                                    updateMessageFilesLoaded();
+                                });
+                            else
+                                Worker.StartWork(Me.Dispatcher.BeginInvoke(() =>
+                                {
+                                    file.LoadImageData();
+                                    updateMessageFilesLoaded();
+                                }));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                });
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -142,28 +191,40 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    foreach(var selectedFile in openFileDialog.FileNames)
+                    Task.Factory.StartNew(async () =>
                     {
-                        var fileInfo = new FileInfo(selectedFile);
-                        var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
-
-                        var myFile = new MyFile()
+                        try
                         {
-                            Name = fileInfo.Name[..^fileInfo.Extension.Length],
-                            Extension = fileInfo.Extension,
-                            CreatedDate = fileInfo.CreationTime,
-                            Size = fileInfo.Length,
-                            ContentType = mimeType
-                        };
+                            var i = 1;
+                            foreach (var selectedFile in openFileDialog.FileNames)
+                            {
+                                await Task.Delay(100);
+                                Legendable?.SendMessage($"Carregando arquivo {i++} de {openFileDialog.FileNames.Length}");
+                                var fileInfo = new FileInfo(selectedFile);
+                                var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
 
-                        var file = new FileView(myFile);
-                        file.LoadImage(selectedFile);
-                        Files.Add(file);
-                    }
+                                var myFile = new MyFile()
+                                {
+                                    Name = fileInfo.Name[..^fileInfo.Extension.Length],
+                                    Extension = fileInfo.Extension,
+                                    CreatedDate = fileInfo.CreationTime,
+                                    Size = fileInfo.Length,
+                                    ContentType = mimeType
+                                };
 
-                    //Files.ToList().ForEach(f => f.LoadImageData());
-                    /*Files.AsParallel()
-                         .ForAll(f => f.LoadImageData());*/
+                                var file = new FileView(myFile);
+                                Me.Dispatcher.Invoke(() =>
+                                {
+                                    Files.Add(file);
+                                    file.LoadImage(selectedFile);
+                                });
+                            }
+                        }
+                        finally
+                        {
+                            Legendable?.SendMessage(string.Empty);
+                        }
+                    });
                 }
             }
             catch (Exception ex)
@@ -176,57 +237,78 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private async Task Save()
+        private bool _saving = false;
+
+        private void Save()
         {
+            if (_saving)
+                return;
+
             try
             {
                 DesableContent();
 
-                var insertedFiles = Files.Where(f => f.Id == 0 && !f.Removed)
-                                         .ToArray();
-                if (insertedFiles.Any())
+                Worker.StartWork(async () =>
                 {
-                    Legendable?.SendMessage($"Preparando ambiente para salvar {insertedFiles.Length} arquivos...");
-                    var ids = _ownerType == FileOwner.Auxiliary ?
-                        await API.ApiFile.InsertAuxiliaryFiles(_id, insertedFiles) :
-                        await API.ApiFile.InsertCampaignFiles(_id, insertedFiles);
-
-                    for (int i = 0; i < ids.Length; i++)
+                    try
                     {
-                        var fileView = insertedFiles[i];
-                        Legendable?.SendMessage($"Salvando arquivo {fileView.Name} ({i + 1} de {ids.Length})...");
-                        var file = fileView.Clone();
-                        file.Id = ids[i];
-                        var bytes = File.ReadAllBytes(fileView.FilePath);
-                        await API.ApiFile.UploadFile(file, bytes);
+                        _saving = true;
 
-                        fileView.Id = file.Id;
-                    }
-                }
-
-                var removedFiles = Files.Where(f => f.Removed);
-                if (removedFiles.Any())
-                {
-                    Legendable?.SendMessage($"Excluindo {removedFiles.Count()} arquivos...");
-
-                    var removedIds = removedFiles.Where(f => f.Id > 0)
-                                                 .Select(f => f.Id)
+                        var insertedFiles = Files.Where(f => f.Id == 0 && !f.Removed)
                                                  .ToArray();
-                    
-                    await API.ApiFile.Delete(removedIds);
+                        if (insertedFiles.Any())
+                        {
+                            Legendable?.SendMessage($"Preparando ambiente para salvar {insertedFiles.Length} arquivos...");
+                            var ids = _ownerType == FileOwner.Auxiliary ?
+                                await API.ApiFile.InsertAuxiliaryFiles(_id, insertedFiles) :
+                                await API.ApiFile.InsertCampaignFiles(_id, insertedFiles);
 
-                    removedFiles.ToList()
-                                .ForEach(f => Files.Remove(f));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
+                            for (int i = 0; i < ids.Length; i++)
+                            {
+                                var fileView = insertedFiles[i];
+                                Legendable?.SendMessage($"Salvando arquivo {fileView.Name} ({i + 1} de {ids.Length})...");
+                                var file = fileView.Clone();
+                                file.Id = ids[i];
+                                var bytes = File.ReadAllBytes(fileView.FilePath);
+                                await API.ApiFile.UploadFile(file, bytes);
+
+                                fileView.Id = file.Id;
+                            }
+                        }
+
+                        var removedFiles = Files.Where(f => f.Removed);
+                        if (removedFiles.Any())
+                        {
+                            Me.Dispatcher.Invoke(() => removedFiles.Where(f => f.Id == 0)
+                                                                   .ToList()
+                                                                   .ForEach(f => Files.Remove(f)));
+
+                            var removedIds = removedFiles.Where(f => f.Id > 0)
+                                                         .ToArray();
+
+                            for (int i = 0; i < removedIds.Length; i++)
+                            {
+                                var removedFile = removedIds[i];
+                                Legendable?.SendMessage($"Excluindo arquivos ({i + 1} de {removedFiles.Count()})...");
+                                await API.ApiFile.Delete(removedFile.Id);
+                                Me.Dispatcher.Invoke(() => Files.Remove(removedFile));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Me.Dispatcher.Invoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error));
+                    }
+                    finally
+                    {
+                        Legendable?.SendMessage(string.Empty);
+                        _saving = false;
+                    }
+                });
             }
             finally
             {
                 EnableContent();
-                Legendable?.SendMessage(string.Empty);
             }
         }
 

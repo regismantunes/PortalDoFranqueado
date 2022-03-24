@@ -4,6 +4,7 @@ using PortalDoFranqueadoGUI.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -26,10 +27,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             _cache = (LocalRepository)App.Current.Resources["Cache"];
 
-            LoadedCommand = new RelayCommand(LoadPurchase);
+            LoadedCommand = new RelayCommand(async () => await LoadPurchase());
         }
 
-        private async void LoadPurchase()
+        private async Task LoadPurchase()
         {
             try
             {
@@ -47,13 +48,23 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 var myFiles = await API.ApiFile.GetFromCollection(Purchase.CollectionId);
 
                 var files = new List<FileView>();
-                for (int i = 0; i < myFiles.Length; i++)
+                myFiles.ToList()
+                       .ForEach(f => files.Add(new FileView(f)));
+
+                var filesArray = files.ToArray();
+
+                _ = Task.Factory.StartNew(async () =>
                 {
-                    Legendable?.SendMessage($"Carregando fotos {i + 1} de {myFiles.Length}...");
-                    var fileView = new FileView(myFiles[i]);
-                    await fileView.StartDownload();
-                    files.Add(fileView);
-                }
+                    foreach (var fileView in filesArray)
+                    {
+                        await Task.Delay(100);
+                        fileView.PrepareDirectory();
+                        if (!fileView.FileExists)
+                            await fileView.Download();
+
+                        Me.Dispatcher.Invoke(fileView.LoadImageData);
+                    }
+                });
 
                 Legendable?.SendMessage("Carregando famílias...");
                 var families = await _cache.LoadFamilies();
@@ -66,7 +77,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                                 .OrderBy(p => p.Family?.Name))
                 {
                     var fileView = files.First(f => f.Id == product.FileId);
-                    fileView?.StartDownload();
+                    fileView?.Download();
                     productsVM.Add(new ProductViewModel(product, Purchase.Items.Where(i => i.ProductId == product.Id)
                                                                                .ToArray())
                     {

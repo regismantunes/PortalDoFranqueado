@@ -229,5 +229,22 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [Authorize(Roles = "Manager")]
+        public async Task<ActionResult<dynamic>> DeleteFile(int id)
+        {
+            try
+            {
+                await FileRepository.DeleteFile(_connection, id);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

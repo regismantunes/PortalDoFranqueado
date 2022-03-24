@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueadoGUI.Repository;
+using PortalDoFranqueadoGUI.ViewModel;
 using System.Windows;
 
 namespace PortalDoFranqueadoGUI.View
@@ -13,6 +14,15 @@ namespace PortalDoFranqueadoGUI.View
             InitializeComponent();
 
             DataContext = new MainWindowViewModel();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(Worker.GetActiveWorks() > 0)
+            {
+                e.Cancel = true;
+                MessageBox.Show(this, "Existem arquivos que estão sendo salvos. Aguarde para fechar.", "BROTHERS - Portal do Franqueado", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
     }
 }

@@ -224,33 +224,39 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     if (openFileDialog.FileNames.Length == 0)
                         return;
 
-                    for (var i = 0; i < openFileDialog.FileNames.Length; i++)
+                    Worker.StartWork(async () =>
                     {
-                        Legendable?.SendMessage($"Carregando arquivo {i + 1} de {openFileDialog.FileNames.Length}...");
-                        var selectedFile = openFileDialog.FileNames[i];
-                        var fileInfo = new FileInfo(selectedFile);
-                        var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
-
-                        var myFile = new MyFile()
+                        for (var i = 0; i < openFileDialog.FileNames.Length; i++)
                         {
-                            Name = fileInfo.Name[..^fileInfo.Extension.Length],
-                            Extension = fileInfo.Extension,
-                            CreatedDate = fileInfo.CreationTime,
-                            Size = fileInfo.Length,
-                            ContentType = mimeType
-                        };
+                            Legendable?.SendMessage($"Carregando arquivo {i + 1} de {openFileDialog.FileNames.Length}...");
+                            var selectedFile = openFileDialog.FileNames[i];
+                            var fileInfo = new FileInfo(selectedFile);
+                            var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
 
-                        var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
+                            var myFile = new MyFile()
+                            {
+                                Name = fileInfo.Name[..^fileInfo.Extension.Length],
+                                Extension = fileInfo.Extension,
+                                CreatedDate = fileInfo.CreationTime,
+                                Size = fileInfo.Length,
+                                ContentType = mimeType
+                            };
 
-                        myFile.Id = id[0];
-                        var file = new FileView(myFile);
-                        file.LoadImage(selectedFile);
-                        
-                        Products.Insert(0, new CollectionProductViewModel(this, file));
-                        
-                        var bytes = File.ReadAllBytes(selectedFile);
-                        await API.ApiFile.UploadFile(myFile, bytes);
-                    }
+                            var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
+
+                            myFile.Id = id[0];
+                            var file = new FileView(myFile);
+
+                            Me.Dispatcher.Invoke(() =>
+                            {
+                                file.LoadImage(selectedFile);
+                                Products.Insert(0, new CollectionProductViewModel(this, file));
+                            });
+
+                            var bytes = File.ReadAllBytes(selectedFile);
+                            await API.ApiFile.UploadFile(myFile, bytes);
+                        }
+                    });
                 }
             }
             catch (Exception ex)
@@ -368,17 +374,32 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 DesableContent();
                 ItemsEnabled = false;
 
-                Legendable?.SendMessage("Carregando fotos...");
+                Legendable?.SendMessage("Preparando ambiente...");
                 var myFiles = await API.ApiFile.GetFromCollection(_collection.Id);
-                
+
                 var files = new List<FileView>();
-                for(int i = 0; i < myFiles.Length; i++)
+                myFiles.ToList().ForEach(f => files.Add(new FileView(f)));
+
+                var filesArray = files.ToArray();
+                _ = Task.Factory.StartNew(async () =>
                 {
-                    Legendable?.SendMessage($"Carregando fotos {i + 1} de {myFiles.Length}...");
-                    var fileView = new FileView(myFiles[i]);
-                    await fileView.StartDownload();
-                    files.Add(fileView);
-                }
+                    try
+                    {
+                        foreach (var fileView in filesArray)
+                        {
+                            await Task.Delay(100);
+                            fileView.PrepareDirectory();
+                            if (!fileView.FileExists)
+                                await fileView.Download();
+                            if (fileView.FileExists)
+                                Me.Dispatcher.Invoke(fileView.LoadImageData);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        Me.Dispatcher.Invoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
+                    }
+                });
                 
                 Legendable?.SendMessage("Carregando produtos...");
                 var products = await API.ApiProduct.Get(_collection.Id);

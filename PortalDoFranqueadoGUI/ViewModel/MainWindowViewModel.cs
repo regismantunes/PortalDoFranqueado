@@ -26,7 +26,10 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 if (value.DataContext is BaseViewModel baseViewModel)
                     baseViewModel.Me = Me;
-                
+
+                if (value is ChangePassword)
+                    VisibilityChagePassword = Visibility.Collapsed;
+
                 _controls.Push(value);
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(VisibilityReturn));
@@ -58,13 +61,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public string Title { get; private set; }
 
         public Visibility _visibilityLogout;
+        public Visibility _visibilityChagePassword;
 
         public Visibility VisibilityReturn => _controls.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility VisibilityLogout { get => _visibilityLogout; private set { _visibilityLogout = value; OnPropertyChanged(); } }
+        public Visibility VisibilityChagePassword { get => _visibilityChagePassword; private set { _visibilityChagePassword = value; OnPropertyChanged(); } }
         public RelayCommand ReturnCommand { get; }
         public RelayCommand<Window> LoadedCommand { get; }
         public RelayCommand ReloadCurrentViewCommand { get; }
         public RelayCommand LogoutCommand { get; }
+        public RelayCommand ChangePasswordCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -78,14 +84,30 @@ namespace PortalDoFranqueadoGUI.ViewModel
             LoadedCommand = new RelayCommand<Window>(Loaded);
             ReloadCurrentViewCommand = new RelayCommand(ReloadCurrentView);
             LogoutCommand = new RelayCommand(Logout);
+            ChangePasswordCommand = new RelayCommand(ChangePassword);
 
             _visibilityLogout = Visibility.Hidden;
+            _visibilityChagePassword = Visibility.Hidden;
             Title = "BROTHERS - Portal do Franqueado";
         }
 
         private void Logout()
         {
             API.Configuration.Current.DisconectSession();
+        }
+
+        private void ChangePassword()
+        { 
+            try
+            {
+                DesableContent();
+
+                NavigateTo(new ChangePassword());
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private void Loaded(Window window)
@@ -130,6 +152,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private void SessionChanged(object? sender, EventArgs e)
         {
             VisibilityLogout = API.Configuration.Current.Session == null ? Visibility.Hidden : Visibility.Visible;
+            VisibilityChagePassword = VisibilityLogout;
             ChangeCurrentView();
         }
 
@@ -156,6 +179,9 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public ContentControl ReturnNavigation()
         {
             var previus = _controls.Pop();
+
+            if (previus is ChangePassword)
+                VisibilityChagePassword = Visibility.Visible;
 
             if (previus.DataContext is IDisposable disposable)
                 disposable.Dispose();

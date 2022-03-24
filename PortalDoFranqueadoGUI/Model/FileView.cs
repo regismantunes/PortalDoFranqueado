@@ -1,7 +1,9 @@
-﻿using System;
+﻿using PortalDoFranqueadoGUI.Util;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace PortalDoFranqueadoGUI.Model
@@ -45,9 +47,23 @@ namespace PortalDoFranqueadoGUI.Model
             {
                 _filePath = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FilePath)));
+
+                if (!string.IsNullOrEmpty(_filePath))
+                {
+                    var fileInfo = new FileInfo(_filePath);
+                    FileExists = fileInfo.Exists &&
+                                 fileInfo.Length == Size;
+                }
+                else
+                    FileExists = false;
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileExists)));
             }
         }
-        public BitmapImage? ImageData { get; private set; }
+
+        public bool FileExists { get; private set; }
+        public ImageSource? ImageData { get; private set; }
+        public Stretch Stretch { get; private set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -62,9 +78,12 @@ namespace PortalDoFranqueadoGUI.Model
             Extension = myFile.Extension;
             Size = myFile.Size;
             ContentType = myFile.ContentType;
+            CompressionType = myFile.CompressionType;
         }
 
-        public async Task StartDownload(string? directoryToSave = null)
+        public bool IsImage { get => ContentType.Contains("image"); }
+
+        public void PrepareDirectory(string? directoryToSave = null)
         {
             IsTempDirectory = string.IsNullOrEmpty(directoryToSave);
 
@@ -73,28 +92,27 @@ namespace PortalDoFranqueadoGUI.Model
                 directoryToSave;
 
             FilePath = Path.Combine(folderPath, string.Concat(Id, '_', Name, Extension));
-
-            var loadImageData = string.IsNullOrEmpty(directoryToSave);
-
-            var fileInfo = new FileInfo(FilePath);
-            if (!fileInfo.Exists ||
-                fileInfo.Length != Size)
-                await UpdateImageDataAsync(loadImageData);
-            else if (loadImageData)
-                LoadImageData();
         }
 
-        private async Task UpdateImageDataAsync(bool loadImageData)
+        public async Task Download(string? directoryToSave = null)
         {
-            var tempFile = await API.ApiFile.DownloadFile(Id);
+            if (string.IsNullOrEmpty(FilePath))
+                PrepareDirectory(directoryToSave);
+
+            if (!FileExists)
+                await UpdateImageDataAsync();
+        }
+
+        private async Task UpdateImageDataAsync()
+        {
+            var tempFile = await API.ApiFile.DownloadFile(this);
 
             if (tempFile != null &&
                 !string.IsNullOrEmpty(FilePath))
             {
                 File.Move(tempFile, FilePath, true);
-
-                if (loadImageData)
-                    LoadImageData();
+                FileExists = true;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileExists)));
             }
         }
 
@@ -105,15 +123,25 @@ namespace PortalDoFranqueadoGUI.Model
 
             try
             {
-                var fileStream = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
+                if (IsImage)
+                {
+                    var fileStream = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
 
-                var imageData = new BitmapImage();
-                imageData.BeginInit();
-                imageData.StreamSource = fileStream;
-                imageData.EndInit();
+                    var imageData = new BitmapImage();
+                    imageData.BeginInit();
+                    imageData.StreamSource = fileStream;
+                    imageData.EndInit();
 
-                ImageData = imageData;
+                    ImageData = imageData;
+                    Stretch = Stretch.Uniform;
+                }
+                else
+                {
+                    ImageData = IconManager.GetToImageSourceFromIcon(FilePath);
+                    Stretch = Stretch.None;
+                }
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ImageData)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Stretch)));
             }
             catch (NotSupportedException) { }
             catch

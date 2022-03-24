@@ -5,6 +5,8 @@ namespace PortalDoFranqueadoAPI.Services
 {
     public class HashService
     {
+        private static readonly byte[] SaltBytes = { 152, 241, 234, 55, 43 };
+
         /// <summary>
         /// Generates a hash for the given plain text value and returns a
         /// base64-encoded result. Before the hash is computed, a random salt
@@ -34,7 +36,8 @@ namespace PortalDoFranqueadoAPI.Services
         {
             // If salt is not specified, generate it on the fly.
             if (saltBytes == null)
-            {
+                saltBytes = SaltBytes;
+            /*{
                 // Define min and max salt sizes.
                 int minSaltSize = 4;
                 int maxSaltSize = 8;
@@ -48,7 +51,7 @@ namespace PortalDoFranqueadoAPI.Services
 
                 // Initialize a random number generator.
                 RandomNumberGenerator.Fill(saltBytes);
-            }
+            }*/
 
             // Convert plain text into a byte array.
             byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);

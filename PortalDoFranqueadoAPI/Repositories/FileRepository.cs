@@ -30,6 +30,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", Size" +
                                                 ", Extension" +
                                                 ", CompressionType" +
+                                                ", ContentType" +
                                             " FROM [File]" +
                                             " WHERE Id = @Id", connection);
 
@@ -63,6 +64,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", Size" +
                                                 ", Extension" +
                                                 ", CompressionType" +
+                                                ", ContentType" +
                                             " FROM [File]" +
                                             $" WHERE Id IN ({criteriaIds})", connection);
 
@@ -96,6 +98,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.Size" +
                                                 ", f.Extension" +
                                                 ", f.CompressionType" +
+                                                ", f.ContentType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Campaign_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -134,6 +137,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.Size" +
                                                 ", f.Extension" +
                                                 ", f.CompressionType" +
+                                                ", f.ContentType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Collection_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -167,6 +171,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", f.Size" +
                                                 ", f.Extension" +
                                                 ", f.CompressionType" +
+                                                ", f.ContentType" +
                                             " FROM [File] AS f" +
                                                 " INNER JOIN Auxiliary_File AS cf" +
                                                     " ON cf.FileId = f.Id" +
@@ -206,7 +211,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Name = reader.GetString("Name"),
                 Size = reader.GetInt64("Size"),
                 Extension = reader.GetString("Extension"),
-                CompressionType = reader.GetString("CompressionType")
+                CompressionType = reader.GetString("CompressionType"),
+                ContentType = reader.GetString("ContentType")
             };
 
         public static async Task<int> Insert(SqlConnection connection, MyFile file)

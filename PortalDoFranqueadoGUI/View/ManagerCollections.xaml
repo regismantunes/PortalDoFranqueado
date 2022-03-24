@@ -89,9 +89,10 @@
         <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                   ItemsSource="{Binding FilteredCollection}"
                   SelectionMode="Single"
-                  Width="809"
+                  Width="822"
                   HorizontalAlignment="Left"
-                  IsEnabled="{Binding EnabledContent}">
+                  IsEnabled="{Binding EnabledContent}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Início" Width="80">

@@ -86,7 +86,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             LoadedCommand = new RelayCommand(() =>
             {
-                MaxWidthInformativeText = Me.ActualWidth - 70;
+                MaxWidthInformativeText = Me.ActualWidth - 100;
                 Me.SizeChanged += Me_SizeChanged;
 
                 UpdateSessionInformation();

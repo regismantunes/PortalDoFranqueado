@@ -49,6 +49,7 @@
                   IsEnabled="{Binding EnabledContent}"
                   HorizontalAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
                   MaxWidth="{Binding Me.ActualWidth}"
                   x:Name="listFiles">
             <ListView.Resources>
@@ -72,8 +73,10 @@
                 <DataTemplate>
                     <StackPanel IsEnabled="{Binding Removed, Converter={StaticResource ReverseBooleanConverter}}">
                         <Image Source="{Binding ImageData}"
-                               Width="100"
-                               Height="100"/>
+                               UseLayoutRounding="True" SnapsToDevicePixels="True" Stretch="{Binding Stretch}"
+                               Height="100"
+                               MaxWidth="100"
+                               MaxHeight="100"/>
                         <TextBlock Text="{Binding Name}"
                                    TextWrapping="Wrap"
                                    MaxWidth="100"/>
