@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoGUI.Util;
+﻿using PortalDoFranqueadoGUI.Util.Compress;
 using System;
 using System.Globalization;
 using System.IO;
@@ -80,7 +80,8 @@ namespace PortalDoFranqueadoGUI.API
                 await contentStream.CopyToAsync(ms);
                 ms.Position = 0;
                 var compressedBytes = ms.ToArray();
-                var bytes = Compress.GZipDecompress(compressedBytes);
+                var bytes = await CompressorFactory.GetCompressorAsync(compressType)
+                                                   .DecompressAsync(compressedBytes);
                 File.WriteAllBytes(tmpFile, bytes);
             }
             else

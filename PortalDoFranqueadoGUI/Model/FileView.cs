@@ -100,10 +100,10 @@ namespace PortalDoFranqueadoGUI.Model
                 PrepareDirectory(directoryToSave);
 
             if (!FileExists)
-                await UpdateImageDataAsync();
+                await UpdateContentDataAsync();
         }
 
-        private async Task UpdateImageDataAsync()
+        private async Task UpdateContentDataAsync()
         {
             var tempFile = await API.ApiFile.DownloadFile(this);
 

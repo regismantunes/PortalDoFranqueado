@@ -1,5 +1,6 @@
 ﻿using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Util;
+using PortalDoFranqueadoGUI.Util.Compress;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoGUI.API
@@ -40,8 +41,10 @@ namespace PortalDoFranqueadoGUI.API
 
         public static async Task UploadFile(MyFile file, byte[] bytes)
         {
-            file.CompressionType = "GZip";
-            var compressedBytes = Compress.GZipCompress(bytes);
+            var compressor = CompressorFactory.GetCompressorForMimeTypeAsync(file.ContentType);
+
+            file.CompressionType = compressor.GetCompressStrategy().GetDescription();
+            var compressedBytes = await compressor.CompressAsync(bytes);
             
             await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
                             .PostFile(compressedBytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
