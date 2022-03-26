@@ -1,6 +1,4 @@
 ﻿using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Util;
-using PortalDoFranqueadoGUI.Util.Compress;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoGUI.API
@@ -40,19 +38,12 @@ namespace PortalDoFranqueadoGUI.API
                             .Get();
 
         public static async Task UploadFile(MyFile file, byte[] bytes)
-        {
-            var compressor = CompressorFactory.GetCompressorForMimeTypeAsync(file.ContentType);
-
-            file.CompressionType = compressor.GetCompressStrategy().GetDescription();
-            var compressedBytes = await compressor.CompressAsync(bytes);
-            
-            await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
-                            .PostFile(compressedBytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
-        }
+            => await BaseApi.GetSimpleHttpClientRequest($"files/upload/{file.Id}/{file.CompressionType}")
+                            .PostFile(bytes, file.ContentType, file.Name, string.Concat(file.Name, file.Extension));
 
         public static async Task<string> DownloadFile(MyFile file)
             => await BaseApi.GetSimpleHttpClientRequest($"files/download/{file.Id}")
-                            .GetFile(file.CompressionType);
+                            .GetFile();
 
         public static async Task Delete(int[] ids)
             => await BaseApi.GetSimpleHttpClientRequest("files")

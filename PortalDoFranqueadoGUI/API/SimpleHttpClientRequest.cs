@@ -1,6 +1,4 @@
-﻿using PortalDoFranqueadoGUI.Util.Compress;
-using System;
-using System.Globalization;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -25,8 +23,8 @@ namespace PortalDoFranqueadoGUI.API
         public async Task Get()
             => await Get(RequestUri, BearerToken);
 
-        public async Task<string> GetFile(string compressType)
-            => await GetFile(RequestUri, compressType, BearerToken);
+        public async Task<string> GetFile()
+            => await GetFile(RequestUri, BearerToken);
 
         public async Task Patch<TValue>(TValue value)
             => await Patch(RequestUri, value, BearerToken);
@@ -66,7 +64,7 @@ namespace PortalDoFranqueadoGUI.API
             await GetResult(response);
         }
 
-        public static async Task<string> GetFile(string? requestUri, string compressType, string? bearerToken = null)
+        public static async Task<string> GetFile(string? requestUri, string? bearerToken = null)
         {
             using var client = CreateHttpClient(bearerToken);
             using var response = await client.GetAsync(requestUri);
@@ -74,22 +72,9 @@ namespace PortalDoFranqueadoGUI.API
             var contentStream = await response.Content.ReadAsStreamAsync();
             var tmpFile = Path.GetTempFileName();
 
-            if (compressType == "GZip")
-            {
-                using var ms = new MemoryStream();
-                await contentStream.CopyToAsync(ms);
-                ms.Position = 0;
-                var compressedBytes = ms.ToArray();
-                var bytes = await CompressorFactory.GetCompressorAsync(compressType)
-                                                   .DecompressAsync(compressedBytes);
-                File.WriteAllBytes(tmpFile, bytes);
-            }
-            else
-            {
-                using var fs = new FileStream(tmpFile, FileMode.Create);
-                await contentStream.CopyToAsync(fs);
-            }
-            
+            using var fs = new FileStream(tmpFile, FileMode.Create);
+            await contentStream.CopyToAsync(fs);
+
             return tmpFile;
         }
 
