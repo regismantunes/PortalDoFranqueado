@@ -56,28 +56,30 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Tabelas" />
+    <Folder Include="Tables" />
     <Folder Include="Populate" />
     <Folder Include="Populate\Development" />
+    <Folder Include="Update" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Tabelas\Store.sql" />
-    <Build Include="Tabelas\User.sql" />
-    <Build Include="Tabelas\User_Store.sql" />
-    <Build Include="Tabelas\Informative.sql" />
-    <Build Include="Tabelas\Collection.sql" />
-    <Build Include="Tabelas\Purchase.sql" />
-    <Build Include="Tabelas\Purchase_Product.sql" />
-    <Build Include="Tabelas\Family.sql" />
-    <Build Include="Tabelas\Family_Size.sql" />
-    <Build Include="Tabelas\Product.sql" />
-    <Build Include="Tabelas\Campaign.sql" />
-    <Build Include="Tabelas\Campaign_File.sql" />
-    <Build Include="Tabelas\File.sql" />
-    <Build Include="Tabelas\Auxiliary.sql" />
-    <Build Include="Tabelas\Auxiliary_File.sql" />
-    <Build Include="Tabelas\Collection_File.sql" />
-    <Build Include="Tabelas\File_Content.sql" />
+    <Build Include="Tables\Store.sql" />
+    <Build Include="Tables\User.sql" />
+    <Build Include="Tables\User_Store.sql" />
+    <Build Include="Tables\Informative.sql" />
+    <Build Include="Tables\Collection.sql" />
+    <Build Include="Tables\Purchase.sql" />
+    <Build Include="Tables\Purchase_Product.sql" />
+    <Build Include="Tables\Family.sql" />
+    <Build Include="Tables\Family_Size.sql" />
+    <Build Include="Tables\Product.sql" />
+    <Build Include="Tables\Campaign.sql" />
+    <Build Include="Tables\Campaign_File.sql" />
+    <Build Include="Tables\File.sql" />
+    <Build Include="Tables\Auxiliary.sql" />
+    <Build Include="Tables\Auxiliary_File.sql" />
+    <Build Include="Tables\Collection_File.sql" />
+    <Build Include="Tables\File_Content.sql" />
+    <Build Include="Tables\Path.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />

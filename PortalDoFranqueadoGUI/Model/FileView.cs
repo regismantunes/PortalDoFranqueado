@@ -1,4 +1,5 @@
 ﻿using PortalDoFranqueadoGUI.Util;
+using PortalDoFranqueadoGUI.Util.Extensions;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -90,6 +91,8 @@ namespace PortalDoFranqueadoGUI.Model
             var folderPath = IsTempDirectory ?
                 Path.Combine(Path.GetTempPath(), "BROTHERS", "Franqueados") :
                 directoryToSave;
+
+            DirectoryExtensions.CreateDirectoryChain(folderPath);
 
             FilePath = Path.Combine(folderPath, string.Concat(Id, '_', Name, Extension));
         }

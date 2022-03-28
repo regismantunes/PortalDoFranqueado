@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace PortalDoFranqueadoGUI.Util
+namespace PortalDoFranqueadoGUI.Util.Extensions
 {
     public static class EnumExtensions
     {

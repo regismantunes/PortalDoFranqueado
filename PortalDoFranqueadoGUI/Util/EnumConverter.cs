@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
+using PortalDoFranqueadoGUI.Util.Extensions;
 
 namespace PortalDoFranqueadoGUI.Util
 {
