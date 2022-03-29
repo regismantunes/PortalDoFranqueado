@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
-             xmlns:model="clr-namespace:PortalDoFranqueadoGUI.Model"
              xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:xt="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
              xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
              d:DataContext="{d:DesignInstance Type=viewmodel:FranchiseePurchaseStoreViewModel}"
              mc:Ignorable="d" 
@@ -129,7 +129,9 @@
                     <GridViewColumn Header="Foto" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding FileView.ImageData}"/>
+                                <Button Command="{Binding OpenFileViewCommand}">
+                                    <Image Source="{Binding FileView.ImageData}"/>
+                                </Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

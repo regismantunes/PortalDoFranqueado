@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Model.Order;
 using PortalDoFranqueadoGUI.Repository;
+using PortalDoFranqueadoGUI.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -53,6 +54,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
             private bool _focused;
             private readonly List<string> _lockedSizes;
 
+            public RelayCommand OpenFileViewCommand { get; }
+
             public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file)
             {
                 _lockedSizes = new List<string>();
@@ -63,6 +66,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 FamilyName = string.Empty;
                 ViewModel = owner;
                 HasChange = false;
+
+                OpenFileViewCommand = new RelayCommand(OpenFileView);
             }
 
             public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file, Product product)
@@ -79,6 +84,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 FileView = file;
                 ViewModel = owner;
                 HasChange = false;
+
+                OpenFileViewCommand = new RelayCommand(OpenFileView);
             }
 
             private void LoadLockedSizes()
@@ -142,13 +149,21 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
             public ManagerCollectionViewModel ViewModel { get; set; }
 
-            
+            private void OpenFileView()
+            {
+                if (ViewModel == null ||
+                    FileView == null)
+                    return;
+
+                ViewModel.Navigator.NavigateTo(new ViewImage(FileView));
+            }
         }
 
         private DateTime _collectionStartDate;
         private DateTime _collectionEndDate;
         private readonly Collection _collection;
         private bool _itemsEnabled;
+        private bool _loaded;
 
         public ObservableCollection<CollectionProductViewModel> Products { get; }
 
@@ -358,7 +373,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao excluir produto", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao excluir produto", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -366,8 +381,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private async Task LoadProducts()
+        private async Task LoadProducts(bool reload = false)
         {
+            if (!reload && _loaded)
+                return;
+
             CollectionProductViewModel? firstEmpty = null;
             try
             {
@@ -448,6 +466,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             finally
             {
+                _loaded = true;
                 ItemsEnabled = true;
 
                 if (firstEmpty != null)

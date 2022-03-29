@@ -1,5 +1,7 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using GalaSoft.MvvmLight.CommandWpf;
+using PortalDoFranqueadoGUI.Model;
 using PortalDoFranqueadoGUI.Util;
+using PortalDoFranqueadoGUI.View;
 using System.Linq;
 
 namespace PortalDoFranqueadoGUI.ViewModel
@@ -7,6 +9,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
     public class ProductViewModel : BaseNotifyPropertyChanged, IExpandable
     {
         private bool _focused;
+
+        public RelayCommand OpenFileViewCommand { get; }
 
         public ProductViewModel(Product product, PurchaseItem[]? items = null)
         {
@@ -37,8 +41,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                 UpdateAmount();
             }
+
+            OpenFileViewCommand = new RelayCommand(OpenFileView);
         }
 
+        public INavigatorViewModel? Navigator { get; set; }
         public bool IsExpanded { get; set; }
         public string FamilyName => Product.Family.Name;
         public Product Product { get; set; }
@@ -61,6 +68,15 @@ namespace PortalDoFranqueadoGUI.ViewModel
         {
             Amount = (Product?.Price ?? 0) * Items.Sum(item => item.Value.Quantity ?? 0);
             OnPropertyChanged(nameof(Amount));
+        }
+
+        private void OpenFileView()
+        {
+            if (Navigator == null ||
+                FileView == null)
+                return;
+
+            Navigator.NavigateTo(new ViewImage(FileView));
         }
     }
 }

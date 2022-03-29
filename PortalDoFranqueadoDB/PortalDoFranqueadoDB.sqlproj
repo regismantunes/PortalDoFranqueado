@@ -82,9 +82,6 @@
     <Build Include="Tables\Path.sql" />
   </ItemGroup>
   <ItemGroup>
-    <RefactorLog Include="PortalDoFranqueadoDB.refactorlog" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Populate\Family.sql" />
     <None Include="Populate\Family_Size.sql" />
     <None Include="Populate\Development\Store.sql" />

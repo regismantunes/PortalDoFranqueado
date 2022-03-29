@@ -70,6 +70,15 @@
         <Setter Property="Width" Value="100"/>
         <Setter Property="FontWeight" Value="Normal"/>
     </Style>
+    <Style TargetType="Button" x:Key="ImageButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style TargetType="Border" x:Key="DefaultBorder">
         <Setter Property="BorderThickness" Value="1"/>

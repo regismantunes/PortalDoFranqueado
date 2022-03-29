@@ -19,7 +19,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private FieldViewModel<PurchaseItemViewModel>[] _fields;
         private Store? _store;
         private decimal _amount;
-        
+        private bool _loaded;
+
         public Visibility VisibilityComboBoxStore => _store == null ? Visibility.Visible : Visibility.Hidden;
         public Visibility VisibilityTextBlockStore => _store == null ? Visibility.Hidden : Visibility.Visible;
         public Store? Store
@@ -63,7 +64,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             Status = null;
             VisibilityButtonSave = Visibility.Hidden;
 
-            LoadedCommand = new RelayCommand(LoadStore);
+            LoadedCommand = new RelayCommand(() => LoadStore());
             GoToNextFieldCommand = new RelayCommand(GoToNextField);
             GoToPreviusFieldCommand = new RelayCommand(GoToPreviusField);
             SaveCommand = new RelayCommand(async () => await Save(false));
@@ -175,8 +176,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
             _fields[_indexFocus].IsFocused = true;
         }
 
-        private void LoadStore()
+        private void LoadStore(bool reload = false)
         {
+            if (!reload && _loaded)
+                return;
+
             if (_store != null)
                 return;
 
@@ -200,6 +204,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             finally
             {
+                _loaded = true;
                 EnableContent();
             }
         }
@@ -278,7 +283,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                             var productVM = new ProductViewModel(product, purchase?.Items.Where(i => i.ProductId == product.Id)
                                                                                         .ToArray())
                             {
-                                FileView = fileView
+                                FileView = fileView,
+                                Navigator = Navigator
                             };
                             productVM.Items
                                 .ToList()

@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <StartupObject>PortalDoFranqueadoGUI.App</StartupObject>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +26,7 @@
     <None Remove="Media\previsao.png" />
     <None Remove="Media\proxima-campanha.png" />
     <None Remove="Media\voltar.png" />
+    <None Remove="ViewModel\ProductViewModel.cs~RF61e78cdc.TMP" />
   </ItemGroup>
 
   <ItemGroup>

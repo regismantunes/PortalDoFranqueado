@@ -14,6 +14,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
     {
         private readonly LocalRepository _cache;
 
+        private bool _loaded;
+
         public Purchase Purchase { get; private set; }
         public Store Store { get; private set; }
         public ProductViewModel[] Products { get; private set; }
@@ -30,8 +32,11 @@ namespace PortalDoFranqueadoGUI.ViewModel
             LoadedCommand = new RelayCommand(async () => await LoadPurchase());
         }
 
-        private async Task LoadPurchase()
+        private async Task LoadPurchase(bool reload = false)
         {
+            if (!reload && _loaded)
+                return;
+
             try
             {
                 DesableContent();
@@ -81,7 +86,8 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     productsVM.Add(new ProductViewModel(product, Purchase.Items.Where(i => i.ProductId == product.Id)
                                                                                .ToArray())
                     {
-                        FileView = fileView
+                        FileView = fileView,
+                        Navigator = Navigator
                     });
                 }
 
@@ -100,6 +106,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             finally
             {
+                _loaded = true;
                 EnableContent();
                 Legendable?.SendMessage(string.Empty);
             }

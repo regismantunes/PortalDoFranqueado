@@ -82,7 +82,9 @@
                     <GridViewColumn Header="Foto" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Image Source="{Binding FileView.ImageData}"/>
+                                <Button Command="{Binding OpenFileViewCommand}">
+                                    <Image Source="{Binding FileView.ImageData}"/>
+                                </Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
