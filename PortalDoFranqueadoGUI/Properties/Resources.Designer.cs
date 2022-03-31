@@ -59,15 +59,5 @@ namespace PortalDoFranqueadoGUI.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] PurchaseModel {
-            get {
-                object obj = ResourceManager.GetObject("PurchaseModel", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }
