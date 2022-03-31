@@ -10,26 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Media\Cabecalho.png" />
-    <None Remove="Media\campanha-ativa.png" />
-    <None Remove="Media\campanha.png" />
-    <None Remove="Media\compras-desabilitado.png" />
-    <None Remove="Media\compras.png" />
-    <None Remove="Media\fotos-e-videos.png" />
-    <None Remove="Media\fotos.png" />
-    <None Remove="Media\fotos.png~RF26a61560.TMP" />
-    <None Remove="Media\logo-01.png" />
-    <None Remove="Media\logo-02.png" />
-    <None Remove="Media\logout.png" />
-    <None Remove="Media\media.png" />
-    <None Remove="Media\previsao-de-pedido.png" />
-    <None Remove="Media\previsao.png" />
-    <None Remove="Media\proxima-campanha.png" />
-    <None Remove="Media\voltar.png" />
-    <None Remove="ViewModel\ProductViewModel.cs~RF61e78cdc.TMP" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Media\cabecalho.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -68,7 +48,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspose.PDF" Version="22.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
@@ -93,8 +72,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
-    <Folder Include="Resources\" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <PropertyGroup>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.Util
+namespace PortalDoFranqueadoGUI.Util.Converter
 {
     public class ReverseBooleanConverter : IValueConverter
     {

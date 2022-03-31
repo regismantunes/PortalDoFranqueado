@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using PortalDoFranqueadoGUI.Util.Extensions;
 
-namespace PortalDoFranqueadoGUI.Util
+namespace PortalDoFranqueadoGUI.Util.Converter
 {
     public class EnumConverter : IValueConverter
     {

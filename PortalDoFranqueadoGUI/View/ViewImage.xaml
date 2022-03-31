@@ -8,5 +8,7 @@
              d:DataContext="{d:DesignInstance Type=viewmodel:ViewImageViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Image Source="{Binding Source}" Stretch="None"/>
+    <ScrollViewer>
+        <Image Source="{Binding Source}" Stretch="None"/>
+    </ScrollViewer>
 </UserControl>

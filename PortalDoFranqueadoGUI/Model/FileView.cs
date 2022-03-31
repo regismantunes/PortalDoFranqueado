@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoGUI.Util;
+﻿using PortalDoFranqueadoGUI.Util.Image;
 using PortalDoFranqueadoGUI.Util.Extensions;
 using System;
 using System.ComponentModel;
