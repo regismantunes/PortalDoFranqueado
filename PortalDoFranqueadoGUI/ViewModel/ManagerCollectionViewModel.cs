@@ -95,7 +95,7 @@ namespace PortalDoFranqueado.ViewModel
                     return;
                 }
 
-                var cache = (LocalRepository)App.Current.Resources["Cache"];
+                var cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
                 var family = cache.Families.First(f => f.Id == FamilyId);
 
                 LockedSizes = family.Sizes.OrderBy(size => size.Order)
@@ -422,7 +422,7 @@ namespace PortalDoFranqueado.ViewModel
                 var products = await API.ApiProduct.Get(_collection.Id);
 
                 Legendable?.SendMessage("Carregando famílias...");
-                var cache = (LocalRepository)App.Current.Resources["Cache"];
+                var cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
                 var families = await cache.LoadFamilies();
 
                 Legendable?.SendMessage("Configurando itens...");

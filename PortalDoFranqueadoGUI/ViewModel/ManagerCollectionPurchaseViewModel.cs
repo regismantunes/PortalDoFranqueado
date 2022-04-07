@@ -14,7 +14,7 @@ namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerCollectionPurchaseViewModel : BaseViewModel
     {
-        private readonly LocalRepository _cache;
+        private readonly TemporaryLocalRepository _cache;
 
         private bool _loaded;
 
@@ -30,7 +30,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             Purchase = purchase;
 
-            _cache = (LocalRepository)App.Current.Resources["Cache"];
+            _cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
 
             LoadedCommand = new RelayCommand(async () => await LoadPurchase());
             ExportToExcelCommand = new RelayCommand(async () => await ExportToExcel());

@@ -99,7 +99,7 @@
                                         <ComboBox.ItemsSource>
                                             <CompositeCollection>
                                                 <model:Family Id="0" Name="&lt;Selecione>"/>
-                                                <CollectionContainer Collection="{Binding Families, Source={StaticResource Cache}}" />
+                                                <CollectionContainer Collection="{Binding Families, Source={StaticResource TempCache}}" />
                                             </CompositeCollection>
                                         </ComboBox.ItemsSource>
                                     </ComboBox>

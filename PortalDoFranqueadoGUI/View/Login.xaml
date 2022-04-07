@@ -74,7 +74,8 @@
                  Margin="5"
                  FontSize="16"
                  Name="txtPassword"
-                 IsEnabled="{Binding LoginIsEnabled}"/>
+                 IsEnabled="{Binding LoginIsEnabled}"
+                 util:FocusExtension.IsFocused="{Binding PasswordFocused}"/>
         <Button Grid.Column="1" Grid.Row="6"
                 Content="LOGIN"
                 Style="{StaticResource MainButton}"

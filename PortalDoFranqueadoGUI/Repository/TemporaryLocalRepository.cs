@@ -7,7 +7,7 @@ using System;
 
 namespace PortalDoFranqueado.Repository
 {
-    public class LocalRepository : BaseNotifyPropertyChanged
+    public class TemporaryLocalRepository : BaseNotifyPropertyChanged
     {
         private IReadOnlyList<Store> _stores = Array.Empty<Store>();
         public IReadOnlyList<Store> Stores 

@@ -34,7 +34,7 @@ namespace PortalDoFranqueado.ViewModel
             public bool CanReverse { get => _canReverse; set { _canReverse = value; OnPropertyChanged(); } }
         }
 
-        private readonly LocalRepository _cache;
+        private readonly TemporaryLocalRepository _cache;
 
         public Collection Collection { get; }
         public PurchaseViewModel[] Purchases { get; private set; }
@@ -46,7 +46,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             Collection = collection;
 
-            _cache = (LocalRepository)App.Current.Resources["Cache"];
+            _cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
 
             LoadedCommand = new RelayCommand(LoadPurchases);
             ViewPurchaseCommand = new RelayCommand<Purchase>(ViewPurchase);

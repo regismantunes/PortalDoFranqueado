@@ -68,7 +68,7 @@
                       Margin="0,5"
                       Cursor="Arrow"
                       Visibility="{Binding VisibilityComboBoxStore}"
-                      ItemsSource="{Binding Stores, Source={StaticResource Cache}}" IsTabStop="True"/>
+                      ItemsSource="{Binding Stores, Source={StaticResource TempCache}}" IsTabStop="True"/>
             <TextBlock Grid.Row="0" Grid.RowSpan="2"
                        Grid.Column="1"
                        Text="{Binding Store.Name}"

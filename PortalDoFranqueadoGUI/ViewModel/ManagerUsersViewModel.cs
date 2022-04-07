@@ -41,7 +41,7 @@ namespace PortalDoFranqueado.ViewModel
                 { 
                     _storeId = value; 
                     OnPropertyChanged();
-                    Store = _storeId == 0 ? null : ((LocalRepository)App.Current.Resources["Cache"]).Stores.First(store => store.Id == value);
+                    Store = _storeId == 0 ? null : ((TemporaryLocalRepository)App.Current.Resources["TempCache"]).Stores.First(store => store.Id == value);
                 } 
             }
 
@@ -258,7 +258,7 @@ namespace PortalDoFranqueado.ViewModel
 
                     var resetCode = await API.ApiAccount.ResetPassword(_user.Id);
                     MessageBox.Show(Window, $"A senha do usuário {_email} foi resetada!{Environment.NewLine}" +
-                                    $"O código para reativação é: {resetCode}", "BRTHERS - Resetar senha", MessageBoxButton.OK, MessageBoxImage.Information);
+                                            $"O código para reativação é: {resetCode}", "BRTHERS - Resetar senha", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -357,7 +357,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 Users.Add(CreateUserViewModel());
 
-                await ((LocalRepository)App.Current.Resources["Cache"]).LoadStores();
+                await ((TemporaryLocalRepository)App.Current.Resources["TempCache"]).LoadStores();
             }
             catch (Exception ex)
             {

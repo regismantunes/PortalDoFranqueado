@@ -19,7 +19,7 @@ namespace PortalDoFranqueado.ViewModel
     public class FranchiseePurchaseStoreViewModel : BaseViewModel, IReloadable
     {
         public bool ExpandGroups { get; set; } = true;
-        private readonly LocalRepository _cache;
+        private readonly TemporaryLocalRepository _cache;
         private int _indexFocus;
         private FieldViewModel<PurchaseItemViewModel>[] _fields;
         private bool _loaded;
@@ -76,7 +76,7 @@ namespace PortalDoFranqueado.ViewModel
 
         public FranchiseePurchaseStoreViewModel()
         {
-            _cache = (LocalRepository)App.Current.Resources["Cache"];
+            _cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
 
             _indexFocus = 0;
             _fields = Array.Empty<FieldViewModel<PurchaseItemViewModel>>();

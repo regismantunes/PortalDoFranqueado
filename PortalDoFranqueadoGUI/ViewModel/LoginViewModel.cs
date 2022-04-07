@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
+using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.Update;
 using System;
 using System.Threading.Tasks;
@@ -9,17 +10,37 @@ namespace PortalDoFranqueado.ViewModel
 {
     internal class LoginViewModel : BaseViewModel
     {
+        private string? _errorMessage;
         private bool _emailLoginFocused;
+        private bool _passwordFocused;
         private bool _loginIsEnabled;
+        private PersistentLocalRepository _persistCache;
 
         public string? EmailLogin { get; set; }
-        public string? ErrorMessage { get; private set; }
+        public string? ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                _errorMessage = value;
+                OnPropertyChanged();
+            }
+        }
         public bool EmailLoginFocused 
         { 
             get => _emailLoginFocused;
             set
             {
                 _emailLoginFocused = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool PasswordFocused
+        {
+            get => _passwordFocused;
+            set
+            {
+                _passwordFocused = value;
                 OnPropertyChanged();
             }
         }
@@ -70,9 +91,16 @@ namespace PortalDoFranqueado.ViewModel
                 if (isCompatible)
                 {
                     LoginIsEnabled = true;
-                    EmailLoginFocused = true;
                     HellcomeMessageVisibility = Visibility.Visible;
                     OnPropertyChanged(nameof(HellcomeMessageVisibility));
+
+                    _persistCache = (PersistentLocalRepository)App.Current.Resources["PersistCache"];
+                    EmailLogin = _persistCache?.LastUserName;
+                    OnPropertyChanged(nameof(EmailLogin));
+                    if (string.IsNullOrEmpty(EmailLogin))
+                        EmailLoginFocused = true;
+                    else
+                        PasswordFocused = true;
                 }
                 else
                 {
@@ -112,11 +140,12 @@ namespace PortalDoFranqueado.ViewModel
                 try
                 {
                     await API.ApiAccount.Login(EmailLogin, password);
+                    _persistCache.LastUserName = EmailLogin;
+                    _persistCache.SaveAsync();
                 }
                 catch (Exception ex)
                 {
                     ErrorMessage = ex.Message;
-                    OnPropertyChanged(nameof(ErrorMessage));
                     EmailLoginFocused = true;
                 }
             }

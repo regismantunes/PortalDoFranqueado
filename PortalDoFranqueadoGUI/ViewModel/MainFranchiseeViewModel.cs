@@ -21,7 +21,7 @@ namespace PortalDoFranqueado.ViewModel
         private Visibility _visibilityInformativeText;
 
         private StackPanel _stackPanelCampaigns;
-        private readonly LocalRepository _cache;
+        private readonly TemporaryLocalRepository _cache;
 
         public string WellcomeMessage { get; private set; }
         public string InformativeTitle { get; private set; }
@@ -80,7 +80,7 @@ namespace PortalDoFranqueado.ViewModel
 
         public MainFranchiseeViewModel()
         {
-            _cache = (LocalRepository)App.Current.Resources["Cache"];
+            _cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
 
             MaxWidthInformativeText = 0;
 
