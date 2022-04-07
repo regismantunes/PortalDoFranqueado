@@ -1,8 +1,8 @@
-﻿using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueado.Model;
+using PortalDoFranqueado.ViewModel;
 using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.View
+namespace PortalDoFranqueado.View
 {
     /// <summary>
     /// Interação lógica para PurchaseCollection.xam

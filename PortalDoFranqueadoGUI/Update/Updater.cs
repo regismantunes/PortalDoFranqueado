@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueadoGUI.Update
+namespace PortalDoFranqueado.Update
 {
     internal static class Updater
     {

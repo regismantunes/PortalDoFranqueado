@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public abstract class BaseNotifyPropertyChanged : INotifyPropertyChanged
     {

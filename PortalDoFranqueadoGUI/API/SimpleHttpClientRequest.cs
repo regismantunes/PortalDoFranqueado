@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueadoGUI.API
+namespace PortalDoFranqueado.API
 {
     public class SimpleHttpClientRequest
     {

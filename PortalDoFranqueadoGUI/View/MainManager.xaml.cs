@@ -1,8 +1,8 @@
-﻿using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueado.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.View
+namespace PortalDoFranqueado.View
 {
     /// <summary>
     /// Interação lógica para MainManager.xam

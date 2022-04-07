@@ -7,7 +7,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class PurchaseRepository
     {
-        public static async Task Save(SqlConnection connection, Purchase purchase)
+        public static async Task<int> Save(SqlConnection connection, Purchase purchase)
         {
             await purchase.Validate(connection);
 
@@ -73,7 +73,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
                         cmd.Parameters.AddWithValue("@Item", count);
                         cmd.Parameters.AddWithValue("@ProductId", item.ProductId);
-                        cmd.Parameters.AddWithValue("@SizeId", item.Size);
+                        cmd.Parameters.AddWithValue("@SizeId", item.Size.Size);
                         cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
 
                         if (await cmd.ExecuteNonQueryAsync() == 0)
@@ -81,6 +81,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     }
 
                     await transaction.CommitAsync();
+
+                    return purchase.Id.Value;
                 }
                 catch
                 {
@@ -104,9 +106,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("SELECT * FROM Purchase" +
-                                            " WHERE Id = @Id;", connection);
+                                        " WHERE Id = @Id;", connection);
 
-                cmd.Parameters.AddWithValue("@Id", purchaseId);;
+                cmd.Parameters.AddWithValue("@Id", purchaseId);
 
                 var reader = await cmd.ExecuteReaderAsync();
 
@@ -115,6 +117,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     var purchase = LoadPurchase(reader);
                     await reader.CloseAsync();
                     await purchase.LoadPurchaseItems(connection);
+                    return purchase;
                 }
 
                 return null;
@@ -149,18 +152,32 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand("SELECT * FROM Purchase_Product" +
+                using var cmd = new SqlCommand("SELECT pp.*, fs.[Order]" +
+                                            " FROM Purchase_Product AS pp" +
+                                                " INNER JOIN Product AS p" +
+                                                    " ON p.Id = pp.ProductId" +
+                                                " INNER JOIN Family_Size AS fs" +
+                                                    " ON fs.FamilyId = p.FamilyId" +
+                                                    " AND fs.SizeId = pp.SizeId" +
                                             " WHERE PurchaseId = @PurchaseId;", connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
                 using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
+                {
+                    var productSize = new ProductSize()
+                    {
+                        Size = reader.GetString("SizeId"),
+                        Order = reader.GetInt16("Order")
+                    };
+
                     listItems.Add(new PurchaseItem()
                     {
                         ProductId = reader.GetInt32("ProductId"),
-                        Size = reader.GetString("SizeId"),
+                        Size = productSize,
                         Quantity = reader.GetInt32("Quantity")
                     });
+                }
 
                 await reader.CloseAsync();
 

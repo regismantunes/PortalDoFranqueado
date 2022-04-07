@@ -1,6 +1,6 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerCampaignsViewModel : BaseViewModel, IReloadable
     {

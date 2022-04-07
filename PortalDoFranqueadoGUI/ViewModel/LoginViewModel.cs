@@ -1,12 +1,16 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
+using PortalDoFranqueado.Update;
 using System;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class LoginViewModel : BaseViewModel
     {
         private bool _emailLoginFocused;
+        private bool _loginIsEnabled;
 
         public string? EmailLogin { get; set; }
         public string? ErrorMessage { get; private set; }
@@ -19,20 +23,75 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 OnPropertyChanged();
             }
         }
+        public bool LoginIsEnabled
+        {
+            get => _loginIsEnabled;
+            set
+            {
+                _loginIsEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+        public Visibility OldVersionMessageVisibility { get; private set; }
+        public Visibility HellcomeMessageVisibility { get; private set; }
 
         public RelayCommand<PasswordBox> LoginCommand { get; }
         public RelayCommand LoadedCommand { get; }
 
         public LoginViewModel()
         {
-            LoginCommand = new RelayCommand<PasswordBox>(Login);
-            LoadedCommand = new RelayCommand(() => EmailLoginFocused = true);
+            LoginCommand = new RelayCommand<PasswordBox>(async (PasswordBox passwordBox) => await Login(passwordBox));
+            LoadedCommand = new RelayCommand(async () => await Loaded());
+            LoginIsEnabled = false;
+            HellcomeMessageVisibility = Visibility.Collapsed;
+            OldVersionMessageVisibility = Visibility.Collapsed;
         }
 
-        public async void Login(PasswordBox passwordBox)
+        private async Task Loaded()
         {
             try
             {
+                DesableContent();
+
+                var currentVersion = string.Empty;
+                try
+                {
+                    currentVersion = Updater.GetCurrentVersion().ToString(3);
+                }
+                catch
+                {
+                    currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(4);
+                }
+
+                var isCompatible = await API.ApiMainScreen.VerifyCompatibleVersion(currentVersion);
+
+                EnableContent();
+
+                if (isCompatible)
+                {
+                    LoginIsEnabled = true;
+                    EmailLoginFocused = true;
+                    HellcomeMessageVisibility = Visibility.Visible;
+                    OnPropertyChanged(nameof(HellcomeMessageVisibility));
+                }
+                else
+                {
+                    OldVersionMessageVisibility = Visibility.Visible;
+                    OnPropertyChanged(nameof(OldVersionMessageVisibility));
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                OnPropertyChanged(nameof(ErrorMessage));
+            }
+        }
+
+        private async Task Login(PasswordBox passwordBox)
+        {
+            try
+            {
+                LoginIsEnabled = false;
                 DesableContent();
 
                 if (string.IsNullOrEmpty(EmailLogin))
@@ -64,6 +123,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             finally
             {
                 EnableContent();
+                LoginIsEnabled = true;
             }
         }
     }

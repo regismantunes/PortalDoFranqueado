@@ -1,4 +1,4 @@
-﻿namespace PortalDoFranqueadoGUI.Util
+﻿namespace PortalDoFranqueado.Util
 {
     public interface IExpandable
     {

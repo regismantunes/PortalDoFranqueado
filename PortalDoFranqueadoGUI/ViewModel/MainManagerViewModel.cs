@@ -1,11 +1,11 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.Windows;
 using System;
 using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.View;
 using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class MainManagerViewModel : BaseViewModel, IReloadable
     {

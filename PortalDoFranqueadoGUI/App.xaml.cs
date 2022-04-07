@@ -1,7 +1,7 @@
-﻿using PortalDoFranqueadoGUI.Update;
+﻿using PortalDoFranqueado.Update;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI
+namespace PortalDoFranqueado
 {
     /// <summary>
     /// Interaction logic for App.xaml

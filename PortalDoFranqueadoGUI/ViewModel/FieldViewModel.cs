@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public class FieldViewModel<T> : BaseNotifyPropertyChanged
     {

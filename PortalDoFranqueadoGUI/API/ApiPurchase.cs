@@ -1,13 +1,32 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace PortalDoFranqueadoGUI.API
+namespace PortalDoFranqueado.API
 {
     public static class ApiPurchase
     {
-        public static async Task Save(Purchase purchas)
-            => await BaseApi.GetSimpleHttpClientRequest("purchase")
-                            .Put(purchas);
+        public static async Task<int> Save(Purchase purchase)
+        {
+            var cleanPurchase = new Purchase()
+            {
+                Id = purchase.Id,
+                CollectionId = purchase.CollectionId,
+                StoreId = purchase.StoreId,
+                Status = purchase.Status,
+            };
+            
+            cleanPurchase.Items = (from i in purchase.Items
+                                  select new PurchaseItem()
+                                  {
+                                      ProductId = i.ProductId,
+                                      Quantity = i.Quantity,
+                                      Size = i.Size
+                                  }).ToArray();
+
+            return await BaseApi.GetSimpleHttpClientRequest<int>("purchase")
+                            .Put(cleanPurchase);
+        }
 
         public static async Task<Purchase?> Get(int collectionId, int storeId)
             => await BaseApi.GetSimpleHttpClientRequest<Purchase?>($"purchase/collection/{collectionId}/{storeId}")

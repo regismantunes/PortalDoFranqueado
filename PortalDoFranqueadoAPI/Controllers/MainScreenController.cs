@@ -17,6 +17,23 @@ namespace PortalDoFranqueadoAPI.Controllers
             => (_connection, _configuration) = ((SqlConnection)(connection as ICloneable).Clone(), configuration);
 
         [HttpGet]
+        [Route("iscompatibleversion/{version}")]
+        public ActionResult<dynamic> ClientVersionIsCompatible(string version)
+        {
+            try
+            {
+                var minCompatibleVersion = new Version("1.0.7");
+                var sysVersion = new Version(version);
+
+                return Ok(sysVersion >= minCompatibleVersion);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("info")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetMainInformations()
@@ -32,7 +49,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 var campaigns = await CampaignRepository.GetList(_connection, true);
                 var stores = await StoreRepository.GetListByUser(_connection, int.Parse(User.Identity.Name));
 
-                return new
+                return Ok(new
                 {
                     InformativeTitle = informative.Title,
                     InformativeText = informative.Text,
@@ -42,7 +59,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                     AuxiliaryPhotoId = auxiliaryPhotoId,
                     Campaigns = campaigns,
                     Stores = stores
-                };
+                });
             }
             catch (Exception ex)
             {

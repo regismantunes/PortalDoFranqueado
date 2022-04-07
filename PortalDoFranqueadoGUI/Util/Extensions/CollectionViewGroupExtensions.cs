@@ -1,6 +1,6 @@
 ﻿using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.Util.Extensions
+namespace PortalDoFranqueado.Util.Extensions
 {
     public static class CollectionViewGroupExtensions 
     {

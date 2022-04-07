@@ -22,9 +22,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await PurchaseRepository.Save(_connection, purchase);
+                var id = await PurchaseRepository.Save(_connection, purchase);
 
-                return Ok();
+                return Ok(id);
             }
             catch (Exception ex)
             {

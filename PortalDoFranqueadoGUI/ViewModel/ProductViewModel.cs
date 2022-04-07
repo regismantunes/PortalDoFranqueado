@@ -1,10 +1,10 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Util;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Util;
+using PortalDoFranqueado.View;
 using System.Linq;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public class ProductViewModel : BaseNotifyPropertyChanged, IExpandable
     {
@@ -28,12 +28,12 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                          Product = Product,
                                          Size = s,
                                          Quantity = items?.FirstOrDefault(i => i.ProductId == Product.Id &&
-                                                                               i.Size == s)?
+                                                                               i.Size.Size == s.Size)?
                                                           .Quantity
                                      })
                          })
                         .ToList()
-                        .OrderBy(i => i.Value.Item.GetValueToOrder())
+                        .OrderBy(i => i.Value.Item.Size.Order)
                         .ToArray();
 
                 Items.ToList()

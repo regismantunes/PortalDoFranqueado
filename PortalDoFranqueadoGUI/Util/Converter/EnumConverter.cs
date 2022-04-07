@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Data;
-using PortalDoFranqueadoGUI.Util.Extensions;
+using PortalDoFranqueado.Util.Extensions;
 
-namespace PortalDoFranqueadoGUI.Util.Converter
+namespace PortalDoFranqueado.Util.Converter
 {
     public class EnumConverter : IValueConverter
     {

@@ -1,14 +1,14 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Update;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Update;
+using PortalDoFranqueado.View;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class MainWindowViewModel : BaseViewModel, INavigatorViewModel, ILegendable
     {

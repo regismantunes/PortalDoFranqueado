@@ -80,6 +80,7 @@
     <Build Include="Tables\Collection_File.sql" />
     <Build Include="Tables\File_Content.sql" />
     <Build Include="Tables\Path.sql" />
+    <Build Include="Update\Version 1.1 - Order Size.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Populate\Family.sql" />

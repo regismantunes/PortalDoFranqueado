@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace PortalDoFranqueadoGUI.Util.Extensions
+namespace PortalDoFranqueado.Util.Extensions
 {
     public static class DirectoryExtensions
     {

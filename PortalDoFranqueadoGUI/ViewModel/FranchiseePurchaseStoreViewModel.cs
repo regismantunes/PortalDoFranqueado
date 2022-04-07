@@ -1,15 +1,20 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Repository;
-using PortalDoFranqueadoGUI.Util;
+using Microsoft.Win32;
+using PortalDoFranqueado.Export;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
+using PortalDoFranqueado.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public class FranchiseePurchaseStoreViewModel : BaseViewModel, IReloadable
     {
@@ -17,9 +22,13 @@ namespace PortalDoFranqueadoGUI.ViewModel
         private readonly LocalRepository _cache;
         private int _indexFocus;
         private FieldViewModel<PurchaseItemViewModel>[] _fields;
+        private bool _loaded;
+        private int? _purchaseId;
+
         private Store? _store;
         private decimal _amount;
-        private bool _loaded;
+        private bool _saveIsEnabled;
+        private bool _exportIsEnabled;
 
         public Visibility VisibilityComboBoxStore => _store == null ? Visibility.Visible : Visibility.Hidden;
         public Visibility VisibilityTextBlockStore => _store == null ? Visibility.Hidden : Visibility.Visible;
@@ -42,6 +51,16 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public ProductViewModel[] Products { get; set; }
         public PurchaseStatus? Status { get; private set; }
         public Visibility VisibilityButtonSave { get; private set; }
+        public bool SaveIsEnabled
+        {
+            get => _saveIsEnabled;
+            private set { _saveIsEnabled = value; OnPropertyChanged(); }
+        }
+        public bool ExportIsEnabled
+        {
+            get => _exportIsEnabled;
+            private set { _exportIsEnabled = value; OnPropertyChanged(); }
+        }
         public decimal Amount
         {
             get => _amount;
@@ -53,6 +72,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public RelayCommand GoToPreviusFieldCommand { get; }
         public RelayCommand SaveCommand { get; }
         public RelayCommand SaveAndCloseCommand { get; }
+        public RelayCommand ExportToExcelCommand { get; }
 
         public FranchiseePurchaseStoreViewModel()
         {
@@ -69,6 +89,57 @@ namespace PortalDoFranqueadoGUI.ViewModel
             GoToPreviusFieldCommand = new RelayCommand(GoToPreviusField);
             SaveCommand = new RelayCommand(async () => await Save(false));
             SaveAndCloseCommand = new RelayCommand(async () => await Save(true));
+            ExportToExcelCommand = new RelayCommand(async () => await ExportToExcel());
+        }
+
+        private async Task ExportToExcel()
+        {
+            if (_purchaseId == null)
+                return;
+
+            try
+            {
+                var sfd = new SaveFileDialog()
+                {
+                    AddExtension = true,
+                    CheckPathExists = true,
+                    FileName = string.Concat(Store.Name, ".xlsx"),
+                    Filter = "Pasta de Trabalho do Excel (*.xlsx)|*.xlsx",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    OverwritePrompt = true,
+                    Title = "Gerar arquivo Excel com informações de compra",
+                    ValidateNames = true
+                };
+
+                if (sfd.ShowDialog() ?? false)
+                {
+                    var fullAddress = sfd.FileName;
+
+                    DesableContent();
+
+                    var purchase = await API.ApiPurchase.Get(_purchaseId.Value);
+
+                    if(purchase == null)
+                    {
+                        MessageBox.Show(Me, "BROTHERS - Falha ao obter informações de compra", "Não foi possível recuperar as informações de compra para gerar o arquivo Excel.", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    purchase.Store = Store;
+                    purchase.Items.ToList()
+                                  .ForEach(item => item.Product = Collection.Products?.FirstOrDefault(p => p.Id == item.ProductId));
+
+                    await Exporter.ExportToExcel(purchase, fullAddress, Legendable);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao gerar arquivo excel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableContent();
+            }
         }
 
         private async Task Save(bool close)
@@ -87,10 +158,14 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                    .ToArray()
                 };
 
-                await API.ApiPurchase.Save(purchase);
+                var id = await API.ApiPurchase.Save(purchase);
+
+                _purchaseId = id;
+                SaveIsEnabled = false;
+                ExportIsEnabled = true;
 
                 if (close)
-                    DisableSave();
+                    SetStatusClosed();
                 else
                     OnPropertyChanged(nameof(Products));
             }
@@ -104,7 +179,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
         }
 
-        private void DisableSave()
+        private void SetStatusClosed()
         {
             VisibilityButtonSave = Visibility.Hidden;
             Status = PurchaseStatus.Closed;
@@ -114,7 +189,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             OnPropertyChanged(nameof(Status));
         }
 
-        private void EnableSave()
+        private void SetStatusOpened()
         {
             VisibilityButtonSave = Visibility.Visible;
             Status = PurchaseStatus.Opened;
@@ -232,20 +307,25 @@ namespace PortalDoFranqueadoGUI.ViewModel
                     }
 
                     Legendable?.SendMessage("Carregando produtos...");
-                    var products = (await API.ApiProduct.Get(Collection.Id)).ToList();
-
-                    if (products.Count > 0)
+                    Collection.Products = await API.ApiProduct.Get(Collection.Id);
+                    
+                    if (Collection.Products.Length > 0)
                     {
                         emptyProducts = false;
 
                         Legendable?.SendMessage("Carregando informações salvas...");
                         var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
 
+                        _purchaseId = purchase?.Id;
+
+                        ExportIsEnabled = _purchaseId.HasValue;
+                        SaveIsEnabled = false;
+
                         if (purchase == null || 
                             purchase.Status == PurchaseStatus.Opened)
-                            EnableSave();
+                            SetStatusOpened();
                         else
-                            DisableSave();
+                            SetStatusClosed();
 
                         Legendable?.SendMessage("Carregando fotos...");
                         var myFiles = await API.ApiFile.GetFromCollection(Collection.Id);
@@ -271,6 +351,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
 
                         Legendable?.SendMessage("Carregando familias...");
                         var families = await _cache.LoadFamilies();
+                        var products = Collection.Products.ToList();
                         products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
 
                         Legendable?.SendMessage("Configurando itens...");
@@ -280,6 +361,21 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                                        .OrderBy(p => p.Family?.Name))
                         {
                             var fileView = files.First(f => f.Id == product.FileId);
+                            product.ImageInformation = new ImageInfo()
+                            { 
+                                FileAddress = fileView.FilePath,
+                                Width = fileView.ImageData?.Width,
+                                Height = fileView.ImageData?.Height
+                            };
+                            fileView.PropertyChanged += (sender, args) =>
+                            {
+                                if (args.PropertyName == nameof(fileView.ImageData))
+                                {
+                                    product.ImageInformation.FileAddress = fileView.FilePath;
+                                    product.ImageInformation.Width = fileView.ImageData?.Width;
+                                    product.ImageInformation.Height = fileView.ImageData?.Height;
+                                }
+                            };
                             var productVM = new ProductViewModel(product, purchase?.Items.Where(i => i.ProductId == product.Id)
                                                                                         .ToArray())
                             {
@@ -290,10 +386,15 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                 .ToList()
                                 .ForEach(item => item.Value.PropertyChanged += (sender, args) =>
                                                  {
-                                                     if (args.PropertyName == "Quantity")
+                                                     if (args.PropertyName == nameof(item.Value.Quantity))
                                                      {
                                                          propertyGroup.CallPropertyChange("GroupNames");
-                                                         UpdateAmount();
+                                                         Task.Factory.StartNew(() =>
+                                                         {
+                                                             SaveIsEnabled = true;
+                                                             ExportIsEnabled = false;
+                                                             UpdateAmount();
+                                                         });
                                                      }
                                                  }
                                 );
@@ -331,7 +432,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar informações para a compra", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar informações para a compra", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {

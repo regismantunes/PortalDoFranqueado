@@ -9,7 +9,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace PortalDoFranqueadoGUI.Util.Image
+namespace PortalDoFranqueado.Util.Image
 {
     public static class IconManager
     {

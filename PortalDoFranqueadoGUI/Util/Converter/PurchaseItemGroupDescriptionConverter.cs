@@ -1,10 +1,10 @@
-﻿using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueado.ViewModel;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.Util.Converter
+namespace PortalDoFranqueado.Util.Converter
 {
     public class PurchaseItemGroupDescriptionConverter : IValueConverter
     {

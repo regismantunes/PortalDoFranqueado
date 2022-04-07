@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
-using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueado.Model;
 using System;
 using System.IO;
 
-namespace PortalDoFranqueadoGUI.API
+namespace PortalDoFranqueado.API
 {
     public class Configuration
     {

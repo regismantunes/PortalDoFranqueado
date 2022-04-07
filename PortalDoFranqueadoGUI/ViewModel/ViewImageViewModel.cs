@@ -1,7 +1,7 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.Windows.Media;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public class ViewImageViewModel : BaseViewModel
     {

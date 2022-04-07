@@ -1,12 +1,12 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Repository;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
+using PortalDoFranqueado.View;
 using System;
 using System.Linq;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerCollectionPurchasesViewModel : BaseViewModel
     {

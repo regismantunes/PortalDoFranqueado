@@ -1,12 +1,12 @@
-﻿<UserControl x:Class="PortalDoFranqueadoGUI.View.Login"
+﻿<UserControl x:Class="PortalDoFranqueado.View.Login"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PortalDoFranqueadoGUI.View"
-             xmlns:util="clr-namespace:PortalDoFranqueadoGUI.Util"
+             xmlns:local="clr-namespace:PortalDoFranqueado.View"
+             xmlns:util="clr-namespace:PortalDoFranqueado.Util"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:viewmodel="clr-namespace:PortalDoFranqueadoGUI.ViewModel"
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel"
              d:DataContext="{d:DesignInstance Type=viewmodel:LoginViewModel}"
              Cursor="{Binding CurrentCursor}"
              mc:Ignorable="d" 
@@ -31,20 +31,33 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Label Grid.Column="1" Grid.Row="1"
-               Content="Franqueado, conecte-se na sua conta"
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
+               Text="Essa versão do Portal Do Franqueado está desatualizada. Aguarde a nova versão ser baixada, feche a aplicação e abra novamente para efetuar o login."
                HorizontalAlignment="Center"
                Foreground="White"
-               FontSize="16"/>
-        <Border Grid.Column="1" Grid.Row="2" Grid.RowSpan="5"
+               FontSize="16"
+               TextWrapping="Wrap"
+                MaxWidth="800"
+                   Margin="0,0,0,100"
+                   Visibility="{Binding OldVersionMessageVisibility}"/>
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
+               Text="Franqueado, conecte-se na sua conta"
+               HorizontalAlignment="Center"
+               Foreground="White"
+               FontSize="16"
+               TextWrapping="Wrap"
+                MaxWidth="800"
+                   Visibility="{Binding HellcomeMessageVisibility}"/>
+        <Border Grid.Column="1" Grid.Row="3" Grid.RowSpan="5"
                 Style="{StaticResource LoginBorder}"/>
-        <Image Grid.Column="1" Grid.Row="2"
+        <Image Grid.Column="1" Grid.Row="3"
                Source="/Media/logo-01.png"
                Width="200"
                Margin="20"/>
-        <TextBox Grid.Column="1" Grid.Row="3"
+        <TextBox Grid.Column="1" Grid.Row="4"
                  Name="txtUser"
                  HorizontalAlignment="Center"
                  HorizontalContentAlignment="Left" 
@@ -52,30 +65,31 @@
                  Margin="5"
                  FontSize="16"
                  Text="{Binding EmailLogin}"
-                 IsEnabled="{Binding EnabledContent}"
+                 IsEnabled="{Binding LoginIsEnabled}"
                  util:FocusExtension.IsFocused="{Binding EmailLoginFocused}"/>
-        <PasswordBox Grid.Column="1" Grid.Row="4"
+        <PasswordBox Grid.Column="1" Grid.Row="5"
                  HorizontalAlignment="Center"
                  HorizontalContentAlignment="Left" 
                  ToolTip="Digite sua senha" Width="200"
                  Margin="5"
                  FontSize="16"
                  Name="txtPassword"
-                 IsEnabled="{Binding EnabledContent}"/>
-        <Button Grid.Column="1" Grid.Row="5"
+                 IsEnabled="{Binding LoginIsEnabled}"/>
+        <Button Grid.Column="1" Grid.Row="6"
                 Content="LOGIN"
                 Style="{StaticResource MainButton}"
                 Height="30"
                 Command="{Binding Path=LoginCommand}"
                 CommandParameter="{Binding ElementName=txtPassword}"
                 IsDefault="True"
-                 IsEnabled="{Binding EnabledContent}"/>
-        <TextBlock Grid.Column="1" Grid.Row="6" 
+                IsEnabled="{Binding LoginIsEnabled}"/>
+        <TextBlock Grid.Column="1" Grid.Row="7" 
                Text="{Binding ErrorMessage}"
                FontSize="10"
                HorizontalAlignment="Center"
                TextWrapping="Wrap"
                Foreground="Red"
-                   Margin="10"/>
+               Margin="10"
+                   MaxWidth="240"/>
     </Grid>
 </UserControl>

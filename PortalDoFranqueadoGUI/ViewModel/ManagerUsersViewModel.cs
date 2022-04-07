@@ -1,6 +1,6 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Repository;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerUsersViewModel : BaseViewModel, IReloadable
     {

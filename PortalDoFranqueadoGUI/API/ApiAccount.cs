@@ -1,7 +1,7 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueadoGUI.API
+namespace PortalDoFranqueado.API
 {
     public static class ApiAccount
     {

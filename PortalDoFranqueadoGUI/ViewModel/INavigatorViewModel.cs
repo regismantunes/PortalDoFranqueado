@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public interface INavigatorViewModel
     {

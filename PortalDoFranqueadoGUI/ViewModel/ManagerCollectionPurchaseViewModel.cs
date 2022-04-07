@@ -1,6 +1,8 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Repository;
+using Microsoft.Win32;
+using PortalDoFranqueado.Export;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerCollectionPurchaseViewModel : BaseViewModel
     {
@@ -22,6 +24,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
         public decimal Amount { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand ExportToExcelCommand { get; }
 
         public ManagerCollectionPurchaseViewModel(Purchase purchase)
         {
@@ -30,6 +33,7 @@ namespace PortalDoFranqueadoGUI.ViewModel
             _cache = (LocalRepository)App.Current.Resources["Cache"];
 
             LoadedCommand = new RelayCommand(async () => await LoadPurchase());
+            ExportToExcelCommand = new RelayCommand(async () => await ExportToExcel());
         }
 
         private async Task LoadPurchase(bool reload = false)
@@ -82,7 +86,21 @@ namespace PortalDoFranqueadoGUI.ViewModel
                                                 .OrderBy(p => p.Family?.Name))
                 {
                     var fileView = files.First(f => f.Id == product.FileId);
-                    fileView?.Download();
+                    product.ImageInformation = new ImageInfo()
+                    {
+                        FileAddress = fileView.FilePath,
+                        Width = fileView.ImageData?.Width,
+                        Height = fileView.ImageData?.Height
+                    };
+                    fileView.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == nameof(fileView.ImageData))
+                        {
+                            product.ImageInformation.FileAddress = fileView.FilePath;
+                            product.ImageInformation.Width = fileView.ImageData?.Width;
+                            product.ImageInformation.Height = fileView.ImageData?.Height;
+                        }
+                    };
                     productsVM.Add(new ProductViewModel(product, Purchase.Items.Where(i => i.ProductId == product.Id)
                                                                                .ToArray())
                     {
@@ -109,6 +127,54 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 _loaded = true;
                 EnableContent();
                 Legendable?.SendMessage(string.Empty);
+            }
+        }
+
+        private async Task ExportToExcel()
+        {
+            try
+            {
+                var sfd = new SaveFileDialog()
+                {
+                    AddExtension = true,
+                    CheckPathExists = true,
+                    FileName = string.Concat(Store.Name, ".xlsx"),
+                    Filter = "Pasta de Trabalho do Excel (*.xlsx)|*.xlsx",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    OverwritePrompt = true,
+                    Title = "Gerar arquivo Excel com informações de compra",
+                    ValidateNames = true
+                };
+
+                if (sfd.ShowDialog() ?? false)
+                {
+                    var fullAddress = sfd.FileName;
+
+                    DesableContent();
+
+                    var purchase = new Purchase()
+                    {
+                        CollectionId = Purchase.CollectionId,
+                        Id = Purchase.Id,
+                        Status = Purchase.Status,
+                        StoreId = Purchase.StoreId,
+                        Store = Purchase.Store,
+                        Items = Purchase.Items
+                    };
+
+                    purchase.Items.ToList()
+                                  .ForEach(item => item.Product = Products?.FirstOrDefault(p => p.Product.Id == item.ProductId)?.Product);
+
+                    await Exporter.ExportToExcel(purchase, fullAddress, Legendable);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao gerar arquivo excel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                EnableContent();
             }
         }
     }

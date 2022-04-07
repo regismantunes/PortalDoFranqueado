@@ -1,8 +1,8 @@
-﻿using PortalDoFranqueadoGUI.Repository;
-using PortalDoFranqueadoGUI.ViewModel;
+﻿using PortalDoFranqueado.Repository;
+using PortalDoFranqueado.ViewModel;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.View
+namespace PortalDoFranqueado.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

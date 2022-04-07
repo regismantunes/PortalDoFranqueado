@@ -5,8 +5,8 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <StartupObject>PortalDoFranqueadoGUI.App</StartupObject>
-    <Version>1.0.6</Version>
+    <StartupObject></StartupObject>
+    <Version>1.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -62,6 +62,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PortalDoFranqueado.Model\PortalDoFranqueado.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -95,6 +99,7 @@
 	<Product>BROTHERS - Portal do Franqueado</Product>
 	<Description>Central de comunicação com franqueados.</Description>
 	<PackageIcon>LogoReduzida.png</PackageIcon>
+	<RootNamespace>PortalDoFranqueado</RootNamespace>
   </PropertyGroup>
 
   <Target Name="GenerateRelease" AfterTargets="AfterBuild" Condition="$(Configuration) == Release">
@@ -103,6 +108,10 @@
 	</XmlPeek>-->
 	<Exec Command="$(NugetTools)\NuGet.exe pack $(NuspecFile) -Version $(Version) -Properties Configuration=Release -OutputDirectory $(SolutionDir)Deployment\GeneratedNugets" />
 	<Exec Command="$(SquirrelTools)\Squirrel.exe --releasify $(SolutionDir)Deployment\GeneratedNugets\PortalDoFranqueado.$(Version).nupkg --releaseDir=$(SolutionDir)Deployment\Releases\$(Version)" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\*.*&quot; &quot;$(OutDir)&quot;&#xD;&#xA;mkdir &quot;$(OutDir)Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\Resources\*.*&quot; &quot;$(OutDir)Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\Resources\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Resources&quot;" />
   </Target>
 
 </Project>

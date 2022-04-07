@@ -1,15 +1,15 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public class PurchaseItemViewModel : BaseNotifyPropertyChanged
     {
-        public int ProductId { get => Item.ProductId; set => Item.ProductId = value; }
-        public Product? Product { get => Item.Product; set => Item.Product = value; }
-        public string Size { get => Item.Size; set => Item.Size = value; }
+        public int ProductId { get => Item.ProductId; }
+        public Product? Product { get => Item.Product; }
+        public string Size { get => Item.Size.Size; }
         public int? Quantity { get => Item.Quantity; set { Item.Quantity = value; OnPropertyChanged(); } }
         public bool IsEnabled { get => !Product?.LockedSizes?.Contains(Size) ?? true; }
 

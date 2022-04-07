@@ -1,9 +1,8 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Model.Order;
-using PortalDoFranqueadoGUI.Repository;
-using PortalDoFranqueadoGUI.View;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
+using PortalDoFranqueado.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerCollectionViewModel : BaseViewModel, IReloadable
     {
@@ -99,26 +98,26 @@ namespace PortalDoFranqueadoGUI.ViewModel
                 var cache = (LocalRepository)App.Current.Resources["Cache"];
                 var family = cache.Families.First(f => f.Id == FamilyId);
 
-                LockedSizes = family.Sizes.OrderBy(size => OrderSize.GetValue(size))
+                LockedSizes = family.Sizes.OrderBy(size => size.Order)
                                           .Select(size =>
                 {
                     var field = new FieldViewModel<LockedSizeViewModel>()
                     {
                         Value = new LockedSizeViewModel()
                         {
-                            Size = size,
-                            IsLocked = _lockedSizes.Contains(size)
+                            Size = size.Size,
+                            IsLocked = _lockedSizes.Contains(size.Size)
                         }
                     };
 
                     field.Value.PropertyChanged += (s, e) =>
                     {
                         if (field.Value.IsLocked &&
-                            !_lockedSizes.Contains(size))
-                            _lockedSizes.Add(size);
+                            !_lockedSizes.Contains(size.Size))
+                            _lockedSizes.Add(size.Size);
                         else if (!field.Value.IsLocked &&
-                            _lockedSizes.Contains(size))
-                            _lockedSizes.Remove(size);
+                            _lockedSizes.Contains(size.Size))
+                            _lockedSizes.Remove(size.Size);
 
                         HasChange = true;
                     };

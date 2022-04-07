@@ -1,17 +1,17 @@
-﻿using PortalDoFranqueadoGUI.Model;
+﻿using PortalDoFranqueado.Model;
 using System.Windows;
 using System.IO;
 using System;
 using System.Linq;
-using PortalDoFranqueadoGUI.Util;
+using PortalDoFranqueado.Util;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight.CommandWpf;
 using System.Windows.Media.Imaging;
-using PortalDoFranqueadoGUI.View;
-using PortalDoFranqueadoGUI.Repository;
+using PortalDoFranqueado.View;
+using PortalDoFranqueado.Repository;
 using System.Diagnostics;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class MainFranchiseeViewModel : BaseViewModel, IReloadable
     {

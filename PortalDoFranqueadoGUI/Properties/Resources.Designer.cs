@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PortalDoFranqueadoGUI.Properties {
+namespace PortalDoFranqueado.Properties {
     using System;
     
     

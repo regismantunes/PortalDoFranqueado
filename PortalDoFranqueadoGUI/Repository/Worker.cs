@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace PortalDoFranqueadoGUI.Repository
+namespace PortalDoFranqueado.Repository
 {
     public static class Worker
     {

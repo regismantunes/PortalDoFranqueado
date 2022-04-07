@@ -1,4 +1,4 @@
-﻿namespace PortalDoFranqueadoGUI.API
+﻿namespace PortalDoFranqueado.API
 {
     internal static class BaseApi
     {

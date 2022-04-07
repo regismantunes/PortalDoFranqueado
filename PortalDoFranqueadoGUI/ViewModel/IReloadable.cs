@@ -1,4 +1,4 @@
-﻿namespace PortalDoFranqueadoGUI.ViewModel
+﻿namespace PortalDoFranqueado.ViewModel
 {
     internal interface IReloadable
     {

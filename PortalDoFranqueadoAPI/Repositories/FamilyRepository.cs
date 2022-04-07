@@ -34,11 +34,15 @@ namespace PortalDoFranqueadoAPI.Repositories
                     cmd.CommandText = "SELECT * FROM Family_Size";
                     reader = await cmd.ExecuteReaderAsync();
 
-                    var tamanhos = new List<KeyValuePair<int, string>>();
+                    var tamanhos = new List<KeyValuePair<int, ProductSize>>();
                     while (await reader.ReadAsync())
-                        tamanhos.Add(new KeyValuePair<int, string>(
+                        tamanhos.Add(new KeyValuePair<int, ProductSize>(
                             reader.GetInt32("FamilyId"),
-                            reader.GetString("SizeId")));
+                            new ProductSize()
+                            {
+                                Size = reader.GetString("SizeId"),
+                                Order = reader.GetInt16("Order")
+                            }));
 
                     foreach (var familia in list)
                         familia.Sizes = (from item in tamanhos

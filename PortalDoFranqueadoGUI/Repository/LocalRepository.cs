@@ -1,11 +1,11 @@
-﻿using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.ViewModel;
-using PortalDoFranqueadoGUI.API;
+﻿using PortalDoFranqueado.Model;
+using PortalDoFranqueado.ViewModel;
+using PortalDoFranqueado.API;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
-namespace PortalDoFranqueadoGUI.Repository
+namespace PortalDoFranqueado.Repository
 {
     public class LocalRepository : BaseNotifyPropertyChanged
     {

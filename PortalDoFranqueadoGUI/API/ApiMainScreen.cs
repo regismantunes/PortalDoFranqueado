@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using PortalDoFranqueadoGUI.Model;
+using PortalDoFranqueado.Model;
 
-namespace PortalDoFranqueadoGUI.API
+namespace PortalDoFranqueado.API
 {
     public static class ApiMainScreen
     {
@@ -25,5 +25,9 @@ namespace PortalDoFranqueadoGUI.API
         public static async Task UpdateInformative(Informative informative)
             => await BaseApi.GetSimpleHttpClientRequest("main/informative")
                             .Put(informative);
+
+        public static async Task<bool> VerifyCompatibleVersion(string version)
+            => await BaseApi.GetSimpleHttpClientRequest<bool>($"main/iscompatibleversion/{version}")
+                            .Get();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     public interface INavigableViewModel : IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Data;
 
-namespace PortalDoFranqueadoGUI.Util
+namespace PortalDoFranqueado.Util
 {
     public class PropertyGroupDescriptionPublicChange : PropertyGroupDescription
     {

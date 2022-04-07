@@ -1,7 +1,7 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
-using PortalDoFranqueadoGUI.Model;
-using PortalDoFranqueadoGUI.Repository;
+using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Repository;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PortalDoFranqueadoGUI.ViewModel
+namespace PortalDoFranqueado.ViewModel
 {
     internal class ManagerFilesViewModel : BaseViewModel, IReloadable
     {
