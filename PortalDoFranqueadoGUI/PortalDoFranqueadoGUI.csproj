@@ -102,16 +102,17 @@
 	<RootNamespace>PortalDoFranqueado</RootNamespace>
   </PropertyGroup>
 
-  <Target Name="GenerateRelease" AfterTargets="AfterBuild" Condition="$(Configuration) == Release">
+  <Target Name="GenerateRelease" AfterTargets="Publish">
 	<!--<XmlPeek XmlInputPath="$(NuspecFile)" Query="/package/metadata/id/text()">
 		<Output TaskParameter="Result" ItemName="ID" />
 	</XmlPeek>-->
+	<Exec Command="mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;" />
 	<Exec Command="$(NugetTools)\NuGet.exe pack $(NuspecFile) -Version $(Version) -Properties Configuration=Release -OutputDirectory $(SolutionDir)Deployment\GeneratedNugets" />
 	<Exec Command="$(SquirrelTools)\Squirrel.exe --releasify $(SolutionDir)Deployment\GeneratedNugets\PortalDoFranqueado.$(Version).nupkg --releaseDir=$(SolutionDir)Deployment\Releases\$(Version)" />
   </Target>
-
+	
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir &quot;$(OutDir)Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(OutDir)Export\&quot;&#xD;&#xA;mkdir &quot;$(OutDir)Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(OutDir)Export\Resources&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;" />
+    <Exec Command="mkdir &quot;$(OutDir)Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(OutDir)Export\&quot;&#xD;&#xA;mkdir &quot;$(OutDir)Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(OutDir)Export\Resources&quot;" />
   </Target>
 
 </Project>
