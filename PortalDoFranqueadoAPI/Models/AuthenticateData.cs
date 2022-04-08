@@ -1,4 +1,6 @@
-﻿namespace PortalDoFranqueadoAPI.Models
+﻿using System;
+
+namespace PortalDoFranqueadoAPI.Models
 {
     public class AuthenticateData
     {

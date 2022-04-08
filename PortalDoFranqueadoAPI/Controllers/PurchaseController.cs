@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
+using System;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -13,7 +15,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly SqlConnection _connection;
 
         public PurchaseController(SqlConnection connection)
-            => _connection = (SqlConnection)(connection as ICloneable).Clone();
+            => _connection = connection;
 
         ~PurchaseController()
             => _connection.Dispose();

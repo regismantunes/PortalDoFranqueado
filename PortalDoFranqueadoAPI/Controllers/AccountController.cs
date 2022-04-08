@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
 using System.Data.SqlClient;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -15,7 +18,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         private readonly IConfiguration _configuration;
 
         public AccountController(SqlConnection connection, IConfiguration configuration)
-            => (_connection, _configuration) = ((SqlConnection)(connection as ICloneable).Clone(), configuration);
+            => (_connection, _configuration) = (connection, configuration);
 
         ~AccountController()
             => _connection.Dispose();

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using PortalDoFranqueadoAPI.Models;
 using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace PortalDoFranqueadoAPI.Services
 {

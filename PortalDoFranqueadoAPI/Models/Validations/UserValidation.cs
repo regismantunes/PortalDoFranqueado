@@ -1,4 +1,7 @@
-﻿namespace PortalDoFranqueadoAPI.Models.Validations
+﻿using System;
+using System.Linq;
+
+namespace PortalDoFranqueadoAPI.Models.Validations
 {
     public static class UserValidation
     {

@@ -1,5 +1,7 @@
 ﻿using PortalDoFranqueadoAPI.Repositories;
+using System;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Models.Validations
 {

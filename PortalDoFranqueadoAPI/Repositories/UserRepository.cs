@@ -4,6 +4,10 @@ using PortalDoFranqueadoAPI.Services;
 using System.Data.SqlClient;
 using PortalDoFranqueadoAPI.Models.Validations;
 using PortalDoFranqueadoAPI.Repositories.Util;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

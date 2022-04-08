@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using PortalDoFranqueadoAPI.Models;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
+using System;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

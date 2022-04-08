@@ -1,4 +1,6 @@
-﻿namespace PortalDoFranqueadoAPI.Models.Validations
+﻿using System;
+
+namespace PortalDoFranqueadoAPI.Models.Validations
 {
     public static class ProductValidation
     {
