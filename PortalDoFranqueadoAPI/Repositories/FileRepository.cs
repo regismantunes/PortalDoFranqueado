@@ -1,5 +1,4 @@
 ﻿using PortalDoFranqueadoAPI.Models;
-using PortalDoFranqueadoAPI.Repositories.Util;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -8,11 +7,11 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class FileRepository
     {
-        private static object _lockerContent = new object();
+        private static readonly object _lockerContent = new();
 
         public static async Task<MyFile> GetFile(SqlConnection connection, int id)
         {
-            bool connectionWasOpened = true;
+            var connectionWasOpened = true;
             try
             {
                 if (connection.State != ConnectionState.Open)
@@ -181,10 +180,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
 
-                if (await reader.ReadAsync())
-                    return await LoadFiles(reader);
-
-                return Array.Empty<MyFile>();
+                return await LoadFiles(reader);
             }
             finally
             {

@@ -15,6 +15,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         public FileController(SqlConnection connection)
             => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
+        ~FileController()
+            => _connection.Dispose();
+
         [HttpGet]
         [Route("auxiliary/{id}")]
         [Authorize]

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
 using PortalDoFranqueado.Model;
 using Microsoft.Office.Core;
-using Microsoft.Office;
 
 namespace PortalDoFranqueado.Export.Excel
 {
@@ -85,7 +84,7 @@ namespace PortalDoFranqueado.Export.Excel
 
                     ws.get_Range($"A{iproduct}").Value = string.Empty;
 
-                    var imageCell = ws.Cells[iproduct, 1];
+                    var imageCell = (dynamic)ws.Cells[iproduct, 1];
                     var imageMaxHeight = imageCell.Height - 4;
                     var imageMaxWidth = imageCell.Width - 4;
                     var imageInfo = gpi.Product.ImageInformation;

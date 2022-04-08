@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <StartupObject></StartupObject>
-    <Version>1.0.7</Version>
+    <Version>1.0.8</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -111,7 +111,7 @@
   </Target>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\*.*&quot; &quot;$(OutDir)&quot;&#xD;&#xA;mkdir &quot;$(OutDir)Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\Resources\*.*&quot; &quot;$(OutDir)Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\Resources\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Resources&quot;" />
+    <Exec Command="mkdir &quot;$(OutDir)Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(OutDir)Export\&quot;&#xD;&#xA;mkdir &quot;$(OutDir)Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(OutDir)Export\Resources&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\&quot;&#xD;&#xA;mkdir &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;&#xD;&#xA;xcopy /q /y &quot;$(SolutionDir)PortalDoFranqueado.Export\bin\Release\net6.0-windows\publish\win-x86\Resources\*.*&quot; &quot;$(SolutionDir)PortalDoFranqueadoGUI\bin\Release\publish\win-x86\Export\Resources&quot;" />
   </Target>
 
 </Project>

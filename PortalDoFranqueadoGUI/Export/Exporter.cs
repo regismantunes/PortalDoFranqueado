@@ -16,14 +16,16 @@ namespace PortalDoFranqueado.Export
             var jsonSerialized = JsonSerializer.Serialize(purchase);
             await File.WriteAllTextAsync(tmpFile, jsonSerialized);
 
+            var exportDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Export");
+
             var psi = new ProcessStartInfo()
             {
                 Arguments = $"\"{tmpFile}\" \"{fullAddress}\"",
                 CreateNoWindow = true,
-                FileName = "PortalDoFranqueado.Export.exe",
+                FileName = Path.Combine(exportDirectory, "PortalDoFranqueado.Export.exe"),
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
-                WorkingDirectory = Environment.CurrentDirectory
+                WorkingDirectory = exportDirectory
             };
             var process = Process.Start(psi);
 

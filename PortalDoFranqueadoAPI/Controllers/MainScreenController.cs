@@ -16,6 +16,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         public MainScreenController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = ((SqlConnection)(connection as ICloneable).Clone(), configuration);
 
+        ~MainScreenController()
+            => _connection.Dispose();
+
         [HttpGet]
         [Route("iscompatibleversion/{version}")]
         public ActionResult<dynamic> ClientVersionIsCompatible(string version)

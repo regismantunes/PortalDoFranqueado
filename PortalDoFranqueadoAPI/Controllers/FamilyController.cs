@@ -14,6 +14,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         public FamilyController(SqlConnection connection)
             => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
+        ~FamilyController()
+            => _connection.Dispose();
+
         [HttpGet]
         [Route("all")]
         [Authorize]

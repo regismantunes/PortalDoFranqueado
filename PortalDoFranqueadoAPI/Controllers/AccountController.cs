@@ -11,11 +11,14 @@ namespace PortalDoFranqueadoAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly SqlConnection _connection; 
+        private readonly SqlConnection _connection;
         private readonly IConfiguration _configuration;
 
         public AccountController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = ((SqlConnection)(connection as ICloneable).Clone(), configuration);
+
+        ~AccountController()
+            => _connection.Dispose();
 
         [HttpPost]
         [Route("login")]

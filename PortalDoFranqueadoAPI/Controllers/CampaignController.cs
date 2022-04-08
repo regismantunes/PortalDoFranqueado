@@ -15,6 +15,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         public CampaignController(SqlConnection connection)
             => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
+        ~CampaignController()
+            => _connection.Dispose();
+
         [HttpGet]
         [Route("all")]
         [Authorize]

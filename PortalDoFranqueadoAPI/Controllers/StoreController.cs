@@ -14,6 +14,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         public StoreController(SqlConnection connection)
             => _connection = (SqlConnection)(connection as ICloneable).Clone();
 
+        ~StoreController()
+            => _connection.Dispose();
+
         [HttpGet]
         [Route("all")]
         [Authorize]

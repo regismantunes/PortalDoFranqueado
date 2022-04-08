@@ -60,20 +60,28 @@ namespace PortalDoFranqueado.ViewModel
                 myFiles.ToList()
                        .ForEach(f => files.Add(new FileView(f)));
 
-                var filesArray = files.ToArray();
+                var hasError = false;
+                files.AsParallel()
+                     .ForAll(async fileView =>
+                     {
+                         try
+                         {
+                             fileView.PrepareDirectory();
+                             if (!fileView.FileExists)
+                                 await fileView.Download();
 
-                _ = Task.Factory.StartNew(async () =>
-                {
-                    foreach (var fileView in filesArray)
-                    {
-                        await Task.Delay(100);
-                        fileView.PrepareDirectory();
-                        if (!fileView.FileExists)
-                            await fileView.Download();
-
-                        Me.Dispatcher.Invoke(fileView.LoadImageData);
-                    }
-                });
+                             if (fileView.FileExists)
+                                 Me?.Dispatcher.BeginInvoke(fileView.LoadImageData);
+                         }
+                         catch (Exception ex)
+                         {
+                             if (!hasError)
+                             {
+                                 hasError = true;
+                                 Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
+                             }
+                         }
+                     });
 
                 Legendable?.SendMessage("Carregando famílias...");
                 var families = await _cache.LoadFamilies();

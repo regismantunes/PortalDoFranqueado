@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -386,6 +387,7 @@ namespace PortalDoFranqueado.ViewModel
                 return;
 
             CollectionProductViewModel? firstEmpty = null;
+
             try
             {
                 DesableContent();
@@ -397,26 +399,28 @@ namespace PortalDoFranqueado.ViewModel
                 var files = new List<FileView>();
                 myFiles.ToList().ForEach(f => files.Add(new FileView(f)));
 
-                var filesArray = files.ToArray();
-                _ = Task.Factory.StartNew(async () =>
-                {
-                    try
-                    {
-                        foreach (var fileView in filesArray)
-                        {
-                            await Task.Delay(100);
-                            fileView.PrepareDirectory();
-                            if (!fileView.FileExists)
-                                await fileView.Download();
-                            if (fileView.FileExists)
-                                Me.Dispatcher.Invoke(fileView.LoadImageData);
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        Me.Dispatcher.Invoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
-                    }
-                });
+                var hasError = false;
+                files.AsParallel()
+                     .ForAll(async fileView =>
+                     {
+                         try
+                         {
+                             fileView.PrepareDirectory();
+                             if (!fileView.FileExists)
+                                 await fileView.Download();
+
+                             if (fileView.FileExists)
+                                 Me?.Dispatcher.BeginInvoke(fileView.LoadImageData);
+                         }
+                         catch (Exception ex)
+                         {
+                             if (!hasError)
+                             {
+                                 hasError = true;
+                                 Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
+                             }
+                         }
+                     });
                 
                 Legendable?.SendMessage("Carregando produtos...");
                 var products = await API.ApiProduct.Get(_collection.Id);
