@@ -10,15 +10,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/campaign")]
     [ApiController]
-    public class CampaignController : ControllerBase
+    public class CampaignController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
 
         public CampaignController(SqlConnection connection)
             => _connection = connection;
-
-        ~CampaignController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("all")]
@@ -89,5 +86,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~CampaignController() => Dispose();
     }
 }

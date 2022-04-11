@@ -10,15 +10,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/collections")]
     [ApiController]
-    public class CollectionsController : Controller
+    public class CollectionsController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
 
         public CollectionsController(SqlConnection connection)
             => _connection = connection;
-
-        ~CollectionsController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("noclosed")]
@@ -165,5 +162,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~CollectionsController() => Dispose();
     }
 }

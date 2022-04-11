@@ -9,15 +9,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/family")]
     [ApiController]
-    public class FamilyController : Controller
+    public class FamilyController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
 
         public FamilyController(SqlConnection connection)
             => _connection = connection;
-
-        ~FamilyController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("all")]
@@ -44,5 +41,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~FamilyController() => Dispose();
     }
 }

@@ -11,15 +11,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/files")]
     [ApiController]
-    public class FileController : ControllerBase
+    public class FileController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
 
         public FileController(SqlConnection connection)
             => _connection = connection;
-
-        ~FileController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("auxiliary/{id}")]
@@ -252,5 +249,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~FileController() => Dispose();
     }
 }

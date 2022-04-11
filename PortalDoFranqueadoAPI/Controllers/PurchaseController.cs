@@ -10,15 +10,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/purchase")]
     [ApiController]
-    public class PurchaseController : Controller
+    public class PurchaseController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
 
         public PurchaseController(SqlConnection connection)
             => _connection = connection;
-
-        ~PurchaseController()
-            => _connection.Dispose();
 
         [HttpPut]
         [Route("")]
@@ -104,5 +101,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~PurchaseController() => Dispose();
     }
 }

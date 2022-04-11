@@ -10,7 +10,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/product")]
     [ApiController]
-    public class ProductController : Controller
+    public class ProductController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
         /*private readonly ILogger<ProductController> _logger;
@@ -20,9 +20,6 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         public ProductController(SqlConnection connection)
             => _connection = connection;
-
-        ~ProductController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("{collectionId}")]
@@ -91,5 +88,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~ProductController() => Dispose();
     }
 }

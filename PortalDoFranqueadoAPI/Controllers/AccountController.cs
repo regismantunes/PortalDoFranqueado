@@ -12,16 +12,13 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/account")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
         private readonly IConfiguration _configuration;
 
         public AccountController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = (connection, configuration);
-
-        ~AccountController()
-            => _connection.Dispose();
 
         [HttpPost]
         [Route("login")]
@@ -165,6 +162,14 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~AccountController() => Dispose();
 
         /*[HttpGet]
         [Route("anonymous")]

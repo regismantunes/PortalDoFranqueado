@@ -11,16 +11,13 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/main")]
     [ApiController]
-    public class MainScreenController : ControllerBase
+    public class MainScreenController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
         private readonly IConfiguration _configuration;
 
         public MainScreenController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = (connection, configuration);
-
-        ~MainScreenController()
-            => _connection.Dispose();
 
         [HttpGet]
         [Route("iscompatibleversion/{version}")]
@@ -154,5 +151,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        ~MainScreenController() => Dispose();
     }
 }
