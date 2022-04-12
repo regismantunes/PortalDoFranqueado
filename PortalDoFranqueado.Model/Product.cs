@@ -9,5 +9,7 @@
         public Family? Family { get; set; }
         public string[]? LockedSizes { get; set; }
         public ImageInfo? ImageInformation { get; set; }
+        public int? SupplierId { get; set; }
+        public Supplier? Supplier { get; set; }
     }
 }

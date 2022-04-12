@@ -31,8 +31,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync())
                     list.Add(new Store()
                     {
-                        Id = reader.GetInt32("id"),
-                        Name = reader.GetString("Name")
+                        Id = reader.GetInt32("Id"),
+                        Name = reader.GetString("Name"),
+                        DocumentNumber = reader.GetValue("DocumentNumber") as string
                     });
 
                 return list.ToArray();
@@ -66,7 +67,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     list.Add(new Store()
                     {
                         Id = reader.GetInt32("Id"),
-                        Name = reader.GetString("Name")
+                        Name = reader.GetString("Name"),
+                        DocumentNumber = reader.GetValue("DocumentNumber") as string
                     });
 
                 await reader.CloseAsync();
@@ -100,7 +102,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     return new Store()
                     {
                         Id = reader.GetInt32("Id"),
-                        Name = reader.GetString("Name")
+                        Name = reader.GetString("Name"),
+                        DocumentNumber = reader.GetValue("DocumentNumber") as string
                     };
 
                 return null;

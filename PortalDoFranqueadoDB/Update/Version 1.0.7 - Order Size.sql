@@ -1,4 +1,4 @@
-/*BEGIN
+BEGIN
 	ALTER TABLE Family_Size
 		ADD [Order] SMALLINT
 
@@ -70,4 +70,4 @@
 
 	ALTER TABLE Family_Size
 		ALTER COLUMN [Order] SMALLINT NOT NULL
-END*/
+END

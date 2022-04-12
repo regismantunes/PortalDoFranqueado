@@ -22,8 +22,8 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var list = new List<Product>();
                 using (var cmd = new SqlCommand("SELECT * FROM Product" +
-                                        " WHERE CollectionId = @CollectionId" +
-                    (familyId.HasValue ? " AND FamilyId = @FamilyId" : string.Empty), connection))
+                                                " WHERE CollectionId = @CollectionId" +
+                                (familyId.HasValue ? " AND FamilyId = @FamilyId" : string.Empty), connection))
                 {
                     cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                     if (familyId.HasValue)
@@ -38,7 +38,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                             FileId = reader.GetInt32("FileId"),
                             Price = reader.GetDecimal("Price"),
                             FamilyId = reader.GetInt32("FamilyId"),
-                            LockedSizes = reader.GetStringArray("LockedSizes")
+                            LockedSizes = reader.GetStringArray("LockedSizes"),
+                            SupplierId = reader.GetValue("SupplierId") as int?
                         });
 
                     await reader.CloseAsync();
@@ -63,15 +64,16 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, FileId, Price, LockedSizes)" +
+                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, FileId, Price, LockedSizes, SupplierId)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@CollectionId, @FamilyId, @FileId, @Price, @LockedSizes);", connection);
+                                            " VALUES (@CollectionId, @FamilyId, @FileId, @Price, @LockedSizes, @SupplierId);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
                 cmd.Parameters.AddWithValue("@FileId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
+                cmd.Parameters.AddWithValue("@SupplierId", product.SupplierId.ToDBValue());
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
                 if (dbid == null)
@@ -101,12 +103,14 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", FileId = @FileId" +
                                                 ", Price = @Price" +
                                                 ", LockedSizes = @LockedSizes" +
+                                                ", SupplierId = @SupplierId" +
                                         " WHERE Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
                 cmd.Parameters.AddWithValue("@FileId", product.FileId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
+                cmd.Parameters.AddWithValue("@SupplierId", product.SupplierId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Id", product.Id);
 
                 if (await cmd.ExecuteNonQueryAsync() == 0)

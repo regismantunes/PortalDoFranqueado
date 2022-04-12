@@ -80,7 +80,7 @@
     <Build Include="Tables\Collection_File.sql" />
     <Build Include="Tables\File_Content.sql" />
     <Build Include="Tables\Path.sql" />
-    <Build Include="Update\Version 1.1 - Order Size.sql" />
+    <Build Include="Tables\Supplier.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Populate\Family.sql" />
@@ -90,5 +90,7 @@
     <None Include="Populate\Development\User_Store.sql" />
     <None Include="Populate\Auxiliary.sql" />
     <None Include="Populate\Store.sql" />
+    <None Include="Update\Version 1.1 - Store Document and Suppliers.sql" />
+    <None Include="Update\Version 1.0.7 - Order Size.sql" />
   </ItemGroup>
 </Project>
