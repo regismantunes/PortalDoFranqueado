@@ -113,5 +113,81 @@ namespace PortalDoFranqueadoAPI.Repositories
                 await connection.CloseAsync().ConfigureAwait(false);
             }
         }
+
+        public static async Task<int> Insert(SqlConnection connection, Store store)
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                if (connection.State != ConnectionState.Open)
+                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+
+                using var cmd = new SqlCommand("INSERT INTO Store (Name, DocumentNumber)" +
+                                            " OUTPUT INSERTED.Id" +
+                                            " VALUES (@Name, @DocumentNumber);", connection);
+
+                cmd.Parameters.AddWithValue("@Name", store.Name);
+                cmd.Parameters.AddWithValue("@DocumentNumber", store.DocumentNumber);
+
+                var dbid = await cmd.ExecuteScalarAsync();
+                if (dbid == null)
+                    throw new Exception(MessageRepositories.InsertFailException);
+
+                return Convert.ToInt32(dbid);
+            }
+            finally
+            {
+                await connection.CloseAsync().ConfigureAwait(false);
+            }
+        }
+
+        public static async Task<bool> Delete(SqlConnection connection, int id)
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                if (connection.State != ConnectionState.Open)
+                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+
+                using var cmd = new SqlCommand("DELETE FROM Store WHERE Id = @Id;", connection);
+
+                cmd.Parameters.AddWithValue("@Id", id);
+
+                return await cmd.ExecuteNonQueryAsync() > 0;
+            }
+            finally
+            {
+                await connection.CloseAsync().ConfigureAwait(false);
+            }
+        }
+
+        public static async Task Update(SqlConnection connection, Store store)
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                if (connection.State != ConnectionState.Open)
+                    throw new Exception(MessageRepositories.ConnectionNotOpenException);
+
+                using var cmd = new SqlCommand("UPDATE Store" +
+                                                " SET Name = @Name" +
+                                                    ", DocumentNumber = @DocumentNumber" +
+                                                " WHERE Id = @Id;", connection);
+
+                cmd.Parameters.AddWithValue("@Name", store.Name);
+                cmd.Parameters.AddWithValue("@DocumentNumber", store.DocumentNumber);
+                cmd.Parameters.AddWithValue("@Id", store.Id);
+
+                if (await cmd.ExecuteNonQueryAsync() == 0)
+                    throw new Exception(MessageRepositories.UpdateFailException);
+            }
+            finally
+            {
+                await connection.CloseAsync().ConfigureAwait(false);
+            }
+        }
     }
 }

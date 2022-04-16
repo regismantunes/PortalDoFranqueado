@@ -336,5 +336,14 @@ namespace PortalDoFranqueado.ViewModel
         }
 
         public async void Reload() => await LoadFiles();
+
+        public override bool BeforeReturn()
+        {
+            if (Files.Any(f => f.Id == 0 || 
+                               f.Removed))
+                return MessageBox.Show(Me, "Existem alterações que não foram salvas, deseja continuar?", "BROTHERS - Deseja sair sem salvar?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+            return true;
+        }
     }
 }

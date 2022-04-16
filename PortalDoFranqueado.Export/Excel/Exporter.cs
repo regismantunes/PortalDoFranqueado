@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
 using PortalDoFranqueado.Model;
 using Microsoft.Office.Core;
+using PortalDoFranqueado.Model.Extensions;
 
 namespace PortalDoFranqueado.Export.Excel
 {
@@ -28,7 +29,8 @@ namespace PortalDoFranqueado.Export.Excel
                 var ws = wb.ActiveSheet as Worksheet;
 
                 ws.get_Range("B2").Value = purchase.Store.Name;
-                
+                ws.get_Range("P2").Value = purchase.Store.DocumentNumber.ToCNPJFormat();
+
                 var families = purchase.Items.GroupBy(i => i.Product.Family.Name,
                                                       i => i.Product.Price * i.Quantity,
                                                     (familyName, totalValue) => new
@@ -100,7 +102,8 @@ namespace PortalDoFranqueado.Export.Excel
                     image.Placement = XlPlacement.xlMoveAndSize;
                     
                     ws.get_Range($"B{iproduct}").Value = gpi.Product.Family.Name;
-                    ws.get_Range($"C{iproduct}").Value = gpi.Product.Price;
+                    ws.get_Range($"C{iproduct}").Value = gpi.Product.Supplier?.Name;
+                    ws.get_Range($"D{iproduct}").Value = gpi.Product.Price;
 
                     var qtd1 = gpi.Itens.Where(i => i.Order == 0)?
                                             .Select(i => new { i.Quantity, i.Size.Size })
@@ -124,22 +127,22 @@ namespace PortalDoFranqueado.Export.Excel
                                             .Select(i => new { i.Quantity, i.Size.Size })
                                             .FirstOrDefault();
 
-                    ws.get_Range($"D{iproduct}").Value = qtd1?.Size;
-                    ws.get_Range($"E{iproduct}").Value = qtd1?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"F{iproduct}").Value = qtd2?.Size;
-                    ws.get_Range($"G{iproduct}").Value = qtd2?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"H{iproduct}").Value = qtd3?.Size;
-                    ws.get_Range($"I{iproduct}").Value = qtd3?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"J{iproduct}").Value = qtd4?.Size;
-                    ws.get_Range($"K{iproduct}").Value = qtd4?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"L{iproduct}").Value = qtd5?.Size;
-                    ws.get_Range($"M{iproduct}").Value = qtd5?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"N{iproduct}").Value = qtd6?.Size;
-                    ws.get_Range($"O{iproduct}").Value = qtd6?.Quantity?.ToString() ?? string.Empty;
-                    ws.get_Range($"P{iproduct}").Value = qtd7?.Size;
-                    ws.get_Range($"Q{iproduct}").Value = qtd7?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"E{iproduct}").Value = qtd1?.Size;
+                    ws.get_Range($"F{iproduct}").Value = qtd1?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"G{iproduct}").Value = qtd2?.Size;
+                    ws.get_Range($"H{iproduct}").Value = qtd2?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"I{iproduct}").Value = qtd3?.Size;
+                    ws.get_Range($"J{iproduct}").Value = qtd3?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"K{iproduct}").Value = qtd4?.Size;
+                    ws.get_Range($"L{iproduct}").Value = qtd4?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"M{iproduct}").Value = qtd5?.Size;
+                    ws.get_Range($"N{iproduct}").Value = qtd5?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"O{iproduct}").Value = qtd6?.Size;
+                    ws.get_Range($"P{iproduct}").Value = qtd6?.Quantity?.ToString() ?? string.Empty;
+                    ws.get_Range($"Q{iproduct}").Value = qtd7?.Size;
+                    ws.get_Range($"R{iproduct}").Value = qtd7?.Quantity?.ToString() ?? string.Empty;
                     
-                    ws.get_Range($"R{iproduct}").Value = string.Format("=SUM(E{0},G{0},I{0},K{0},M{0},O{0},Q{0})*C{0}", iproduct);
+                    ws.get_Range($"S{iproduct}").Value = string.Format("=SUM(F{0},H{0},J{0},L{0},N{0},P{0},R{0})*D{0}", iproduct);
 
                     iproduct++;
                 }

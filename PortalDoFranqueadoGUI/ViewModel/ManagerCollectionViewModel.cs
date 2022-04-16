@@ -51,9 +51,42 @@ namespace PortalDoFranqueado.ViewModel
             private bool _hasChange;
             private decimal? _price;
             private int? _familyId;
+            private int? _supplierId;
             private bool _focused;
             private readonly List<string> _lockedSizes;
 
+            public int? Id { get; set; }
+            public int FileId { get; set; }
+            public FileView FileView { get; }
+            public decimal? Price { get => _price; set { _price = value; HasChange = true; OnPropertyChanged(); } }
+            public int? FamilyId
+            {
+                get => _familyId;
+                set
+                {
+                    _familyId = value;
+                    HasChange = true;
+                    LoadLockedSizes();
+                    OnPropertyChanged();
+                }
+            }
+            public string? FamilyName { get; private set; }
+            public int? SupplierId
+            {
+                get => _supplierId;
+                set
+                {
+                    _supplierId = value;
+                    HasChange = true;
+                    OnPropertyChanged();
+                }
+            }
+            public string? SupplierName { get; private set; }
+            public FieldViewModel<LockedSizeViewModel>[] LockedSizes { get; private set; }
+            public bool HasChange { get => _hasChange; set { _hasChange = value; OnPropertyChanged(); } }
+            public bool Focused { get => _focused; set { _focused = value; OnPropertyChanged(); } }
+
+            public ManagerCollectionViewModel ViewModel { get; set; }
             public RelayCommand OpenFileViewCommand { get; }
 
             public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file)
@@ -64,6 +97,8 @@ namespace PortalDoFranqueado.ViewModel
                 FileView = file;
                 FamilyId = 0;
                 FamilyName = string.Empty;
+                SupplierId = 0;
+                SupplierName = string.Empty;
                 ViewModel = owner;
                 HasChange = false;
 
@@ -77,8 +112,10 @@ namespace PortalDoFranqueado.ViewModel
                     _lockedSizes.AddRange(product.LockedSizes);
 
                 Id = product.Id;
-                FamilyId = product.FamilyId;
+                FamilyId = product.FamilyId ?? 0;
                 FamilyName = product.Family?.Name;
+                SupplierId = product.SupplierId ?? 0;
+                SupplierName = product.Supplier?.Name;
                 FileId = product.FileId;
                 Price = product.Price;
                 FileView = file;
@@ -128,26 +165,6 @@ namespace PortalDoFranqueado.ViewModel
 
                 OnPropertyChanged(nameof(LockedSizes));
             }
-
-            public int? Id { get; set; }
-            public int FileId { get; set; }
-            public FileView FileView { get; }
-            public decimal? Price { get => _price; set { _price = value; HasChange = true; OnPropertyChanged(); } }
-            public int? FamilyId { get => _familyId; 
-                set 
-                { 
-                    _familyId = value; 
-                    HasChange = true; 
-                    OnPropertyChanged(); 
-                    LoadLockedSizes(); 
-                } 
-            }
-            public string? FamilyName { get; private set; }
-            public FieldViewModel<LockedSizeViewModel>[] LockedSizes { get; private set; }
-            public bool HasChange { get => _hasChange; set { _hasChange = value; OnPropertyChanged(); } }
-            public bool Focused { get => _focused; set { _focused = value; OnPropertyChanged(); } }
-
-            public ManagerCollectionViewModel ViewModel { get; set; }
 
             private void OpenFileView()
             {
@@ -219,10 +236,10 @@ namespace PortalDoFranqueado.ViewModel
             SaveCommand = new RelayCommand<CollectionProductViewModel>(SaveProduct);
             DeleteCommand = new RelayCommand<CollectionProductViewModel>(DeleteProduct);
             LoadedCommand = new RelayCommand(async () => await LoadProducts());
-            AddFilesCommand = new RelayCommand(async () => await AddFiles());
+            AddFilesCommand = new RelayCommand(AddFiles);
         }
 
-        private async Task AddFiles()
+        private void AddFiles()
         {
             try
             {
@@ -276,7 +293,7 @@ namespace PortalDoFranqueado.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao carregar fotos", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -324,8 +341,15 @@ namespace PortalDoFranqueado.ViewModel
                     LockedSizes = productVM.LockedSizes
                                            .Where(ls => ls.Value.IsLocked)
                                            .Select(ls => ls.Value.Size)
-                                           .ToArray()
+                                           .ToArray(),
+                    SupplierId = productVM.SupplierId
                 };
+
+                if (product.FamilyId == 0)
+                    product.FamilyId = null;
+
+                if (product.SupplierId == 0)
+                    product.SupplierId = null;
 
                 if (productVM.Id.HasValue)
                     await API.ApiProduct.Update(product);
@@ -397,7 +421,8 @@ namespace PortalDoFranqueado.ViewModel
                 var myFiles = await API.ApiFile.GetFromCollection(_collection.Id);
 
                 var files = new List<FileView>();
-                myFiles.ToList().ForEach(f => files.Add(new FileView(f)));
+                myFiles.ToList()
+                       .ForEach(f => files.Add(new FileView(f)));
 
                 var hasError = false;
                 files.AsParallel()
@@ -429,11 +454,20 @@ namespace PortalDoFranqueado.ViewModel
                 var cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
                 var families = await cache.LoadFamilies();
 
+                Legendable?.SendMessage("Carregando fornecedores...");
+                var supplier = await cache.LoadSuppliers();
+
                 Legendable?.SendMessage("Configurando itens...");
                 products.ToList()
-                        .ForEach(product => product.Family = product.FamilyId.HasValue ? 
-                                                            families.First(f => f.Id == product.FamilyId) : 
-                                                            null);
+                        .ForEach(product =>
+                        {
+                            product.Family = product.FamilyId.HasValue ?
+                                            families.First(f => f.Id == product.FamilyId) :
+                                            null;
+                            product.Supplier = product.SupplierId.HasValue ?
+                                            supplier.First(s => s.Id == product.SupplierId) :
+                                            null;
+                        });
 
                 Products.Clear();
                 var listTmp = new List<CollectionProductViewModel>();
@@ -481,5 +515,13 @@ namespace PortalDoFranqueado.ViewModel
         }
 
         public async void Reload() => await LoadProducts();
+
+        public override bool BeforeReturn()
+        {
+            if (Products.Any(p => p.HasChange))
+                return MessageBox.Show(Me, "Existem alterações que não foram salvas, deseja continuar?", "BROTHERS - Deseja sair sem salvar?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+            return true;
+        }
     }
 }

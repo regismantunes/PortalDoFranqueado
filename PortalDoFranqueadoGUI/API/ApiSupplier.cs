@@ -17,8 +17,8 @@ namespace PortalDoFranqueado.API
             => await BaseApi.GetSimpleHttpClientRequest<int>($"supplier")
                             .Post(supplier);
 
-        public static async Task Delete(int id)
-            => await BaseApi.GetSimpleHttpClientRequest($"supplier/{id}")
+        public static async Task<bool> Delete(int id)
+            => await BaseApi.GetSimpleHttpClientRequest<bool>($"supplier/{id}")
                             .Delete();
 
         public static async Task Update(Supplier supplier)

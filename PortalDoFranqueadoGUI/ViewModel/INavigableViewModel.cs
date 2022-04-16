@@ -7,5 +7,6 @@ namespace PortalDoFranqueado.ViewModel
         INavigatorViewModel Navigator { get; set; }
         
         void OnReturnToView();
+        bool BeforeReturn();
     }
 }

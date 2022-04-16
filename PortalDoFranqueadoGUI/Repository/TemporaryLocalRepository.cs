@@ -21,6 +21,7 @@ namespace PortalDoFranqueado.Repository
         }
 
         public IReadOnlyList<Family>? Families { get; private set; }
+        public IReadOnlyList<Supplier>? Suppliers { get; private set; }
 
         public async Task<IReadOnlyList<Family>> LoadFamilies()
         {
@@ -31,6 +32,17 @@ namespace PortalDoFranqueado.Repository
             }
 
             return Families;
+        }
+
+        public async Task<IReadOnlyList<Supplier>> LoadSuppliers(bool reload = false)
+        {
+            if (Suppliers == null || reload)
+            {
+                Suppliers = await ApiSupplier.GetSuppliers(true);
+                OnPropertyChanged(nameof(Suppliers));
+            }
+
+            return Suppliers;
         }
 
         public async Task<IReadOnlyList<Store>> LoadStores(bool reload = false)

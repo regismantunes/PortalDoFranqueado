@@ -43,6 +43,12 @@
             <StackPanel Grid.Column="1" Grid.Row="1"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
+                <Button Content="FORNECEDORES"
+                        Style="{StaticResource DefaultButton}"
+                        Command="{Binding SuppliersCommand}"/>
+                <Button Content="LOJAS"
+                        Style="{StaticResource DefaultButton}"
+                        Command="{Binding StoresCommand}"/>
                 <Button Content="USUÁRIOS"
                         Style="{StaticResource DefaultButton}"
                         Command="{Binding UsersCommand}"/>

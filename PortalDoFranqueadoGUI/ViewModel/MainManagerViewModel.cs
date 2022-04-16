@@ -48,6 +48,8 @@ namespace PortalDoFranqueado.ViewModel
         public RelayCommand UpdateInformativeCommand { get; }
         public RelayCommand PurchaseCommand { get; }
         public RelayCommand UsersCommand { get; }
+        public RelayCommand SuppliersCommand { get; }
+        public RelayCommand StoresCommand { get; }
 
         public double MaxWidthInformativeText
         {
@@ -92,12 +94,15 @@ namespace PortalDoFranqueado.ViewModel
                 UpdateSessionInformation();
                 UpdateInformative();
             });
+
             PhotosCommand = new RelayCommand(OpenPhotos);
             SupportCommand = new RelayCommand(OpenSupport);
             CampaignsCommand = new RelayCommand(OpenCampaigns);
             UpdateInformativeCommand = new RelayCommand(UpdateInformative);
             PurchaseCommand = new RelayCommand(OpenPurchase);
             UsersCommand = new RelayCommand(OpenUsers);
+            SuppliersCommand = new RelayCommand(OpenSuppliers);
+            StoresCommand = new RelayCommand(OpenStores);
         }
 
         private void Me_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -134,6 +139,34 @@ namespace PortalDoFranqueado.ViewModel
                 DesableContent();
 
                 Navigator.NavigateTo(new ManagerUsers());
+            }
+            finally
+            {
+                EnableContent();
+            }
+        }
+
+        private void OpenSuppliers()
+        {
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerSuppliers());
+            }
+            finally
+            {
+                EnableContent();
+            }
+        }
+
+        private void OpenStores()
+        {
+            try
+            {
+                DesableContent();
+
+                Navigator.NavigateTo(new ManagerStores());
             }
             finally
             {

@@ -6,11 +6,7 @@ using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.Util;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -358,10 +354,15 @@ namespace PortalDoFranqueado.ViewModel
                                  }
                              });
 
-                        Legendable?.SendMessage("Carregando familias...");
+                        Legendable?.SendMessage("Carregando familias e fornecedores...");
                         var families = await _cache.LoadFamilies();
+                        var suppliers = await _cache.LoadSuppliers();
                         var products = Collection.Products.ToList();
-                        products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
+                        products.ForEach(p =>
+                            {
+                                p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId);
+                                p.Supplier = suppliers.FirstOrDefault(s => s.Id == p.SupplierId);
+                            });
 
                         Legendable?.SendMessage("Configurando itens...");
                         var productsVM = new List<ProductViewModel>();
@@ -464,5 +465,13 @@ namespace PortalDoFranqueado.ViewModel
         }
 
         public void Reload() => LoadCollection();
+
+        public override bool BeforeReturn()
+        {
+            if (SaveIsEnabled)
+                return MessageBox.Show(Me, "Existem alterações que não foram salvas, deseja continuar?", "BROTHERS - Deseja sair sem salvar?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+            return true;
+        }
     }
 }

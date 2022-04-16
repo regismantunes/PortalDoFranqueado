@@ -100,5 +100,10 @@ namespace PortalDoFranqueado.ViewModel
             CloseRequest?.Invoke();
             GC.SuppressFinalize(this);
         }
+
+        public virtual bool BeforeReturn()
+        {
+            return true;
+        }
     }
 }

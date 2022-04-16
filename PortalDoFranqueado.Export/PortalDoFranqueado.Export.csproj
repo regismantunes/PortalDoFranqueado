@@ -6,6 +6,9 @@
     <Nullable>disable</Nullable>
     <OutputType>Exe</OutputType>
     <StartupObject>PortalDoFranqueado.Export.Program</StartupObject>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

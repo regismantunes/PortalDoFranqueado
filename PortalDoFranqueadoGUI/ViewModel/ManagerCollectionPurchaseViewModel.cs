@@ -83,9 +83,14 @@ namespace PortalDoFranqueado.ViewModel
                          }
                      });
 
-                Legendable?.SendMessage("Carregando famílias...");
+                Legendable?.SendMessage("Carregando familias e fornecedores...");
                 var families = await _cache.LoadFamilies();
-                products.ForEach(p => p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId));
+                var suppliers = await _cache.LoadSuppliers();
+                products.ForEach(p =>
+                    {
+                        p.Family = families.FirstOrDefault(f => f.Id == p.FamilyId);
+                        p.Supplier = suppliers.FirstOrDefault(s => s.Id == p.SupplierId);
+                    });
 
                 Legendable?.SendMessage("Configurando itens...");
                 var productsVM = new List<ProductViewModel>();

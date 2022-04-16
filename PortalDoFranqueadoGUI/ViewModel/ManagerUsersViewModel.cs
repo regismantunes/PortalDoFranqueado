@@ -394,5 +394,13 @@ namespace PortalDoFranqueado.ViewModel
         }
 
         public async void Reload() => await LoadUsers();
+
+        public override bool BeforeReturn()
+        {
+            if (Users.Any(u => u.IsEditing))
+                return MessageBox.Show(Me, "Existem alterações que não foram salvas, deseja continuar?", "BROTHERS - Deseja sair sem salvar?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+
+            return true;
+        }
     }
 }

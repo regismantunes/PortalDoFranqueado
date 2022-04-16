@@ -130,7 +130,7 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="915"
+                  Width="995"
                   HorizontalAlignment="Left"
                   Style="{StaticResource ListViewUnfocusable}"
                   IsEnabled="{Binding EnabledContent}"
@@ -150,6 +150,14 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Product.Family.Name}"
+                                            Style="{StaticResource TextBlockCell}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Fornecedor" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Product.Supplier.Name}"
                                             Style="{StaticResource TextBlockCell}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

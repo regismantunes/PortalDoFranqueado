@@ -176,9 +176,13 @@ namespace PortalDoFranqueado.ViewModel
             CurrentViewControl = control;
         }
 
-        public ContentControl ReturnNavigation()
+        public bool ReturnNavigation()
         {
-            var previus = _controls.Pop();
+            var previus = _controls.Peek();
+
+            if (previus.DataContext is INavigableViewModel navigable)
+                if (!navigable.BeforeReturn())
+                    return false;
 
             if (previus is ChangePassword)
                 VisibilityChagePassword = Visibility.Visible;
@@ -186,14 +190,16 @@ namespace PortalDoFranqueado.ViewModel
             if (previus.DataContext is IDisposable disposable)
                 disposable.Dispose();
 
+            _controls.Pop();
+
             OnPropertyChanged(nameof(CurrentViewControl));
             OnPropertyChanged(nameof(VisibilityReturn));
 
             var current = CurrentViewControl;
-            if (current.DataContext is INavigableViewModel navigable)
-                navigable.OnReturnToView();
+            if (current.DataContext is INavigableViewModel currentNavigable)
+                currentNavigable.OnReturnToView();
 
-            return current;
+            return true;
         }
 
         public void SendMessage(string message)

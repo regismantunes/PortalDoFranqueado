@@ -72,7 +72,7 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="884"
+                  Width="984"
                   HorizontalAlignment="Left"
                   IsEnabled="{Binding ItemsEnabled}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -100,6 +100,26 @@
                                             <CompositeCollection>
                                                 <model:Family Id="0" Name="&lt;Selecione>"/>
                                                 <CollectionContainer Collection="{Binding Families, Source={StaticResource TempCache}}" />
+                                            </CompositeCollection>
+                                        </ComboBox.ItemsSource>
+                                    </ComboBox>
+                                </DockPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Fornecedor" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <ComboBox DisplayMemberPath="Name"
+                                              SelectedValuePath="Id"
+                                              SelectedValue="{Binding SupplierId}"
+                                              Width="88"
+                                              util:FocusExtension.IsFocused="{Binding Focused}">
+                                        <ComboBox.ItemsSource>
+                                            <CompositeCollection>
+                                                <model:Supplier Id="0" Name="&lt;Selecione>"/>
+                                                <CollectionContainer Collection="{Binding Suppliers, Source={StaticResource TempCache}}" />
                                             </CompositeCollection>
                                         </ComboBox.ItemsSource>
                                     </ComboBox>

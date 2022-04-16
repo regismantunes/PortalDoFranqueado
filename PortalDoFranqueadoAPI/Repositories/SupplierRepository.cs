@@ -19,7 +19,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 using var cmd = new SqlCommand("SELECT * FROM Supplier" +
-                                    (onlyActives ? "WHERE Active = 1" : string.Empty), connection);
+                                (onlyActives ? " WHERE Active = 1" : string.Empty), connection);
 
                 using var reader = await cmd.ExecuteReaderAsync();
 
