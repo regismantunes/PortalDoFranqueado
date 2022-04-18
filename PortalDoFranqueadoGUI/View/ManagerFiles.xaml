@@ -50,7 +50,7 @@
                   HorizontalAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  MaxWidth="{Binding Me.ActualWidth}"
+                  MaxWidth="{Binding MaxWidthListView}"
                   x:Name="listFiles">
             <ListView.Resources>
                 <ContextMenu x:Key="ItemContextMenu">

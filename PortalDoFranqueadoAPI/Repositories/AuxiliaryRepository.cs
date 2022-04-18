@@ -18,13 +18,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT FileId" +
-                                        " FROM Auxiliary_File" +
-                                        " WHERE AuxiliaryId = @id", connection);
+                using var cmd = new SqlCommand("SELECT FileId" +
+                                                " FROM Auxiliary_File" +
+                                                " WHERE AuxiliaryId = @id", connection);
 
                 cmd.Parameters.AddWithValue("@id", id);
 
-                var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync();
 
                 var list = new List<int>();
                 while (await reader.ReadAsync())

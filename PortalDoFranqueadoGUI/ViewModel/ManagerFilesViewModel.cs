@@ -20,6 +20,7 @@ namespace PortalDoFranqueado.ViewModel
         public string TitleMessage { get; private set; }
         public ObservableCollection<FileView> Files { get; }
         public Visibility VisibilityChangeButtons { get; }
+        public double MaxWidthListView { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
         public RelayCommand AddFilesCommand { get; }
@@ -58,49 +59,56 @@ namespace PortalDoFranqueado.ViewModel
                     await API.ApiFile.GetFromCampaign(_id);
 
                 if (myFiles.Length == 0)
-                {
                     Legendable?.SendMessage(string.Empty);
-                    return;
-                }
-
-                myFiles.ToList().ForEach(f => Files.Add(new FileView(f)));
-
-                try
+                else
                 {
-                    var i = 1;
-                    var length = Files.Count;
-                    var hasError = false;
-                    Files.AsParallel()
-                         .ForAll(async file =>
-                        {
-                            try
-                            {
-                                file.PrepareDirectory();
-                                if (!file.FileExists)
-                                    await file.Download();
+                    myFiles.ToList()
+                           .ForEach(f => Files.Add(new FileView(f)));
 
-                                if (file.FileExists)
-                                    Me?.Dispatcher.BeginInvoke(file.LoadImageData);
-
-                                if (i < length)
-                                    Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
-                                else
-                                    Legendable?.SendMessage(string.Empty);
-                            }
-                            catch (Exception ex)
+                    try
+                    {
+                        _ = Task.Factory.StartNew(() =>
                             {
-                                if (!hasError)
-                                {
-                                    hasError = true;
-                                    Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error));
-                                }
-                            }
-                        });
+                                var i = 1;
+                                var length = Files.Count;
+                                var hasError = false;
+                                Files.AsParallel()
+                                     .ForAll(async file =>
+                                    {
+                                        try
+                                        {
+                                            file.PrepareDirectory();
+                                            if (!file.FileExists)
+                                                await file.Download();
+
+                                            if (file.FileExists)
+                                                Me?.Dispatcher.BeginInvoke(file.LoadImageData);
+
+                                            if (i < length)
+                                                Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
+                                            else
+                                                Legendable?.SendMessage(string.Empty);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            if (!hasError)
+                                            {
+                                                hasError = true;
+                                                Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error));
+                                            }
+                                        }
+                                    });
+                            });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar fotos e vídeos", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+
+                MaxWidthListView = Me.ActualWidth - 50;
+                OnPropertyChanged(nameof(MaxWidthListView));
+                Me.SizeChanged += Me_SizeChanged;
             }
             catch (Exception ex)
             {
@@ -110,6 +118,12 @@ namespace PortalDoFranqueado.ViewModel
             {
                 EnableContent();
             }
+        }
+
+        private void Me_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            MaxWidthListView = e.NewSize.Width - 50;
+            OnPropertyChanged(nameof(MaxWidthListView));
         }
 
         private void SaveLocal(IList selectedItems)
@@ -185,6 +199,7 @@ namespace PortalDoFranqueado.ViewModel
                 {
                     Task.Factory.StartNew(() =>
                     {
+                        Legendable?.SendMessage($"Carregando {openFileDialog.FileNames.Length} arquivos selecionados");
                         var i = 1;
                         foreach (var selectedFile in openFileDialog.FileNames)
                         {
@@ -208,6 +223,8 @@ namespace PortalDoFranqueado.ViewModel
                             {
                                 Files.Add(file);
                                 file.LoadImage(selectedFile);
+                                if (i >= openFileDialog.FileNames.Length)
+                                    Legendable?.SendMessage(string.Empty);
                             });
                         }
                     });

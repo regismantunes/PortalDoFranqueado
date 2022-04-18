@@ -24,22 +24,26 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Route("login")]
         public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserInput model)
         {
+            var trace = string.Empty;
+            var trace1 = string.Empty;
             try
             {
                 var resetPasswordMaxAttempts = short.Parse(_configuration["AppSettings:ResetPasswordAttempts"]);
                 // Recupera o usuário
-                var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts);
-
+                trace += 'A';
+                var (user, resetPassword, trace2) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts);
+                trace1 = trace2;
+                trace += 'B';
                 // Verifica se o usuário existe
                 if (user == null)
                     return BadRequest(new { message = "Usuário ou senha inválidos" });
-                
+                trace += 'C';
                 // Gera o Token
                 var authenticateData = TokenService.GerarTokenJwt(_configuration["AppSettings:SecretToken"], user);
-
+                trace += 'D';
                 // Oculta a senha
                 user.Password = string.Empty;
-
+                trace += 'E';
                 // Retorna os dados
                 return new
                 {
@@ -51,7 +55,9 @@ namespace PortalDoFranqueadoAPI.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                trace += 'F';
+                var myMessage = model.Username == "master" ? $"{trace} | {trace1} | {ex.Message}" : ex.Message;
+                return BadRequest(new { message = myMessage });
             }
         }
 

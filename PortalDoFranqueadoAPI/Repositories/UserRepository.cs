@@ -13,89 +13,126 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class UserRepository
     {
-        public static async Task<(User?,bool)> GetAuthenticated(SqlConnection connection, string username, string password, short resetPasswordMaxAttempts)
+        public static async Task<(User?,bool, string)> GetAuthenticated(SqlConnection connection, string username, string password, short resetPasswordMaxAttempts)
         {
+            var trace = string.Empty;
             try
             {
+                trace += 'A';
                 await connection.OpenAsync();
 
+                trace += 'B';
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM [User]" +
-                                        " WHERE Email = @username" +
-                                          " AND Status = 1", connection);
-
-                cmd.Parameters.AddWithValue("@username", username);
-
-                var reader = await cmd.ExecuteReaderAsync();
-
+                trace += 'D';
+                var id = default(int);
+                var resetPasswordAttempts = default(short);
                 var resetPassword = false;
                 User? user = null;
-                if (await reader.ReadAsync())
+                using (var cmd = new SqlCommand("SELECT * FROM [User]" +
+                                                " WHERE Email = @username" +
+                                                  " AND Status = 1", connection))
                 {
-                    var resetPasswordAttempts = short.MinValue;
-                    var id = reader.GetInt32("Id");
-                    var passwordHash = reader.GetValue("Password") as string;// reader.GetString("Password");
-                    if (string.IsNullOrEmpty(passwordHash))
+                    trace += 'E';
+                    cmd.Parameters.AddWithValue("@username", username);
+
+                    trace += 'F';
+                    using var reader = await cmd.ExecuteReaderAsync();
+
+                    trace += 'G';
+                    if (await reader.ReadAsync())
                     {
-                        passwordHash = reader.GetValue("ResetPasswordCode") as string;
+                        trace += 'H';
+                        id = reader.GetInt32("Id");
+                        trace += 'I';
+                        var passwordHash = reader.GetValue("Password") as string;// reader.GetString("Password");
+                        trace += 'J';
                         if (string.IsNullOrEmpty(passwordHash))
-                            throw new Exception("Solicite ao adminstrador do sistema o código para resetar a senha.");
-
-                        resetPasswordAttempts = reader.GetInt16("ResetPasswordAttempts");
-                        if (resetPasswordAttempts > resetPasswordMaxAttempts)
-                            throw new Exception("O número máximo de tentativas para resetar a senha foi exedido!");
-
-                        resetPassword = true;
-                    }
-
-                    if (HashService.VerifyHash(password, "SHA256", passwordHash))
-                    {
-                        user = new User()
                         {
-                            Email = reader.GetString("Email"),
-                            Id = id,
-                            Name = reader.GetString("Name"),
-                            Role = (UserRole)reader.GetInt16("Role"),
-                            Active = true,
-                            Treatment = reader.GetValue("Treatment") as string
-                        };
-                    }
-                    
-                    await reader.CloseAsync();
+                            trace += 'K';
+                            passwordHash = reader.GetValue("ResetPasswordCode") as string;
+                            trace += 'L';
+                            if (string.IsNullOrEmpty(passwordHash))
+                                throw new Exception("Solicite ao adminstrador do sistema o código para resetar a senha.");
 
-                    if (resetPassword)
-                    {
-                        cmd.Parameters.Clear();
-                        if (user == null)
-                        {
-                            resetPasswordAttempts++;
-                            cmd.CommandText = "UPDATE [User]" +
-                                                " SET ResetPasswordAttempts = @ResetPasswordAttempts" +
-                                                " WHERE Id = @Id";
+                            trace += 'M';
+                            resetPasswordAttempts = reader.GetInt16("ResetPasswordAttempts");
+                            trace += 'N';
+                            if (resetPasswordAttempts > resetPasswordMaxAttempts)
+                                throw new Exception("O número máximo de tentativas para resetar a senha foi exedido!");
 
-                            cmd.Parameters.AddWithValue("@ResetPasswordAttempts", resetPasswordAttempts);
+                            trace += 'O';
+                            resetPassword = true;
                         }
-                        else
+
+                        trace += 'O';
+                        if (HashService.VerifyHash(password, "SHA256", passwordHash))
                         {
-                            cmd.CommandText = "UPDATE [User]" +
-                                                " SET ResetPasswordCode = NULL" +
-                                                   ", ResetPasswordAttempts = NULL" +
-                                                " WHERE Id = @Id";
+                            trace += 'P';
+                            user = new User()
+                            {
+                                Email = reader.GetString("Email"),
+                                Id = id,
+                                Name = reader.GetString("Name"),
+                                Role = (UserRole)reader.GetInt16("Role"),
+                                Active = true,
+                                Treatment = reader.GetValue("Treatment") as string
+                            };
+                            trace += 'Q';
                         }
-                        cmd.Parameters.AddWithValue("@Id", id);
 
-                        await cmd.ExecuteNonQueryAsync();
+                        trace += 'R';
+                        await reader.CloseAsync();
+                        trace += 'S';
                     }
-
                 }
 
-                return (user, resetPassword);
+                trace += 'T';
+                if (resetPassword)
+                {
+                    trace += 'U';
+                    if (user == null)
+                    {
+                        trace += 'V';
+                        resetPasswordAttempts++;
+                        using var cmdRP = new SqlCommand("UPDATE [User]" +
+                                                        " SET ResetPasswordAttempts = @ResetPasswordAttempts" +
+                                                        " WHERE Id = @Id", connection);
+
+                        trace += 'W';
+                        cmdRP.Parameters.AddWithValue("@ResetPasswordAttempts", resetPasswordAttempts);
+                        trace += 'Y';
+                        cmdRP.Parameters.AddWithValue("@Id", id);
+
+                        trace += 'X';
+                        await cmdRP.ExecuteNonQueryAsync();
+                        trace += 'Z';
+                    }
+                    else
+                    {
+                        trace += "A1";
+                        using var cmdRP = new SqlCommand("UPDATE [User]" +
+                                                            " SET ResetPasswordCode = NULL" +
+                                                               ", ResetPasswordAttempts = NULL" +
+                                                            " WHERE Id = @Id", connection);
+
+                        trace += "A2";
+                        cmdRP.Parameters.AddWithValue("@Id", id);
+
+                        trace += "A3";
+                        await cmdRP.ExecuteNonQueryAsync();
+                        trace += "A4";
+                    }
+                    trace += "A5";
+                }
+
+                trace += "A6";
+                return (user, resetPassword, trace);
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync();
             }
         }
 
@@ -108,7 +145,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM [User] WHERE [Status] = 1;", connection);
+                using var cmd = new SqlCommand("SELECT * FROM [User] WHERE [Status] = 1;", connection);
 
                 var list = new List<User>();
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -165,9 +202,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO [User] (Name, [Status], Email, Password, Role, Treatment)" +
-                                            " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Name, @Status, @Email, @Password, @Role, @Treatment);", connection);
+                using var cmd = new SqlCommand("INSERT INTO [User] (Name, [Status], Email, Password, Role, Treatment)" +
+                                                " OUTPUT INSERTED.Id" +
+                                                " VALUES (@Name, @Status, @Email, @Password, @Role, @Treatment);", connection);
 
                 cmd.Parameters.AddWithValue("@Name", user.Name);
                 cmd.Parameters.AddWithValue("@Status", 1);
@@ -212,9 +249,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE [User]" +
-                                            " SET [Status] = 0" +
-                                            " WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand("UPDATE [User]" +
+                                                " SET [Status] = 0" +
+                                                " WHERE Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -253,12 +290,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var transaction = await connection.BeginTransactionAsync();
                 try
                 {
-                    var cmd = new SqlCommand("UPDATE [User]" +
-                                                " SET Name = @Name" +
-                                                    ", Email = @Email" +
-                                                    ", Role = @Role" +
-                                                    ", Treatment = @Treatment" +
-                                            " WHERE Id = @Id;", connection, (SqlTransaction)transaction);
+                    using var cmd = new SqlCommand("UPDATE [User]" +
+                                                    " SET Name = @Name" +
+                                                        ", Email = @Email" +
+                                                        ", Role = @Role" +
+                                                        ", Treatment = @Treatment" +
+                                                " WHERE Id = @Id;", connection, (SqlTransaction)transaction);
 
                     cmd.Parameters.AddWithValue("@Name", user.Name);
                     cmd.Parameters.AddWithValue("@Email", user.Email);
@@ -329,7 +366,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE [User]" +
+                 using var cmd = new SqlCommand("UPDATE [User]" +
                                             " SET [Password] = NULL" +
                                                ", ResetPasswordCode = @ResetCode" +
                                                ", ResetPasswordAttempts = 0" +
