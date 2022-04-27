@@ -13,19 +13,15 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class UserRepository
     {
-        public static async Task<(User?,bool, string)> GetAuthenticated(SqlConnection connection, string username, string password, short resetPasswordMaxAttempts)
+        public static async Task<(User?,bool)> GetAuthenticated(SqlConnection connection, string username, string password, short resetPasswordMaxAttempts)
         {
-            var trace = string.Empty;
             try
             {
-                trace += 'A';
                 await connection.OpenAsync();
 
-                trace += 'B';
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                trace += 'D';
                 var id = default(int);
                 var resetPasswordAttempts = default(short);
                 var resetPassword = false;
@@ -34,42 +30,29 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 " WHERE Email = @username" +
                                                   " AND Status = 1", connection))
                 {
-                    trace += 'E';
                     cmd.Parameters.AddWithValue("@username", username);
 
-                    trace += 'F';
                     using var reader = await cmd.ExecuteReaderAsync();
 
-                    trace += 'G';
                     if (await reader.ReadAsync())
                     {
-                        trace += 'H';
                         id = reader.GetInt32("Id");
-                        trace += 'I';
                         var passwordHash = reader.GetValue("Password") as string;// reader.GetString("Password");
-                        trace += 'J';
                         if (string.IsNullOrEmpty(passwordHash))
                         {
-                            trace += 'K';
                             passwordHash = reader.GetValue("ResetPasswordCode") as string;
-                            trace += 'L';
                             if (string.IsNullOrEmpty(passwordHash))
                                 throw new Exception("Solicite ao adminstrador do sistema o código para resetar a senha.");
 
-                            trace += 'M';
                             resetPasswordAttempts = reader.GetInt16("ResetPasswordAttempts");
-                            trace += 'N';
                             if (resetPasswordAttempts > resetPasswordMaxAttempts)
                                 throw new Exception("O número máximo de tentativas para resetar a senha foi exedido!");
 
-                            trace += 'O';
                             resetPassword = true;
                         }
 
-                        trace += 'O';
                         if (HashService.VerifyHash(password, "SHA256", passwordHash))
                         {
-                            trace += 'P';
                             user = new User()
                             {
                                 Email = reader.GetString("Email"),
@@ -79,56 +62,40 @@ namespace PortalDoFranqueadoAPI.Repositories
                                 Active = true,
                                 Treatment = reader.GetValue("Treatment") as string
                             };
-                            trace += 'Q';
                         }
 
-                        trace += 'R';
                         await reader.CloseAsync();
-                        trace += 'S';
                     }
                 }
 
-                trace += 'T';
                 if (resetPassword)
                 {
-                    trace += 'U';
                     if (user == null)
                     {
-                        trace += 'V';
                         resetPasswordAttempts++;
                         using var cmdRP = new SqlCommand("UPDATE [User]" +
                                                         " SET ResetPasswordAttempts = @ResetPasswordAttempts" +
                                                         " WHERE Id = @Id", connection);
 
-                        trace += 'W';
                         cmdRP.Parameters.AddWithValue("@ResetPasswordAttempts", resetPasswordAttempts);
-                        trace += 'Y';
                         cmdRP.Parameters.AddWithValue("@Id", id);
 
-                        trace += 'X';
                         await cmdRP.ExecuteNonQueryAsync();
-                        trace += 'Z';
                     }
                     else
                     {
-                        trace += "A1";
                         using var cmdRP = new SqlCommand("UPDATE [User]" +
                                                             " SET ResetPasswordCode = NULL" +
                                                                ", ResetPasswordAttempts = NULL" +
                                                             " WHERE Id = @Id", connection);
 
-                        trace += "A2";
                         cmdRP.Parameters.AddWithValue("@Id", id);
 
-                        trace += "A3";
                         await cmdRP.ExecuteNonQueryAsync();
-                        trace += "A4";
                     }
-                    trace += "A5";
                 }
 
-                trace += "A6";
-                return (user, resetPassword, trace);
+                return (user, resetPassword);
             }
             finally
             {

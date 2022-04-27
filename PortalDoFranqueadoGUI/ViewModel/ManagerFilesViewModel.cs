@@ -81,13 +81,16 @@ namespace PortalDoFranqueado.ViewModel
                                             if (!file.FileExists)
                                                 await file.Download();
 
-                                            if (file.FileExists)
-                                                Me?.Dispatcher.BeginInvoke(file.LoadImageData);
+                                            Me?.Dispatcher.BeginInvoke(() =>
+                                            {
+                                                if (file.FileExists)
+                                                    file.LoadImageData();
 
-                                            if (i < length)
-                                                Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
-                                            else
-                                                Legendable?.SendMessage(string.Empty);
+                                                if (i < length)
+                                                    Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
+                                                else
+                                                    Legendable?.SendMessage(string.Empty);
+                                            });
                                         }
                                         catch (Exception ex)
                                         {
@@ -197,14 +200,13 @@ namespace PortalDoFranqueado.ViewModel
 
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    Task.Factory.StartNew(() =>
+                    _ = Task.Factory.StartNew(() =>
                     {
-                        Legendable?.SendMessage($"Carregando {openFileDialog.FileNames.Length} arquivos selecionados");
                         var i = 1;
+                        var length = openFileDialog.FileNames.Length;
+                        Legendable?.SendMessage($"Carregando {length} arquivos selecionados...");
                         foreach (var selectedFile in openFileDialog.FileNames)
                         {
-                            Legendable?.SendMessage($"Carregando arquivo {i++} de {openFileDialog.FileNames.Length}");
-
                             var fileInfo = new FileInfo(selectedFile);
                             var mimeType = MimeTypes.MimeTypeMap.GetMimeType(fileInfo.FullName);
 
@@ -223,8 +225,8 @@ namespace PortalDoFranqueado.ViewModel
                             {
                                 Files.Add(file);
                                 file.LoadImage(selectedFile);
-                                if (i >= openFileDialog.FileNames.Length)
-                                    Legendable?.SendMessage(string.Empty);
+
+                                Legendable?.SendMessage(i < length ? $"Arquivo carregando ({i++} de {length})" : string.Empty);
                             });
                         }
                     });

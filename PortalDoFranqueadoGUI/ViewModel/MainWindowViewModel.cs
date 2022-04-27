@@ -205,6 +205,7 @@ namespace PortalDoFranqueado.ViewModel
         public void SendMessage(string message)
         {
             StatusMessage = message;
+            //App.Current.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Background);
         }
     }
 }
