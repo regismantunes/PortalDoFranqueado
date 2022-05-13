@@ -123,7 +123,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                             Id = reader.GetInt32("Id"),
                             Email = reader.GetString("Email"),
                             Name = reader.GetString("Name"),
-                            Treatment = reader.GetString("Treatment"),
+                            Treatment = reader.GetValue("Treatment") as string,
                             Role = (UserRole)reader.GetInt16("Role"),
                             Active = true
                         });

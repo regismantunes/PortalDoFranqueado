@@ -49,7 +49,6 @@ namespace PortalDoFranqueado.ViewModel
             public Visibility VisibitityEditControls => _isEditing ? Visibility.Visible : Visibility.Collapsed;
             public Visibility VisibitityReadControls => _isEditing ? Visibility.Collapsed : Visibility.Visible;
             public RelayCommand StartEditCommand { get; }
-            public RelayCommand CancelEditCommand { get; }
             public RelayCommand SaveCommand { get; }
             public RelayCommand DeleteCommand { get; }
             public Window Window { get; set; }
@@ -69,10 +68,15 @@ namespace PortalDoFranqueado.ViewModel
 
             public StoreViewModel()
             {
-                StartEditCommand = new RelayCommand(() => { IsEditing = true; SetFocusAt(nameof(Name)); });
-                CancelEditCommand = new RelayCommand(CancelEdit);
+                StartEditCommand = new RelayCommand(StartEdit);
                 SaveCommand = new RelayCommand(async () => await Save().ConfigureAwait(false));
                 DeleteCommand = new RelayCommand(async () => await Delete().ConfigureAwait(false));
+            }
+
+            public void StartEdit()
+            {
+                IsEditing = true;
+                SetFocusAt(nameof(Name));
             }
 
             private void SetAllFocusOff()
@@ -247,20 +251,37 @@ namespace PortalDoFranqueado.ViewModel
         public bool EnabledDelete => SelectedStore?.Id != null;
 
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand NewRecordCommand { get; }
+        public RelayCommand CancelEditCommand { get; }
 
         public ManagerStoresViewModel()
         {
             Stores = new ObservableCollection<StoreViewModel>();
 
-            LoadedCommand = new RelayCommand(async () => await LoadSuppliers());
+            LoadedCommand = new RelayCommand(async () => await LoadStores());
+            NewRecordCommand = new RelayCommand(NewRecord);
+            CancelEditCommand = new RelayCommand(CancelEdit);
         }
 
-        public void SetWindow(Window main)
+        private void CancelEdit()
         {
-            Me = main;
+            if (SelectedStore == null)
+                return;
+
+            SelectedStore.CancelEdit();
+            if (SelectedStore.Id == null)
+                Stores.Remove(SelectedStore);
         }
 
-        private async Task LoadSuppliers()
+        private void NewRecord()
+        {
+            var newStore = CreateSupplierViewModel();
+            Stores.Add(newStore);
+            SelectedIndex = Stores.Count - 1;
+            newStore.StartEdit();
+        }
+
+        private async Task LoadStores()
         {
             try
             {
@@ -271,8 +292,6 @@ namespace PortalDoFranqueado.ViewModel
 
                 stores.ToList()
                       .ForEach(store => Stores.Add(CreateSupplierViewModel(store)));
-
-                Stores.Add(CreateSupplierViewModel());
             }
             catch (Exception ex)
             {
@@ -289,17 +308,9 @@ namespace PortalDoFranqueado.ViewModel
             var vm = store == null ? new StoreViewModel() :
                                      new StoreViewModel(store);
             vm.Window = Me;
-
             vm.AfterDelete += VM_AfterDelete;
-            vm.AfterInsert += VM_AfterInsert;
 
             return vm;
-        }
-
-        private void VM_AfterInsert(object? sender, EventArgs e)
-        {
-            Stores.Add(CreateSupplierViewModel());
-            OnPropertyChanged(nameof(EnabledDelete));
         }
 
         private void VM_AfterDelete(object? sender, EventArgs e)
@@ -308,7 +319,7 @@ namespace PortalDoFranqueado.ViewModel
                 Stores.Remove(vm);
         }
 
-        public async void Reload() => await LoadSuppliers();
+        public async void Reload() => await LoadStores();
 
         public override bool BeforeReturn()
         {

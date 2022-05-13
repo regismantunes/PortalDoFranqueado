@@ -29,7 +29,10 @@
                FontWeight="Bold"/>
         <StackPanel Orientation="Horizontal"
                     Grid.Row="1">
-            <Button Content="{Binding StartEditAction}"
+            <Button Content="Novo"
+                    Style="{StaticResource CellButton}"
+                    Command="{Binding NewRecordCommand}"/>
+            <Button Content="Editar"
                     IsEnabled="{Binding EnabledSatartEdit}"
                     Style="{StaticResource CellButton}"
                     Command="{Binding SelectedUser.StartEditCommand}"/>
@@ -40,7 +43,7 @@
             <Button Content="Cancelar"
                     IsEnabled="{Binding IsEditing}"
                     Style="{StaticResource CellButton}"
-                    Command="{Binding SelectedUser.CancelEditCommand}"/>
+                    Command="{Binding CancelEditCommand}"/>
             <Button Content="Resetar senha"
                     IsEnabled="{Binding EnabledDelete}"
                     Style="{StaticResource CellButton}"

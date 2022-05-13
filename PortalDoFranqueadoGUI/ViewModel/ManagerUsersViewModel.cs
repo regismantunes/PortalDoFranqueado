@@ -64,13 +64,11 @@ namespace PortalDoFranqueado.ViewModel
                 } 
             }
 
-            public string StartEditAction => _id == null ? "Novo" : "Editar";
             public bool EnabledSatartEdit => !_isEditing;
             public Visibility VisibitityEditControls => _isEditing ? Visibility.Visible : Visibility.Collapsed;
             public Visibility VisibitityReadControls => _isEditing ? Visibility.Collapsed : Visibility.Visible;
             public bool EnabledComboBoxStores => Role == UserRole.Franchisee;
             public RelayCommand StartEditCommand { get; }
-            public RelayCommand CancelEditCommand { get; }
             public RelayCommand SaveCommand { get; }
             public RelayCommand DeleteCommand { get; }
             public RelayCommand ResetPasswordCommand { get; }
@@ -98,11 +96,16 @@ namespace PortalDoFranqueado.ViewModel
                 _role = UserRole.Franchisee;
                 _storeId = 0;
 
-                StartEditCommand = new RelayCommand(() => { IsEditing = true; SetFocusAt(nameof(Name)); });
-                CancelEditCommand = new RelayCommand(CancelEdit);
+                StartEditCommand = new RelayCommand(StartEdit);
                 SaveCommand = new RelayCommand(async () => await Save().ConfigureAwait(false));
                 DeleteCommand = new RelayCommand(async () => await Delete().ConfigureAwait(false));
                 ResetPasswordCommand = new RelayCommand(async () => await ResetPassword().ConfigureAwait(false));
+            }
+
+            public void StartEdit()
+            {
+                IsEditing = true; 
+                SetFocusAt(nameof(Name));
             }
 
             private void SetAllFocusOff()
@@ -329,6 +332,8 @@ namespace PortalDoFranqueado.ViewModel
         public bool EnabledDelete => SelectedUser?.Id != null;
 
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand NewRecordCommand { get; }
+        public RelayCommand CancelEditCommand { get; }
 
         public ManagerUsersViewModel()
         {
@@ -336,11 +341,26 @@ namespace PortalDoFranqueado.ViewModel
             Users = new ObservableCollection<UserViewModel>();
 
             LoadedCommand = new RelayCommand(async () => await LoadUsers());
+            NewRecordCommand = new RelayCommand(NewRecord);
+            CancelEditCommand = new RelayCommand(CancelEdit);
         }
 
-        public void SetWindow(Window main)
+        private void CancelEdit()
         {
-            Me = main;
+            if (SelectedUser == null)
+                return;
+
+            SelectedUser.CancelEdit();
+            if (SelectedUser.Id == null)
+                Users.Remove(SelectedUser);
+        }
+
+        private void NewRecord()
+        {
+            var newUser = CreateUserViewModel();
+            Users.Add(newUser);
+            SelectedIndex = Users.Count - 1;
+            newUser.StartEdit();
         }
 
         private async Task LoadUsers()
@@ -354,8 +374,6 @@ namespace PortalDoFranqueado.ViewModel
 
                 users.ToList()
                      .ForEach(user => Users.Add(CreateUserViewModel(user)));
-
-                Users.Add(CreateUserViewModel());
 
                 await ((TemporaryLocalRepository)App.Current.Resources["TempCache"]).LoadStores();
             }
@@ -374,17 +392,9 @@ namespace PortalDoFranqueado.ViewModel
             var userVM = user == null ? new UserViewModel() : 
                                         new UserViewModel(user);
             userVM.Window = Me;
-
             userVM.AfterDelete += UserVM_AfterDelete;
-            userVM.AfterInsert += UserVM_AfterInsert;
-
+        
             return userVM;
-        }
-
-        private void UserVM_AfterInsert(object? sender, EventArgs e)
-        {
-            Users.Add(CreateUserViewModel());
-            OnPropertyChanged(nameof(EnabledDelete));
         }
 
         private void UserVM_AfterDelete(object? sender, EventArgs e)

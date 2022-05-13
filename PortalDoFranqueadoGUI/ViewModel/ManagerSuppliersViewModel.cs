@@ -47,7 +47,6 @@ namespace PortalDoFranqueado.ViewModel
             public Visibility VisibitityEditControls => _isEditing ? Visibility.Visible : Visibility.Collapsed;
             public Visibility VisibitityReadControls => _isEditing ? Visibility.Collapsed : Visibility.Visible;
             public RelayCommand StartEditCommand { get; }
-            public RelayCommand CancelEditCommand { get; }
             public RelayCommand SaveCommand { get; }
             public RelayCommand DeleteCommand { get; }
             public Window Window { get; set; }
@@ -69,10 +68,15 @@ namespace PortalDoFranqueado.ViewModel
             {
                 _active = true;
 
-                StartEditCommand = new RelayCommand(() => { IsEditing = true; SetFocusAt(nameof(Name)); });
-                CancelEditCommand = new RelayCommand(CancelEdit);
+                StartEditCommand = new RelayCommand(StartEdit);
                 SaveCommand = new RelayCommand(async () => await Save().ConfigureAwait(false));
                 DeleteCommand = new RelayCommand(async () => await Delete().ConfigureAwait(false));
+            }
+
+            public void StartEdit()
+            {
+                IsEditing = true;
+                SetFocusAt(nameof(Name));
             }
 
             private void SetAllFocusOff()
@@ -240,17 +244,34 @@ namespace PortalDoFranqueado.ViewModel
         public bool EnabledDelete => SelectedSupplier?.Id != null;
 
         public RelayCommand LoadedCommand { get; }
+        public RelayCommand NewRecordCommand { get; }
+        public RelayCommand CancelEditCommand { get; }
 
         public ManagerSuppliersViewModel()
         {
             Suppliers = new ObservableCollection<SupplierViewModel>();
 
             LoadedCommand = new RelayCommand(async () => await LoadSuppliers());
+            NewRecordCommand = new RelayCommand(NewRecord);
+            CancelEditCommand = new RelayCommand(CancelEdit);
         }
 
-        public void SetWindow(Window main)
+        private void CancelEdit()
         {
-            Me = main;
+            if (SelectedSupplier == null)
+                return;
+
+            SelectedSupplier.CancelEdit();
+            if (SelectedSupplier.Id == null)
+                Suppliers.Remove(SelectedSupplier);
+        }
+
+        private void NewRecord()
+        {
+            var newSupplier = CreateSupplierViewModel();
+            Suppliers.Add(newSupplier);
+            SelectedIndex = Suppliers.Count - 1;
+            newSupplier.StartEdit();
         }
 
         private async Task LoadSuppliers()
@@ -264,8 +285,6 @@ namespace PortalDoFranqueado.ViewModel
 
                 suppliers.ToList()
                          .ForEach(supplier => Suppliers.Add(CreateSupplierViewModel(supplier)));
-
-                Suppliers.Add(CreateSupplierViewModel());
             }
             catch (Exception ex)
             {
@@ -282,17 +301,9 @@ namespace PortalDoFranqueado.ViewModel
             var vm = supplier == null ? new SupplierViewModel() :
                                         new SupplierViewModel(supplier);
             vm.Window = Me;
-
             vm.AfterDelete += VM_AfterDelete;
-            vm.AfterInsert += VM_AfterInsert;
-
+        
             return vm;
-        }
-
-        private void VM_AfterInsert(object? sender, EventArgs e)
-        {
-            Suppliers.Add(CreateSupplierViewModel());
-            OnPropertyChanged(nameof(EnabledDelete));
         }
 
         private void VM_AfterDelete(object? sender, EventArgs e)
