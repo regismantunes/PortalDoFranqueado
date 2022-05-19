@@ -32,6 +32,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            finally { _connection.Dispose(); }
         }
 
         [HttpPost]
@@ -49,6 +50,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            finally { _connection.Dispose(); }
         }
 
         [HttpDelete]
@@ -66,6 +68,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            finally { _connection.Dispose(); }
         }
 
         [HttpPut]
@@ -85,11 +88,12 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+            finally { _connection.Dispose(); }
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
+            //_connection.Dispose();
             GC.SuppressFinalize(this);
         }
 
