@@ -25,6 +25,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
+                Task.Factory.StartNew(TestConnectionToKeepAccessible);
+
                 var minCompatibleVersion = new Version("1.0.7");
                 var sysVersion = new Version(version);
 
@@ -34,7 +36,16 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+        }
+
+        private async Task TestConnectionToKeepAccessible()
+        {
+            try
+            {
+                await _connection.OpenAsync();
+                await _connection.CloseAsync();
+            }
+            catch { }
         }
 
         [HttpGet]
@@ -69,7 +80,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+            
         }
 
         [HttpGet]
@@ -96,7 +107,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+            
         }
 
         [HttpGet]
@@ -118,7 +129,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+            
         }
 
         [HttpGet]
@@ -137,7 +148,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+            
         }
 
         [HttpPut]
@@ -155,12 +166,12 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            finally { _connection.Dispose(); }
+            
         }
 
         public void Dispose()
         {
-            //_connection.Dispose();
+            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 
