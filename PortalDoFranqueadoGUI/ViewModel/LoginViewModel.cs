@@ -14,6 +14,7 @@ namespace PortalDoFranqueado.ViewModel
         private bool _emailLoginFocused;
         private bool _passwordFocused;
         private bool _loginIsEnabled;
+        private string? _lockLoginMessage;
         private PersistentLocalRepository _persistCache;
 
         public string? EmailLogin { get; set; }
@@ -53,7 +54,17 @@ namespace PortalDoFranqueado.ViewModel
                 OnPropertyChanged();
             }
         }
-        public Visibility OldVersionMessageVisibility { get; private set; }
+        public string? LockLoginMessage
+        {
+            get => _lockLoginMessage;
+            set
+            {
+                _lockLoginMessage = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LockLoginMessageVisibility));
+            }
+        }
+        public Visibility LockLoginMessageVisibility => string.IsNullOrEmpty(_lockLoginMessage) ? Visibility.Visible : Visibility.Collapsed;
         public Visibility HellcomeMessageVisibility { get; private set; }
 
         public RelayCommand<PasswordBox> LoginCommand { get; }
@@ -65,7 +76,6 @@ namespace PortalDoFranqueado.ViewModel
             LoadedCommand = new RelayCommand(async () => await Loaded());
             LoginIsEnabled = false;
             HellcomeMessageVisibility = Visibility.Collapsed;
-            OldVersionMessageVisibility = Visibility.Collapsed;
         }
 
         private async Task Loaded()
@@ -84,11 +94,24 @@ namespace PortalDoFranqueado.ViewModel
                     currentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(4);
                 }
 
-                var isCompatible = await API.ApiMainScreen.VerifyCompatibleVersion(currentVersion);
+                var connectionValidateInto = await API.ApiMainScreen.ValidateConnection(currentVersion);
 
                 EnableContent();
 
-                if (isCompatible)
+                if (!connectionValidateInto.IsCompatibleVersion)
+                {
+                    LockLoginMessage = "Essa versão do Portal Do Franqueado está desatualizada. Aguarde a nova versão ser baixada, feche a aplicação e abra novamente para efetuar o login.";
+                }
+                else if (!connectionValidateInto.IsServiceAvalible)
+                {
+                    LockLoginMessage = "O serviço está iniciando. Aguarde...";
+                    await Task.Run(async () =>
+                    {
+                        await Task.Delay(1000);
+                        await Loaded();
+                    }).ConfigureAwait(false);
+                }
+                else
                 {
                     LoginIsEnabled = true;
                     HellcomeMessageVisibility = Visibility.Visible;
@@ -101,11 +124,6 @@ namespace PortalDoFranqueado.ViewModel
                         EmailLoginFocused = true;
                     else
                         PasswordFocused = true;
-                }
-                else
-                {
-                    OldVersionMessageVisibility = Visibility.Visible;
-                    OnPropertyChanged(nameof(OldVersionMessageVisibility));
                 }
             }
             catch (Exception ex)

@@ -29,5 +29,9 @@ namespace PortalDoFranqueado.API
         public static async Task<bool> VerifyCompatibleVersion(string version)
             => await BaseApi.GetSimpleHttpClientRequest<bool>($"main/iscompatibleversion/{version}")
                             .Get();
+
+        public static async Task<ConnectionValidationInfo> ValidateConnection(string version)
+            => await BaseApi.GetSimpleHttpClientRequest<ConnectionValidationInfo>($"main/validateconnection/{version}")
+                            .Get();
     }
 }

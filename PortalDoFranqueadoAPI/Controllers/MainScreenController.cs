@@ -20,13 +20,48 @@ namespace PortalDoFranqueadoAPI.Controllers
             => (_connection, _configuration) = (connection, configuration);
 
         [HttpGet]
+        [Route("validateconnection/{version}")]
+        public ActionResult<dynamic> ValidateConnection(string version)
+        {
+            try
+            {
+                var isServiceAvalible = DatabaseConnectionIsAvalible();
+
+                var minCompatibleVersion = new Version("1.0.7");
+                var sysVersion = new Version(version);
+
+                return Ok(new
+                {
+                    IsCompatibleVersion = sysVersion >= minCompatibleVersion,
+                    IsServiceAvalible = isServiceAvalible
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        private async Task<bool> DatabaseConnectionIsAvalible()
+        {
+            try
+            {
+                await _connection.OpenAsync();
+                await _connection.CloseAsync();
+                return true;
+            }
+            catch 
+            {
+                return false;
+            }
+        }
+
+        [HttpGet]
         [Route("iscompatibleversion/{version}")]
         public ActionResult<dynamic> ClientVersionIsCompatible(string version)
         {
             try
             {
-                Task.Factory.StartNew(TestConnectionToKeepAccessible);
-
                 var minCompatibleVersion = new Version("1.0.7");
                 var sysVersion = new Version(version);
 
@@ -36,16 +71,6 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
-
-        private async Task TestConnectionToKeepAccessible()
-        {
-            try
-            {
-                await _connection.OpenAsync();
-                await _connection.CloseAsync();
-            }
-            catch { }
         }
 
         [HttpGet]

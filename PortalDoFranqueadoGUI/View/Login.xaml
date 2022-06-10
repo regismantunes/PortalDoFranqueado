@@ -35,14 +35,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
-               Text="Essa versão do Portal Do Franqueado está desatualizada. Aguarde a nova versão ser baixada, feche a aplicação e abra novamente para efetuar o login."
-               HorizontalAlignment="Center"
-               Foreground="White"
-               FontSize="16"
-               TextWrapping="Wrap"
+                Text="{Binding LockLoginMessage}"
+                HorizontalAlignment="Center"
+                Foreground="White"
+                FontSize="16"
+                TextWrapping="Wrap"
                 MaxWidth="800"
-                   Margin="0,0,0,100"
-                   Visibility="{Binding OldVersionMessageVisibility}"/>
+                Margin="0,0,0,100"
+                Visibility="{Binding LockLoginMessageVisibility}"/>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
                Text="Franqueado, conecte-se na sua conta"
                HorizontalAlignment="Center"
