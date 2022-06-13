@@ -21,11 +21,11 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         [HttpGet]
         [Route("validateconnection/{version}")]
-        public ActionResult<dynamic> ValidateConnection(string version)
+        public async Task<ActionResult<dynamic>> ValidateConnection(string version)
         {
             try
             {
-                var isServiceAvalible = DatabaseConnectionIsAvalible();
+                var isServiceAvalible = await DatabaseConnectionIsAvalible();
 
                 var minCompatibleVersion = new Version("1.0.7");
                 var sysVersion = new Version(version);

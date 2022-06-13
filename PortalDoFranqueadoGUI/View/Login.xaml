@@ -38,25 +38,28 @@
                 Text="{Binding LockLoginMessage}"
                 HorizontalAlignment="Center"
                 Foreground="White"
-                FontSize="16"
+                FontSize="20"
+                FontWeight="Bold"
                 TextWrapping="Wrap"
                 MaxWidth="800"
                 Margin="0,0,0,100"
                 Visibility="{Binding LockLoginMessageVisibility}"/>
         <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
-               Text="Franqueado, conecte-se na sua conta"
-               HorizontalAlignment="Center"
-               Foreground="White"
-               FontSize="16"
-               TextWrapping="Wrap"
+                Text="Franqueado, conecte-se na sua conta"
+                HorizontalAlignment="Center"
+                Foreground="White"
+                FontSize="16"
+                TextWrapping="Wrap"
                 MaxWidth="800"
-                   Visibility="{Binding HellcomeMessageVisibility}"/>
+                Visibility="{Binding LoginVisibility}"/>
         <Border Grid.Column="1" Grid.Row="3" Grid.RowSpan="5"
-                Style="{StaticResource LoginBorder}"/>
+                Style="{StaticResource LoginBorder}"
+                Visibility="{Binding LoginVisibility}"/>
         <Image Grid.Column="1" Grid.Row="3"
                Source="/Media/logo-01.png"
                Width="200"
-               Margin="20"/>
+               Margin="20"
+               Visibility="{Binding LoginVisibility}"/>
         <TextBox Grid.Column="1" Grid.Row="4"
                  Name="txtUser"
                  HorizontalAlignment="Center"
@@ -66,6 +69,7 @@
                  FontSize="16"
                  Text="{Binding EmailLogin}"
                  IsEnabled="{Binding LoginIsEnabled}"
+                 Visibility="{Binding LoginVisibility}"
                  util:FocusExtension.IsFocused="{Binding EmailLoginFocused}"/>
         <PasswordBox Grid.Column="1" Grid.Row="5"
                  HorizontalAlignment="Center"
@@ -75,6 +79,7 @@
                  FontSize="16"
                  Name="txtPassword"
                  IsEnabled="{Binding LoginIsEnabled}"
+                 Visibility="{Binding LoginVisibility}"
                  util:FocusExtension.IsFocused="{Binding PasswordFocused}"/>
         <Button Grid.Column="1" Grid.Row="6"
                 Content="LOGIN"
@@ -83,7 +88,8 @@
                 Command="{Binding Path=LoginCommand}"
                 CommandParameter="{Binding ElementName=txtPassword}"
                 IsDefault="True"
-                IsEnabled="{Binding LoginIsEnabled}"/>
+                IsEnabled="{Binding LoginIsEnabled}"
+                Visibility="{Binding LoginVisibility}"/>
         <TextBlock Grid.Column="1" Grid.Row="7" 
                Text="{Binding ErrorMessage}"
                FontSize="10"
@@ -91,6 +97,7 @@
                TextWrapping="Wrap"
                Foreground="Red"
                Margin="10"
-                   MaxWidth="240"/>
+               MaxWidth="240"
+               Visibility="{Binding LoginVisibility}"/>
     </Grid>
 </UserControl>
