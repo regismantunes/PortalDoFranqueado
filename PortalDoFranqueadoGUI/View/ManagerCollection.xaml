@@ -12,12 +12,12 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White"
              Cursor="{Binding CurrentCursor}">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -72,7 +72,7 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="984"
+                  Width="1284"
                   HorizontalAlignment="Left"
                   IsEnabled="{Binding ItemsEnabled}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -87,6 +87,16 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+					<GridViewColumn Header="Descrição" Width="300">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+                                <TextBox Text="{Binding Description}" 
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         Width="288"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
                     <GridViewColumn Header="Família" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

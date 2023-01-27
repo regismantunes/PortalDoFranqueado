@@ -83,7 +83,7 @@ namespace PortalDoFranqueado.Export
                     }
                     catch (Exception ex)
                     {
-                        Console.Error.WriteLine("Falha ao gerar arquivo Excel\r\n" + ex.ToString());
+                        Console.Error.WriteLine($"Falha ao gerar arquivo Excel\r\n{ex}");
                     }
                     finally
                     {

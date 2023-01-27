@@ -54,6 +54,7 @@ namespace PortalDoFranqueado.ViewModel
             private int? _supplierId;
             private bool _focused;
             private readonly List<string> _lockedSizes;
+            private string? _description;
 
             public int? Id { get; set; }
             public int FileId { get; set; }
@@ -85,6 +86,16 @@ namespace PortalDoFranqueado.ViewModel
             public FieldViewModel<LockedSizeViewModel>[] LockedSizes { get; private set; }
             public bool HasChange { get => _hasChange; set { _hasChange = value; OnPropertyChanged(); } }
             public bool Focused { get => _focused; set { _focused = value; OnPropertyChanged(); } }
+            public string? Description 
+            { 
+                get => _description;
+                set 
+                { 
+                    _description = value;
+                    HasChange = true;
+                    OnPropertyChanged();
+                }
+            }
 
             public ManagerCollectionViewModel ViewModel { get; set; }
             public RelayCommand OpenFileViewCommand { get; }
@@ -99,6 +110,7 @@ namespace PortalDoFranqueado.ViewModel
                 FamilyName = string.Empty;
                 SupplierId = 0;
                 SupplierName = string.Empty;
+                Description = string.Empty;
                 ViewModel = owner;
                 HasChange = false;
 
@@ -116,6 +128,7 @@ namespace PortalDoFranqueado.ViewModel
                 FamilyName = product.Family?.Name;
                 SupplierId = product.SupplierId ?? 0;
                 SupplierName = product.Supplier?.Name;
+                Description = product.Description;
                 FileId = product.FileId;
                 Price = product.Price;
                 FileView = file;
@@ -342,7 +355,8 @@ namespace PortalDoFranqueado.ViewModel
                                            .Where(ls => ls.Value.IsLocked)
                                            .Select(ls => ls.Value.Size)
                                            .ToArray(),
-                    SupplierId = productVM.SupplierId
+                    SupplierId = productVM.SupplierId,
+                    Description = productVM.Description
                 };
 
                 if (product.FamilyId == 0)

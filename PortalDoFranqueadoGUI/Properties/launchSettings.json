@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PortalDoFranqueadoGUI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:57892;http://localhost:57895"
+    }
+  }
+}

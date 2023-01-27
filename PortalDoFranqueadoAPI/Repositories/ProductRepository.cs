@@ -36,6 +36,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         {
                             Id = reader.GetInt32("Id"),
                             FileId = reader.GetInt32("FileId"),
+                            Description = reader.GetValue("Description") as string,
                             Price = reader.GetDecimal("Price"),
                             FamilyId = reader.GetInt32("FamilyId"),
                             LockedSizes = reader.GetStringArray("LockedSizes"),
@@ -64,9 +65,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, FileId, Price, LockedSizes, SupplierId)" +
+                var cmd = new SqlCommand("INSERT INTO Product (CollectionId, FamilyId, FileId, Price, LockedSizes, SupplierId, Description)" +
                                             " OUTPUT INSERTED.Id" +
-                                            " VALUES (@CollectionId, @FamilyId, @FileId, @Price, @LockedSizes, @SupplierId);", connection);
+                                            " VALUES (@CollectionId, @FamilyId, @FileId, @Price, @LockedSizes, @SupplierId, @Description);", connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
@@ -74,6 +75,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
                 cmd.Parameters.AddWithValue("@SupplierId", product.SupplierId.ToDBValue());
+                cmd.Parameters.AddWithValue("@Description", product.Description.ToDBValue());
 
                 var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
                 if (dbid == null)
@@ -104,6 +106,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                 ", Price = @Price" +
                                                 ", LockedSizes = @LockedSizes" +
                                                 ", SupplierId = @SupplierId" +
+                                                ", Description = @Description" +
                                         " WHERE Id = @Id;", connection);
 
                 cmd.Parameters.AddWithValue("@FamilyId", product.FamilyId.ToDBValue());
@@ -111,6 +114,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@Price", product.Price.ToDBValue());
                 cmd.Parameters.AddWithValue("@LockedSizes", product.LockedSizes.ToDBValue());
                 cmd.Parameters.AddWithValue("@SupplierId", product.SupplierId.ToDBValue());
+                cmd.Parameters.AddWithValue("@Description", product.Description.ToDBValue());
                 cmd.Parameters.AddWithValue("@Id", product.Id);
 
                 if (await cmd.ExecuteNonQueryAsync() == 0)

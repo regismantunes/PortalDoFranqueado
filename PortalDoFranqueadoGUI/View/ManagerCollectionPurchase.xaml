@@ -74,7 +74,7 @@
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"
-                  Width="1085"
+                  Width="1385"
                   HorizontalAlignment="Left"
                   Style="{StaticResource ListViewUnfocusable}"
                   IsEnabled="{Binding EnabledContent}">
@@ -86,6 +86,15 @@
                                 <Button Command="{Binding OpenFileViewCommand}">
                                     <Image Source="{Binding FileView.ImageData}"/>
                                 </Button>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Descrição" Width="300">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Product.Description}" 
+                                         TextWrapping="Wrap"
+                                         Width="288"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

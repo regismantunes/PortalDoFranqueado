@@ -92,5 +92,6 @@
     <None Include="Populate\Store.sql" />
     <None Include="Update\Version 1.1 - Store Document and Suppliers.sql" />
     <None Include="Update\Version 1.0.7 - Order Size.sql" />
+    <None Include="Update\Version 1.2 - Add Product Description.sql" />
   </ItemGroup>
 </Project>
