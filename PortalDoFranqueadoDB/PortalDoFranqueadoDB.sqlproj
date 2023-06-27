@@ -81,6 +81,7 @@
     <Build Include="Tables\File_Content.sql" />
     <Build Include="Tables\Path.sql" />
     <Build Include="Tables\Supplier.sql" />
+    <Build Include="Update\Version 1.3 - Purchase Sugestion.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Populate\Family.sql" />
