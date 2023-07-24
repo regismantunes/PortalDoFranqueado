@@ -47,6 +47,7 @@ namespace PortalDoFranqueado.ViewModel
         public RelayCommand CampaignsCommand { get; }
         public RelayCommand UpdateInformativeCommand { get; }
         public RelayCommand PurchaseCommand { get; }
+        public RelayCommand PurchaseSuggestionCommand { get; }
         public RelayCommand UsersCommand { get; }
         public RelayCommand SuppliersCommand { get; }
         public RelayCommand StoresCommand { get; }
@@ -100,6 +101,7 @@ namespace PortalDoFranqueado.ViewModel
             CampaignsCommand = new RelayCommand(OpenCampaigns);
             UpdateInformativeCommand = new RelayCommand(UpdateInformative);
             PurchaseCommand = new RelayCommand(OpenPurchase);
+            PurchaseSuggestionCommand = new RelayCommand(OpenPurchaseSuggestion);
             UsersCommand = new RelayCommand(OpenUsers);
             SuppliersCommand = new RelayCommand(OpenSuppliers);
             StoresCommand = new RelayCommand(OpenStores);
@@ -181,6 +183,20 @@ namespace PortalDoFranqueado.ViewModel
                 DesableContent();
 
                 Navigator.NavigateTo(new ManagerCollections());
+            }
+            finally
+            {
+                EnableContent();
+            }
+        }
+
+        private void OpenPurchaseSuggestion()
+        {
+            try
+            {
+                DesableContent();
+
+                //Navigator.NavigateTo(new ManagerPurchaseSuggestion());
             }
             finally
             {

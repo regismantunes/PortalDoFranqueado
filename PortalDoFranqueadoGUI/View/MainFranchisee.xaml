@@ -79,7 +79,7 @@
             </Button>
             <Button Grid.Column="1"
                 Style="{StaticResource MainButton}"
-                IsEnabled="False">
+                Command="{Binding PurchaseSuggestionCommand}">
                 <StackPanel>
                     <Label Content="PREVISÃO DE PEDIDO" 
                         Style="{StaticResource LabelButton}"/>

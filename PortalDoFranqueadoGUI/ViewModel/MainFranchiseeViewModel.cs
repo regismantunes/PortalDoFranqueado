@@ -37,6 +37,7 @@ namespace PortalDoFranqueado.ViewModel
         public RelayCommand<Campaign> CampaignCommand { get; }
         public RelayCommand UpdateInfosCommand { get; }
         public RelayCommand PurchaseCommand { get; }
+        public RelayCommand PurchaseSuggestionCommand { get; }
 
         public double MaxWidthInformativeText
         {
@@ -95,7 +96,8 @@ namespace PortalDoFranqueado.ViewModel
             SupportCommand = new RelayCommand(OpenSupport);
             CampaignCommand = new RelayCommand<Campaign>(OpenCampaign);
             UpdateInfosCommand = new RelayCommand(UpdateInformative);
-            PurchaseCommand = new RelayCommand(OpenPurchases);
+            PurchaseCommand = new RelayCommand(OpenPurchase);
+            PurchaseSuggestionCommand = new RelayCommand(OpenPurchaseSuggestion);
         }
 
         private void Me_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -103,7 +105,7 @@ namespace PortalDoFranqueado.ViewModel
             MaxWidthInformativeText = e.NewSize.Width - 70;
         }
 
-        private void OpenPurchases()
+        private void OpenPurchase()
         {
             try
             {
@@ -118,6 +120,24 @@ namespace PortalDoFranqueado.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show(Me,ex.Message, "BROTHERS - Falha ao abrir compras", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenPurchaseSuggestion()
+        {
+            try
+            {
+                if (_cache.Stores.Count == 0)
+                {
+                    MessageBox.Show(Me, "Nenhuma loja está vinculada ao seu perfil de usuário.");
+                    return;
+                }
+
+                Navigator.NavigateTo(new FranchiseePurchaseSuggestionStore());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao abrir previsão de compras", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -18,7 +18,7 @@ namespace PortalDoFranqueado.ViewModel
         public bool ExpandGroups { get; set; } = true;
         private readonly TemporaryLocalRepository _cache;
         private int _indexFocus;
-        private FieldViewModel<PurchaseItemViewModel>[] _fields;
+        private IFieldViewModel<PurchaseItemViewModel>[] _fields;
         private bool _loaded;
         private int? _purchaseId;
 
@@ -40,13 +40,14 @@ namespace PortalDoFranqueado.ViewModel
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(VisibilityComboBoxStore));
                     OnPropertyChanged(nameof(VisibilityTextBlockStore));
-                    LoadCollection();
+                    LoadCollection().ConfigureAwait(false);
                 }
             }
         }
         public Collection Collection { get; private set; }
-        public ProductViewModel[] Products { get; set; }
         public PurchaseStatus? Status { get; private set; }
+        public ProductViewModel[] Products { get; set; }
+        public PurchaseSuggestion? PurchaseSuggestion { get; private set; }
         public Visibility VisibilityButtonSave { get; private set; }
         public bool SaveIsEnabled
         {
@@ -76,7 +77,7 @@ namespace PortalDoFranqueado.ViewModel
             _cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];
 
             _indexFocus = 0;
-            _fields = Array.Empty<FieldViewModel<PurchaseItemViewModel>>();
+            _fields = Array.Empty<IFieldViewModel<PurchaseItemViewModel>>();
 
             Status = null;
             VisibilityButtonSave = Visibility.Hidden;
@@ -180,7 +181,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             VisibilityButtonSave = Visibility.Hidden;
             Status = PurchaseStatus.Closed;
-            PurchaseItemViewModel.ItemsReadyOnly = true;
+            PurchaseItemViewModel.ReadyOnly = true;
 
             OnPropertyChanged(nameof(VisibilityButtonSave));
             OnPropertyChanged(nameof(Status));
@@ -190,7 +191,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             VisibilityButtonSave = Visibility.Visible;
             Status = PurchaseStatus.Opened;
-            PurchaseItemViewModel.ItemsReadyOnly = false;
+            PurchaseItemViewModel.ReadyOnly = false;
 
             OnPropertyChanged(nameof(VisibilityButtonSave));
             OnPropertyChanged(nameof(Status));
@@ -281,13 +282,13 @@ namespace PortalDoFranqueado.ViewModel
             }
         }
 
-        private async void LoadCollection()
+        private async Task LoadCollection()
         {
             try
             {
                 DesableContent();
 
-                bool emptyProducts = true;
+                var emptyProducts = true;
                 var propertyGroup = new PropertyGroupDescriptionPublicChange("FamilyName");
                 
                 if (_store != null)
@@ -314,6 +315,10 @@ namespace PortalDoFranqueado.ViewModel
                         var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
 
                         _purchaseId = purchase?.Id;
+
+                        PurchaseSuggestion = _purchaseId.HasValue ?
+                            await API.ApiPurchaseSuggestion.GetByPurchaseId(_purchaseId.Value) : 
+                            null;
 
                         ExportIsEnabled = _purchaseId.HasValue;
                         SaveIsEnabled = false;
@@ -390,7 +395,8 @@ namespace PortalDoFranqueado.ViewModel
                                                                                         .ToArray())
                             {
                                 FileView = fileView,
-                                Navigator = Navigator
+                                Navigator = Navigator,
+                                SuggestionFamily = PurchaseSuggestion?.Families.FirstOrDefault(f => f.FamilyId == product.FamilyId),
                             };
                             productVM.Items
                                 .ToList()
@@ -414,8 +420,8 @@ namespace PortalDoFranqueado.ViewModel
 
                         Products = productsVM.ToArray();
 
-                        _fields = PurchaseItemViewModel.ItemsReadyOnly ?
-                            Array.Empty<FieldViewModel<PurchaseItemViewModel>>() :
+                        _fields = PurchaseItemViewModel.ReadyOnly ?
+                            Array.Empty<IFieldViewModel<PurchaseItemViewModel>>() :
                             Products.SelectMany(p => p.Items)
                                     .Where(i => i.Value.IsEnabled)
                                     .ToArray();
@@ -423,7 +429,7 @@ namespace PortalDoFranqueado.ViewModel
                         for (var i = 0; i < _fields.Length; i++)
                         {
                             _fields[i].TabIndex = i;
-                            _fields[i].GotFocus += (sender, args) => _indexFocus = ((FieldViewModel<PurchaseItemViewModel>)sender).TabIndex;
+                            _fields[i].GotFocus += (sender, args) => _indexFocus = ((IFieldViewModel<PurchaseItemViewModel>)sender).TabIndex;
                         }
                     }
                 }
@@ -431,10 +437,10 @@ namespace PortalDoFranqueado.ViewModel
                 if (emptyProducts)
                 {
                     Products = Array.Empty<ProductViewModel>();
-                    _fields = Array.Empty<FieldViewModel<PurchaseItemViewModel>>();
+                    _fields = Array.Empty<IFieldViewModel<PurchaseItemViewModel>>();
                 }
 
-                var view = (CollectionView)CollectionViewSource.GetDefaultView(Products);
+                var view = CollectionViewSource.GetDefaultView(Products);
                 view.GroupDescriptions.Add(propertyGroup);
 
                 OnPropertyChanged(nameof(Products));

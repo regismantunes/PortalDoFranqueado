@@ -1,10 +1,11 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace PortalDoFranqueado.ViewModel
 {
-    public class FieldViewModel<T> : BaseNotifyPropertyChanged
+    public class FieldViewModel<T> : BaseNotifyPropertyChanged, IFieldViewModel<T>
     {
         private T _value;
         private bool _isfocused;
@@ -16,6 +17,12 @@ namespace PortalDoFranqueado.ViewModel
             OnGotFocus = new RelayCommand(() => IsFocused = true);
         }
 
+        public FieldViewModel(T value)
+            : this()
+        {
+            Value = value;
+        }
+
         public T Value
         {
             get => _value;
@@ -24,7 +31,7 @@ namespace PortalDoFranqueado.ViewModel
                 _value = value;
 
                 if (_value is INotifyPropertyChanged notify)
-                    notify.PropertyChanged += (o, e) => OnPropertyChanged(nameof(Value));
+                    notify.PropertyChanged += (o, e) => OnPropertyChanged(e.PropertyName);
 
                 OnPropertyChanged(); 
             }
@@ -34,8 +41,11 @@ namespace PortalDoFranqueado.ViewModel
         {
             get => _isfocused;
             set 
-            { 
-                _isfocused = value; 
+            {
+                if (_isfocused == value)
+                    return;
+
+                _isfocused = value;
                 OnPropertyChanged();
 
                 if (_isfocused)
@@ -51,10 +61,12 @@ namespace PortalDoFranqueado.ViewModel
             set { _tabIndex = value; OnPropertyChanged(); }
         }
 
+        public object Tag { get; set; }
+
         public event RoutedEventHandler LostFocus;
         public event RoutedEventHandler GotFocus;
 
-        public RelayCommand OnGotFocus { get; }
-        public RelayCommand OnLostFocus { get; }
+        public ICommand OnGotFocus { get; }
+        public ICommand OnLostFocus { get; }
     }
 }

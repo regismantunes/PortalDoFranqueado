@@ -13,8 +13,8 @@ namespace PortalDoFranqueado.ViewModel
         public int? Quantity { get => Item.Quantity; set { Item.Quantity = value; OnPropertyChanged(); } }
         public bool IsEnabled { get => !Product?.LockedSizes?.Contains(Size) ?? true; }
 
-        public Visibility VisibilityTextBlockQuantity => ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility VisibilityTextBoxQuantity => !ItemsReadyOnly ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility VisibilityTextBlockQuantity => ReadyOnly ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility VisibilityTextBoxQuantity => !ReadyOnly ? Visibility.Visible : Visibility.Collapsed;
         public PurchaseItem Item { get; }
 
         public PurchaseItemViewModel(PurchaseItem item)
@@ -27,15 +27,15 @@ namespace PortalDoFranqueado.ViewModel
             };
         }
 
-        private static bool _itemsReadyOnly = false;
+        private static bool _readyOnly = false;
         private static event PropertyChangedEventHandler? StaticPropertyChanged;
-        internal static bool ItemsReadyOnly
+        internal static bool ReadyOnly
         {
-            get => _itemsReadyOnly;
+            get => _readyOnly;
             set
             {
-                _itemsReadyOnly = value;
-                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ItemsReadyOnly)));
+                _readyOnly = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(ReadyOnly)));
             }
         }
     }

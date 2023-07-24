@@ -106,6 +106,13 @@
         <Setter Property="Margin" Value="12,0,0,0"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
+    <Style TargetType="TextBlock" x:Key="TextBlockSubTitleBlack" BasedOn="{StaticResource TextBlockSubTitle}">
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+    <Style TargetType="TextBlock" x:Key="TextBlockSubTitleBlackNumber" BasedOn="{StaticResource TextBlockSubTitleBlack}">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
     <Style TargetType="TextBlock" x:Key="TextBlockMinButton" BasedOn="{StaticResource TextBlockSubTitle}">
         <Setter Property="Margin" Value="12,0,0,0"/>
     </Style>

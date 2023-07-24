@@ -1,0 +1,324 @@
+﻿<UserControl x:Class="PortalDoFranqueado.View.FranchiseePurchaseSuggestionStore"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:util="clr-namespace:PortalDoFranqueado.Util"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel"
+             xmlns:local="clr-namespace:PortalDoFranqueado.View"
+             d:DataContext="{d:DesignInstance Type=viewmodel:FranchiseePurchaseSuggestionStoreViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="White"
+             Cursor="{Binding CurrentCursor}">
+    <UserControl.InputBindings>
+        <KeyBinding Gesture="Shift+Tab" Command="{Binding GoToPreviusFieldCommand}"/>
+        <KeyBinding Gesture="Tab" Command="{Binding GoToNextFieldCommand}"/>
+    </UserControl.InputBindings>
+    <Grid>
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="Loaded">
+                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Content="PREVISÃO DE COMPRA"
+               FontWeight="Bold"
+               IsTabStop="False"/>
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="0,0,5,5"
+                    HorizontalAlignment="Stretch">
+            <!--#region Store-->
+            <Border Style="{StaticResource DefaultBlackBorder}">
+                <Grid Margin="0,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                               Text="Selecione uma loja para fazer a compra" 
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontSize="10"
+                               Visibility="{Binding VisibilityComboBoxStore}"/>
+                    <ComboBox Grid.Row="1"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding Store}"
+                              Margin="0,5"
+                              Cursor="Arrow"
+                              Visibility="{Binding VisibilityComboBoxStore}"
+                              ItemsSource="{Binding Stores, Source={StaticResource TempCache}}"
+                              IsTabStop="True"/>
+                    <TextBlock Grid.Row="0" Grid.RowSpan="2"
+                               Text="{Binding Store.Name}"
+                               Visibility="{Binding VisibilityTextBlockStore}"
+                               Style="{StaticResource TextBlockSubTitle}"/>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+            <Rectangle Width="5" Fill="Transparent"/>
+            <!--#region Collection-->
+            <Border Style="{StaticResource DefaultBlackBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Início" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Fim" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Situação" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" 
+                           Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
+                           Margin="5"
+                           Foreground="White"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" 
+                           Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
+                           Margin="5"
+                           Foreground="White"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" 
+                           Text="{Binding Status, Converter={StaticResource EnumConverter}}"
+                           Margin="5"
+                           Foreground="White"/>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+            <Rectangle Width="5" Fill="Transparent"/>
+            <!--#region Purchase Suggestion-->
+            <Border Style="{StaticResource DefaultBlackBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Meta" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="PA" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="TM" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="3" Content="Cobertura" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="4" Content="Peças" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="5" Content="Soma das famílias" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <TextBox Grid.Row="1" Grid.Column="0" 
+                           Text="{Binding Target.Value, StringFormat='N2', ConverterCulture='pt-BR'}"
+                           util:FocusExtension.IsFocused="{Binding Target.IsFocused}"
+                           Margin="5"
+                           Width="100">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="GotFocus">
+                                <i:InvokeCommandAction Command="{Binding Target.OnGotFocus}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="LostFocus">
+                                <i:InvokeCommandAction Command="{Binding Target.OnLostFocus}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <TextBox Grid.Row="1" Grid.Column="1" 
+                           Text="{Binding PartsPerService.Value, StringFormat='N0', ConverterCulture='pt-BR'}"
+                           util:FocusExtension.IsFocused="{Binding PartsPerService.IsFocused}"
+                           Margin="5"
+                           Width="50">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="GotFocus">
+                                <i:InvokeCommandAction Command="{Binding PartsPerService.OnGotFocus}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="LostFocus">
+                                <i:InvokeCommandAction Command="{Binding PartsPerService.OnLostFocus}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <TextBox Grid.Row="1" Grid.Column="2" 
+                           Text="{Binding AverageTicket.Value, StringFormat='N2', ConverterCulture='pt-BR'}"
+                           util:FocusExtension.IsFocused="{Binding AverageTicket.IsFocused}"
+                           Margin="5"
+                           Width="50">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="GotFocus">
+                                <i:InvokeCommandAction Command="{Binding AverageTicket.OnGotFocus}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="LostFocus">
+                                <i:InvokeCommandAction Command="{Binding AverageTicket.OnLostFocus}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <TextBlock Grid.Row="1" Grid.Column="3"
+                           Text="{Binding Coverage.Value, StringFormat='N1', ConverterCulture='pt-BR'}"
+                           Margin="5"
+                           Width="50"
+                           Foreground="White"/>
+                    <TextBlock Grid.Row="1" Grid.Column="4"
+                           Text="{Binding TotalSuggestedItems, StringFormat='N0', ConverterCulture='pt-BR'}"
+                           Margin="5"
+                           Width="50"
+                           Foreground="White"
+                           HorizontalAlignment="Right"/>
+                    <StackPanel Grid.Row="1" Grid.Column="5"
+                                Orientation="Horizontal">
+                        <TextBlock Text="{Binding SumPercentageFamiliesView, StringFormat='N2', ConverterCulture='pt-BR'}"
+                           Margin="5"
+                           Foreground="White"/>
+                        <TextBlock Text="% / "
+                           Margin="-2,5,-5,5"
+                           Foreground="White"/>
+                        <TextBlock Text="{Binding SumItemsFamilies, StringFormat='N0', ConverterCulture='pt-BR'}"
+                           Margin="5"
+                           Foreground="White"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+            <Rectangle Width="5" Fill="Transparent"/>
+            <Button Grid.Row="0" Grid.RowSpan="2"
+                    Grid.Column="8"
+                    Content="Salvar"
+                    Width="78"
+                    Style="{StaticResource DefaultButtonFull}"
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding SaveIsEnabled}"
+                    Visibility="{Binding VisibilityButtonSave}"
+                    IsTabStop="False"/>
+        </StackPanel>
+        <ListView Grid.Row="2"
+                  ItemsSource="{Binding Families}"
+                  SelectionMode="Single"
+                  Width="1295"
+                  HorizontalAlignment="Left"
+                  Style="{StaticResource ListViewUnfocusable}"
+                  IsEnabled="{Binding EnabledContent}"
+                  Name="lvPurchase"
+                  IsTabStop="True"
+                  Visibility="{Binding VisibilityFamilies}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0"
+                                BorderBrush="LightGray"
+                                Background="LightGray">
+                            <Grid Margin="0,0,5,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0"
+                                            Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Family.Name}"
+                                               Style="{StaticResource TextBlockSubTitleBlack}"
+                                               Width="150"/>
+                                    <TextBox Text="{Binding PercentageView, StringFormat='N2', ConverterCulture='pt-BR'}"
+                                             util:FocusExtension.IsFocused="{Binding Percentage.IsFocused}"
+                                             Width="45"
+                                             Background="LightGray"
+                                             VerticalAlignment="Center">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="GotFocus">
+                                                <i:InvokeCommandAction Command="{Binding Percentage.OnGotFocus}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="LostFocus">
+                                                <i:InvokeCommandAction Command="{Binding Percentage.OnLostFocus}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                    <Label Content="%  Peças:"
+                                           Style="{StaticResource LabelCell}"
+                                           Margin="-4,0,-10,0"/>
+                                    <TextBlock Text="{Binding FamilySuggestedItems, StringFormat='N0', ConverterCulture='pt-BR'}"
+                                               Style="{StaticResource TextBlockSubTitleBlackNumber}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2"
+                                            Orientation="Horizontal"
+                                            Visibility="{Binding VisibilitySizes}">
+                                    <Label Content="Soma dos tamanhos:"
+                                           Style="{StaticResource LabelCell}"
+                                           Margin="0,0,-10,0"/>
+                                    <TextBlock Text="{Binding SumPercentSizesView, StringFormat='N2', ConverterCulture='pt-BR'}"
+                                               Style="{StaticResource TextBlockSubTitleBlack}"/>
+                                    <TextBlock Text="% / "
+                                               Style="{StaticResource TextBlockSubTitleBlack}"
+                                               Margin="0,0,0,0"/>
+                                    <TextBlock Text="{Binding FamilySuggestedSelectedSizes, StringFormat='N0', ConverterCulture='pt-BR'}"
+                                               Style="{StaticResource TextBlockSubTitleBlack}"
+                                               Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <ListView Grid.Row="1"
+                                  ItemsSource="{Binding Sizes}"
+                                  BorderBrush="Transparent"
+                                  BorderThickness="0"
+                                  Style="{StaticResource ListViewUnfocusable}"
+                                  Visibility="{Binding VisibilitySizes}">
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Content="{Binding Size.Size}"
+                                               Style="{StaticResource LabelCell}"
+                                               HorizontalContentAlignment="Right"
+                                               Width="27" IsTabStop="False"/>
+                                        <Label Content=":"
+                                               Style="{StaticResource LabelCell}"
+                                               HorizontalContentAlignment="Right"
+                                               Margin="-8,-1,0,0" IsTabStop="False"/>
+                                        <TextBox Text="{Binding PercentageView, StringFormat='N2', ConverterCulture='pt-BR'}"
+                                                 IsTabStop="True"
+                                                 Width="40"
+                                                 util:FocusExtension.IsFocused="{Binding Percentage.IsFocused}"
+                                                 Visibility="{Binding VisibilityTextBoxPercent}"
+                                                 VerticalAlignment="Center">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="GotFocus">
+                                                    <i:InvokeCommandAction Command="{Binding Percentage.OnGotFocus}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="LostFocus">
+                                                    <i:InvokeCommandAction Command="{Binding Percentage.OnLostFocus}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </TextBox>
+                                        <Label Content="{Binding PercentageView, StringFormat='N2', ConverterCulture='pt-BR'}"
+                                               Width="40"
+                                               Visibility="{Binding VisibilityTextBlockPercent}"
+                                               BorderBrush="Gray"
+                                               BorderThickness="1" IsTabStop="False"/>
+                                        <Label Content="%"
+                                               Style="{StaticResource LabelCell}"
+                                               Margin="-4,0,0,0"/>
+                                        <Label Content="{Binding SizeSuggestedItems, StringFormat='N2', ConverterCulture='pt-BR'}"
+                                               Width="33"
+                                               BorderBrush="Gray"
+                                               BorderThickness="1" IsTabStop="False"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

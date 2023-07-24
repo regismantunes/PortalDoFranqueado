@@ -9,9 +9,7 @@ namespace PortalDoFranqueadoAPI.Models.Validations
     {
         public static async Task Validate(this Purchase purchase, SqlConnection connection)
         {
-            var currentCollection = await CollectionRepository.GetOpenedCollection(connection);
-
-            if (currentCollection == null)
+            var currentCollection = await CollectionRepository.GetOpenedCollection(connection) ?? 
                 throw new Exception("O período de compras não está aberto.");
 
             if (currentCollection.Id != purchase.CollectionId)

@@ -8,21 +8,20 @@ namespace PortalDoFranqueado.API
     {
         public static async Task<int> Save(Purchase purchase)
         {
-            var cleanPurchase = new Purchase()
+            var cleanPurchase = new Purchase
             {
                 Id = purchase.Id,
                 CollectionId = purchase.CollectionId,
                 StoreId = purchase.StoreId,
                 Status = purchase.Status,
+                Items = (from i in purchase.Items
+                         select new PurchaseItem()
+                         {
+                             ProductId = i.ProductId,
+                             Quantity = i.Quantity,
+                             Size = i.Size
+                         }).ToArray()
             };
-            
-            cleanPurchase.Items = (from i in purchase.Items
-                                  select new PurchaseItem()
-                                  {
-                                      ProductId = i.ProductId,
-                                      Quantity = i.Quantity,
-                                      Size = i.Size
-                                  }).ToArray();
 
             return await BaseApi.GetSimpleHttpClientRequest<int>("purchase")
                             .Put(cleanPurchase);

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Controllers\ProdutoController.cs~RF209bd4dc.TMP" />
+    <None Remove="Repositories\PurchaseSuggestionRepository.cs~RF10506ef.TMP" />
   </ItemGroup>
 
   <ItemGroup>
