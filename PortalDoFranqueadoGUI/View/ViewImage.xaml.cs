@@ -1,5 +1,4 @@
-﻿using PortalDoFranqueado.Model;
-using PortalDoFranqueado.ViewModel;
+﻿using PortalDoFranqueado.ViewModel;
 using System.Windows.Controls;
 
 namespace PortalDoFranqueado.View
