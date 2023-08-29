@@ -6,8 +6,6 @@
              xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel"
              xmlns:util="clr-namespace:PortalDoFranqueado.Util"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:xt="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit/extended"
-             xmlns:local="clr-namespace:PortalDoFranqueado.View"
              d:DataContext="{d:DesignInstance Type=viewmodel:FranchiseePurchaseStoreViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -31,102 +29,102 @@
         <Label Grid.Row="0"
                Content="PERÍODO DE COMPRA ABERTO"
                FontWeight="Bold" IsTabStop="False"/>
-        <Grid Grid.Row="1"
-              Margin="0,0,5,5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Grid.ColumnSpan="3"
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Style="{StaticResource DefaultBlackBorder}"
-                    Width="145"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" 
-                       Text="Selecione uma loja para fazer a compra" 
-                       TextWrapping="Wrap"
-                       Foreground="White"
-                       FontSize="10"
-                       Visibility="{Binding VisibilityComboBoxStore}"/>
-            <ComboBox Grid.Row="1" Grid.Column="1"
-                      DisplayMemberPath="Name"
-                      SelectedValue="{Binding Store}"
-                      Margin="0,5"
-                      Cursor="Arrow"
-                      Visibility="{Binding VisibilityComboBoxStore}"
-                      ItemsSource="{Binding Stores, Source={StaticResource TempCache}}" IsTabStop="True"/>
-            <TextBlock Grid.Row="0" Grid.RowSpan="2"
-                       Grid.Column="1"
-                       Text="{Binding Store.Name}"
-                       Visibility="{Binding VisibilityTextBlockStore}"
-                       Style="{StaticResource TextBlockSubTitle}"/>
-            <Border Grid.Column="3" Grid.ColumnSpan="6"
-                    Grid.Row="0" Grid.RowSpan="2"
-                    Style="{StaticResource DefaultBlackBorder}"
-                    Width="440"/>
-            <Label Grid.Row="0" Grid.Column="4" Content="Início" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
-            <Label Grid.Row="0" Grid.Column="5" Content="Fim" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
-            <Label Grid.Row="0" Grid.Column="6" Content="Situação" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
-            <Label Grid.Row="0" Grid.Column="7" Content="Valor total" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
-            <TextBlock Grid.Row="1" Grid.Column="4" 
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="0,0,5,5"
+                    HorizontalAlignment="Stretch">
+            <!--#region Store-->
+            <Border Style="{StaticResource DefaultBlackBorder}">
+                <Grid Margin="0,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                               Text="Selecione uma loja para fazer a compra" 
+                               TextWrapping="Wrap"
+                               Foreground="White"
+                               FontSize="10"
+                               Visibility="{Binding VisibilityComboBoxStore}"/>
+                    <ComboBox Grid.Row="1"
+                              DisplayMemberPath="Name"
+                              SelectedValue="{Binding Store}"
+                              Margin="0,5"
+                              Cursor="Arrow"
+                              Visibility="{Binding VisibilityComboBoxStore}"
+                              ItemsSource="{Binding Stores, Source={StaticResource TempCache}}"
+                              IsTabStop="True"/>
+                    <TextBlock Grid.Row="0" Grid.RowSpan="2"
+                               Text="{Binding Store.Name}"
+                               Visibility="{Binding VisibilityTextBlockStore}"
+                               Style="{StaticResource TextBlockSubTitle}"/>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+            <Rectangle Width="5" Fill="Transparent"/>
+            <!--#region Collection-->
+            <Border Style="{StaticResource DefaultBlackBorder}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Início" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Fim" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Situação" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="3" Content="Peças" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <Label Grid.Row="0" Grid.Column="4" Content="Valor total" Style="{StaticResource LabelTituloCampo}" IsTabStop="False"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" 
                        Text="{Binding Collection.StartDate, StringFormat='dd/MM/yyyy'}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <TextBlock Grid.Row="1" Grid.Column="5" 
+                       Style="{StaticResource TextBlockInfoHeader}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" 
                        Text="{Binding Collection.EndDate, StringFormat='dd/MM/yyyy'}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <TextBlock Grid.Row="1" Grid.Column="6" 
+                       Style="{StaticResource TextBlockInfoHeader}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" 
                        Text="{Binding Status, Converter={StaticResource EnumConverter}}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <TextBlock Grid.Row="1" Grid.Column="7" 
+                       Style="{StaticResource TextBlockInfoHeader}"/>
+                    <StackPanel Grid.Row="1" Grid.Column="3"
+                                Orientation="Horizontal">
+                        <TextBlock Text="{Binding TotalQuantity, StringFormat=N0, ConverterCulture=pt-BR}"
+                                   Style="{StaticResource TextBlockInfoHeader}"/>
+                        <TextBlock Text="/"
+                                   Style="{StaticResource TextBlockInfoHeader}"
+                                   Visibility="{Binding VisibilitySuggestion}"
+                                   Margin="0,5"/>
+                        <TextBlock Text="{Binding PurchaseSuggestion.TotalSuggestedItems, StringFormat=N0, ConverterCulture=pt-BR}"
+                                   Style="{StaticResource TextBlockInfoHeader}"
+                                   Visibility="{Binding VisibilitySuggestion}"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Grid.Column="4" 
                        Text="{Binding Amount, StringFormat=C, ConverterCulture=pt-BR}"
-                       Margin="5"
-                       Foreground="White"
-                       Width="100"/>
-            <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="9"
-                    Width="78"
-                    Style="{StaticResource DefaultButtonFull}"
+                       Style="{StaticResource TextBlockInfoHeader}"/>
+                </Grid>
+            </Border>
+            <!--#endregion-->
+            <Rectangle Width="5" Fill="Transparent"/>
+            <Button Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding ExportToExcelCommand}"
                     IsEnabled="{Binding ExportIsEnabled}" IsTabStop="False">
                 <TextBlock Text="Gerar Excel" TextWrapping="Wrap"/>
             </Button>
-            <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="10"
-                    Content="Salvar"
-                    Width="78"
+            <Button Content="Salvar"
                     Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveCommand}"
                     IsEnabled="{Binding SaveIsEnabled}"
                     Visibility="{Binding VisibilityButtonSave}" IsTabStop="False"/>
-            <Button Grid.Row="0" Grid.RowSpan="2"
-                    Grid.Column="11"
-                    Width="78"
-                    Style="{StaticResource DefaultButtonFull}"
+            <Button Style="{StaticResource DefaultButtonFull}"
                     Command="{Binding SaveAndCloseCommand}"
                     Visibility="{Binding VisibilityButtonSave}" IsTabStop="False">
                 <TextBlock Text="Fechar compra" TextWrapping="Wrap"/>
             </Button>
-        </Grid>
+        </StackPanel>
         <ListView Grid.Row="2"
                   ItemsSource="{Binding Products}"
                   SelectionMode="Single"

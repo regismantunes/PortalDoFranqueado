@@ -24,6 +24,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private Store? _store;
         private decimal _amount;
+        private int _totalQuantity;
         private bool _saveIsEnabled;
         private bool _exportIsEnabled;
 
@@ -48,6 +49,7 @@ namespace PortalDoFranqueado.ViewModel
         public PurchaseStatus? Status { get; private set; }
         public ProductViewModel[] Products { get; set; }
         public PurchaseSuggestion? PurchaseSuggestion { get; private set; }
+        public Visibility VisibilitySuggestion => PurchaseSuggestion != null ? Visibility.Visible : Visibility.Collapsed;
         public Visibility VisibilityButtonSave { get; private set; }
         public bool SaveIsEnabled
         {
@@ -63,6 +65,11 @@ namespace PortalDoFranqueado.ViewModel
         {
             get => _amount;
             private set { _amount = value; OnPropertyChanged(); }
+        }
+        public int TotalQuantity
+        {
+            get => _totalQuantity;
+            private set { _totalQuantity = value; OnPropertyChanged(); }
         }
 
         public RelayCommand LoadedCommand { get; }
@@ -444,6 +451,8 @@ namespace PortalDoFranqueado.ViewModel
                 view.GroupDescriptions.Add(propertyGroup);
 
                 OnPropertyChanged(nameof(Products));
+                OnPropertyChanged(nameof(PurchaseSuggestion));
+                OnPropertyChanged(nameof(VisibilitySuggestion));
                 UpdateAmount();
             }
             catch (Exception ex)
@@ -460,17 +469,27 @@ namespace PortalDoFranqueado.ViewModel
 
         private void UpdateAmount()
         {
-            Amount = Products
+            var sumAmount = 0m;
+            var sumQuantity = 0;
+            Products
                 .Select(productVM =>
                         new
                         {
                             Price = productVM?.Product.Price ?? 0m,
                             Quantity = productVM?.Items.Sum(item => item.Value.Quantity) ?? 0
                         })
-                .Sum(item => item.Price * item.Quantity);
+                .ToList()
+                .ForEach(item =>
+                {
+                    sumQuantity += item.Quantity;
+                    sumAmount += item.Price * item.Quantity;
+                });
+
+            Amount = sumAmount;
+            TotalQuantity = sumQuantity;
         }
 
-        public void Reload() => LoadCollection();
+        public void Reload() => LoadCollection().ConfigureAwait(false);
 
         public override bool BeforeReturn()
         {

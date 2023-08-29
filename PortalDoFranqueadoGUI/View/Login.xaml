@@ -12,92 +12,56 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="Black">
-    <Grid>
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="Loaded">
-                <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"
-                Text="{Binding LockLoginMessage}"
-                HorizontalAlignment="Center"
-                Foreground="White"
-                FontSize="20"
-                FontWeight="Bold"
-                TextWrapping="Wrap"
-                MaxWidth="800"
-                Margin="0,0,0,100"
-                Visibility="{Binding LockLoginMessageVisibility}"/>
-        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2"
-                Text="Franqueado, conecte-se na sua conta"
-                HorizontalAlignment="Center"
-                Foreground="White"
-                FontSize="16"
-                TextWrapping="Wrap"
-                MaxWidth="800"
-                Visibility="{Binding LoginVisibility}"/>
-        <Border Grid.Column="1" Grid.Row="3" Grid.RowSpan="5"
-                Style="{StaticResource LoginBorder}"
-                Visibility="{Binding LoginVisibility}"/>
-        <Image Grid.Column="1" Grid.Row="3"
-               Source="/Media/logo-01.png"
-               Width="200"
-               Margin="20"
-               Visibility="{Binding LoginVisibility}"/>
-        <TextBox Grid.Column="1" Grid.Row="4"
-                 Name="txtUser"
-                 HorizontalAlignment="Center"
-                 HorizontalContentAlignment="Left" 
-                 ToolTip="Digite seu e-mail" Width="200"
-                 Margin="5"
-                 FontSize="16"
-                 Text="{Binding EmailLogin}"
-                 IsEnabled="{Binding LoginIsEnabled}"
-                 Visibility="{Binding LoginVisibility}"
-                 util:FocusExtension.IsFocused="{Binding EmailLoginFocused}"/>
-        <PasswordBox Grid.Column="1" Grid.Row="5"
-                 HorizontalAlignment="Center"
-                 HorizontalContentAlignment="Left" 
-                 ToolTip="Digite sua senha" Width="200"
-                 Margin="5"
-                 FontSize="16"
-                 Name="txtPassword"
-                 IsEnabled="{Binding LoginIsEnabled}"
-                 Visibility="{Binding LoginVisibility}"
-                 util:FocusExtension.IsFocused="{Binding PasswordFocused}"/>
-        <Button Grid.Column="1" Grid.Row="6"
-                Content="LOGIN"
-                Style="{StaticResource MainButton}"
-                Height="30"
-                Command="{Binding Path=LoginCommand}"
-                CommandParameter="{Binding ElementName=txtPassword}"
-                IsDefault="True"
-                IsEnabled="{Binding LoginIsEnabled}"
-                Visibility="{Binding LoginVisibility}"/>
-        <TextBlock Grid.Column="1" Grid.Row="7" 
-               Text="{Binding ErrorMessage}"
-               FontSize="10"
-               HorizontalAlignment="Center"
-               TextWrapping="Wrap"
-               Foreground="Red"
-               Margin="10"
-               MaxWidth="240"
-               Visibility="{Binding LoginVisibility}"/>
-    </Grid>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+        <TextBlock Text="{Binding LockLoginMessage}"
+                   Style="{StaticResource TextBlockMediumWhiteMessage}"
+                   MaxWidth="800"
+                   Visibility="{Binding LockLoginMessageVisibility}"/>
+        <TextBlock Text="Franqueado, conecte-se na sua conta"
+                   Style="{StaticResource TextBlockSmallWhiteMessage}"
+                   MaxWidth="800"
+                   Visibility="{Binding LoginVisibility}"/>
+        <Border Style="{StaticResource LoginBorder}"
+                Visibility="{Binding LoginVisibility}"
+                Width="250">
+            <StackPanel>
+                <Image Source="/Media/logo-01.png"
+                       Width="200"
+                       Margin="20"
+                       Visibility="{Binding LoginVisibility}"/>
+                <TextBox Name="txtUser"
+                         Style="{StaticResource TextBoxLogin}"
+                         ToolTip="Digite seu e-mail"
+                         Width="200"
+                         Text="{Binding EmailLogin}"
+                         IsEnabled="{Binding LoginIsEnabled}"
+                         Visibility="{Binding LoginVisibility}"
+                         util:FocusExtension.IsFocused="{Binding EmailLoginFocused}"/>
+                <PasswordBox ToolTip="Digite sua senha"
+                             Width="200"
+                             Name="txtPassword"
+                             IsEnabled="{Binding LoginIsEnabled}"
+                             Visibility="{Binding LoginVisibility}"
+                             util:FocusExtension.IsFocused="{Binding PasswordFocused}"/>
+                <Button Content="LOGIN"
+                        Style="{StaticResource MainButton}"
+                        Height="30"
+                        Command="{Binding Path=LoginCommand}"
+                        CommandParameter="{Binding ElementName=txtPassword}"
+                        IsDefault="True"
+                        IsEnabled="{Binding LoginIsEnabled}"
+                        Visibility="{Binding LoginVisibility}"/>
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Style="{StaticResource TextBlockSmallRedMessage}"
+                           MaxWidth="240"
+                           Visibility="{Binding LoginVisibility}"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
 </UserControl>
