@@ -15,7 +15,7 @@ using System.Windows.Media;
 
 namespace PortalDoFranqueado.ViewModel
 {
-    internal class ManagerCollectionViewModel : BaseViewModel, IReloadable
+    internal class ManagerCollectionViewModel : FileViewViewModel, IReloadable
     {
         public class LockedSizeViewModel : BaseNotifyPropertyChanged
         {
@@ -292,7 +292,7 @@ namespace PortalDoFranqueado.ViewModel
                             myFile.Id = id[0];
                             var file = new FileView(myFile);
 
-                            Me.Dispatcher.Invoke(() =>
+                            Me?.Dispatcher.Invoke(() =>
                             {
                                 file.LoadImage(selectedFile);
                                 Products.Insert(0, new CollectionProductViewModel(this, file));
@@ -436,29 +436,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 var files = myFiles.Select(f => new FileView(f)).ToList();
 
-                var hasError = false;
-                files.ToArray()
-                    .AsParallel()
-                    .ForAll(async fileView =>
-                     {
-                         try
-                         {
-                             fileView.PrepareDirectory();
-                             if (!fileView.FileExists)
-                                 await fileView.Download();
-
-                             if (fileView.FileExists)
-                                 Me?.Dispatcher.BeginInvoke(fileView.LoadImageData);
-                         }
-                         catch (Exception ex)
-                         {
-                             if (!hasError)
-                             {
-                                 hasError = true;
-                                 Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
-                             }
-                         }
-                     });
+                await LoadImageData(files.ToArray()).ConfigureAwait(false);
                 
                 Legendable?.SendMessage("Carregando produtos...");
                 var products = await API.ApiProduct.Get(_collection.Id);
