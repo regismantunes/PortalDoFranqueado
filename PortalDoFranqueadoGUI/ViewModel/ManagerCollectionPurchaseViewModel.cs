@@ -56,13 +56,12 @@ namespace PortalDoFranqueado.ViewModel
                 Legendable?.SendMessage("Carregando fotos...");
                 var myFiles = await API.ApiFile.GetFromCollection(Purchase.CollectionId);
 
-                var files = new List<FileView>();
-                myFiles.ToList()
-                       .ForEach(f => files.Add(new FileView(f)));
+                var files = myFiles.Select(f => new FileView(f)).ToList();
 
                 var hasError = false;
-                files.AsParallel()
-                     .ForAll(async fileView =>
+                files.ToArray()
+                    .AsParallel()
+                    .ForAll(async fileView =>
                      {
                          try
                          {

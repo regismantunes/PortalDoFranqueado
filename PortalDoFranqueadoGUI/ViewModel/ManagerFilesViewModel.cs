@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
+using NuGet;
 using PortalDoFranqueado.Model;
 using PortalDoFranqueado.Repository;
 using System;
@@ -62,8 +63,7 @@ namespace PortalDoFranqueado.ViewModel
                     Legendable?.SendMessage(string.Empty);
                 else
                 {
-                    myFiles.ToList()
-                           .ForEach(f => Files.Add(new FileView(f)));
+                    Files.AddRange(myFiles.Select(f => new FileView(f)));
 
                     try
                     {
@@ -72,8 +72,9 @@ namespace PortalDoFranqueado.ViewModel
                                 var i = 1;
                                 var length = Files.Count;
                                 var hasError = false;
-                                Files.AsParallel()
-                                     .ForAll(async file =>
+                                Files.ToArray()
+                                    .AsParallel()
+                                    .ForAll(async file =>
                                     {
                                         try
                                         {
