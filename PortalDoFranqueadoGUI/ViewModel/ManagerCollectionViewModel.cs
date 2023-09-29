@@ -425,6 +425,7 @@ namespace PortalDoFranqueado.ViewModel
                 return;
 
             CollectionProductViewModel? firstEmpty = null;
+            Task? taskAfterLoad = null;
 
             try
             {
@@ -436,8 +437,13 @@ namespace PortalDoFranqueado.ViewModel
 
                 var files = myFiles.Select(f => new FileView(f)).ToList();
 
-                await LoadImageData(files.ToArray()).ConfigureAwait(false);
-                
+                var filesToLoadImageData = files.ToArray();
+                taskAfterLoad = new Task(() =>
+                {
+                    Task.Delay(500).Wait();
+                    LoadFiles(filesToLoadImageData).ConfigureAwait(false);
+                });
+
                 Legendable?.SendMessage("Carregando produtos...");
                 var products = await API.ApiProduct.Get(_collection.Id);
 
@@ -484,9 +490,10 @@ namespace PortalDoFranqueado.ViewModel
                 {
                     Products.Add(product);
 
-                    if (firstEmpty == null)
-                        firstEmpty = product;
+                    firstEmpty ??= product;
                 }
+
+                taskAfterLoad?.Start();
             }
             catch (Exception ex)
             {

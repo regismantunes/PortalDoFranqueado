@@ -287,8 +287,9 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                bool emptyProducts = true;
+                var emptyProducts = true;
                 var propertyGroup = new PropertyGroupDescriptionPublicChange("FamilyName");
+                Task? taskAfterLoad = null;
                 
                 if (_store != null)
                 {
@@ -328,8 +329,13 @@ namespace PortalDoFranqueado.ViewModel
                         var myFiles = await API.ApiFile.GetFromCollection(Collection.Id);
 
                         var files = myFiles.Select(f => new FileView(f)).ToList();
-
-                        await LoadImageData(files.ToArray()).ConfigureAwait(false);
+                        
+                        var filesToLoadImageData = files.ToArray();
+                        taskAfterLoad = new Task(() =>
+                        {
+                            Task.Delay(500).Wait();
+                            LoadFiles(filesToLoadImageData).ConfigureAwait(false);
+                        });
 
                         Legendable?.SendMessage("Carregando familias e fornecedores...");
                         var families = await _cache.LoadFamilies();
@@ -416,6 +422,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 OnPropertyChanged(nameof(Products));
                 UpdateAmount();
+                taskAfterLoad?.Start();
             }
             catch (Exception ex)
             {

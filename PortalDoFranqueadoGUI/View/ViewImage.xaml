@@ -18,10 +18,10 @@
         <Image Source="{Binding Source}" Stretch="None">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Loaded">
-                    <i:InvokeCommandAction Command="{Binding ResizeImageCommand}"
-                                   CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Image}, Mode=OneWay}"/>
+                    <i:InvokeCommandAction Command="{Binding ResizeImageCommand}"/>
                 </i:EventTrigger>
-            </i:Interaction.Triggers><Image.LayoutTransform>
+            </i:Interaction.Triggers>
+            <Image.LayoutTransform>
                 <ScaleTransform ScaleX="{Binding ZoomFactor}" ScaleY="{Binding ZoomFactor}"/>
             </Image.LayoutTransform>
             <Image.InputBindings>

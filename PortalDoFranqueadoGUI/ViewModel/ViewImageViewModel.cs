@@ -1,16 +1,16 @@
-﻿using System.Windows.Media;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using GalaSoft.MvvmLight.CommandWpf;
-using System.Windows.Controls;
 using System;
+using System.Drawing;
 
 namespace PortalDoFranqueado.ViewModel
 {
     public class ViewImageViewModel : BaseViewModel
     {
         private double _zoomFactor = 1.0;
+        private Size? _size;
 
-        public ImageSource? Source { get; }
+        public string Source { get; }
         public ICommand ZoomInCommand { get; }
         public ICommand ZoomOutCommand { get; }
         public ICommand ResizeImageCommand { get; }
@@ -28,15 +28,27 @@ namespace PortalDoFranqueado.ViewModel
             }
         }
 
+        public Size Size
+        {
+            get
+            {
+                if (_size == null)
+                    using (var image = Image.FromFile(Source))
+                        _size = image.Size;
+
+                return _size.Value;
+            }
+        }
+
         public ViewImageViewModel(FileView file)
         {
             if(!file.IsImage)
                 return;
 
-            Source = file.ImageData;
+            Source = file.FilePath;
             ZoomInCommand = new RelayCommand(ZoomIn);
             ZoomOutCommand = new RelayCommand(ZoomOut);
-            ResizeImageCommand = new RelayCommand<Image>(ResizeImage);
+            ResizeImageCommand = new RelayCommand(ResizeImage);
         }
 
         private void ZoomIn()
@@ -49,14 +61,14 @@ namespace PortalDoFranqueado.ViewModel
             ZoomFactor /= 1.1;
         }
 
-        private void ResizeImage(Image image)
+        private void ResizeImage()
         {
             if (Source == null ||
                 Me == null)
                 return;
 
-            var zoomFactorH = (Me.Height - 150) / Source.Height;
-            var zoomFactorW = (Me.Width - 75) / Source.Width;
+            var zoomFactorH = (Me.Height - 150) / Size.Height;
+            var zoomFactorW = (Me.Width - 75) / Size.Width;
 
             ZoomFactor = Math.Min(zoomFactorH, zoomFactorW);
         }

@@ -6,6 +6,7 @@ using PortalDoFranqueado.Repository;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -80,7 +81,22 @@ namespace PortalDoFranqueado.ViewModel
                                         {
                                             file.PrepareDirectory();
                                             if (!file.FileExists)
+                                            {
+                                                /*file.PropertyChanged += (object? sender, PropertyChangedEventArgs e) =>
+                                                {
+                                                    Me?.Dispatcher.BeginInvoke(() =>
+                                                    {
+                                                        if (e.PropertyName == nameof(file.FileExists))
+                                                        {
+                                                            if (i < length)
+                                                                Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
+                                                            else
+                                                                Legendable?.SendMessage(string.Empty);
+                                                        }
+                                                    });
+                                                };*/
                                                 await file.Download();
+                                            }
 
                                             Me?.Dispatcher.BeginInvoke(() =>
                                             {

@@ -8,7 +8,7 @@ namespace PortalDoFranqueado.ViewModel
 {
     public abstract class FileViewViewModel : BaseViewModel
     {
-        internal async Task LoadImageData(IEnumerable<FileView> files)
+        internal async Task LoadFiles(IEnumerable<FileView> files)
         {
             var hasError = false;
             var count = 0;
@@ -17,32 +17,33 @@ namespace PortalDoFranqueado.ViewModel
             {
                 try
                 {
-                    fileView.PrepareDirectory();
-                    if (!fileView.FileExists)
-                        await fileView.Download();
+                    await fileView.Download();
 
-                    if (fileView.FileExists)
-                        Me?.Dispatcher.BeginInvoke(() =>
-                        {
-                            count++;
-                            Legendable?.SendMessage($"Carrengando fotos {count} de {totalFiles}...");
-                            fileView.LoadImageData();
-                        });
+                    fileView.GenerateMiniature();
+
+                    Me?.Dispatcher.BeginInvoke(() =>
+                    {
+                        count++;
+                        Legendable?.SendMessage($"Carrengando fotos {count} de {totalFiles}...");
+                    });
+
+                    if (!fileView.FileExists)
+                        throw new Exception($"Falha ao carregar arquivo {fileView.FilePath}");
                 }
                 catch (Exception ex)
                 {
                     if (!hasError)
                     {
                         hasError = true;
-                        Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
+                        Me?.Dispatcher.BeginInvoke(() =>
+                        {
+                            MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
                     }
                 }
             }
 
-            Me?.Dispatcher.BeginInvoke(() =>
-            {
-                Legendable?.SendMessage(string.Empty);
-            });
+            Me?.Dispatcher.BeginInvoke(() => Legendable?.SendMessage(string.Empty));
         }
     }
 }

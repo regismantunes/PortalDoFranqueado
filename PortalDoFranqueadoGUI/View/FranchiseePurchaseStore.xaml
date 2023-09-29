@@ -141,7 +141,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding OpenFileViewCommand}">
-                                    <Image Source="{Binding FileView.ImageData}"/>
+                                    <Image Source="{Binding FileView.MiniatureFilePath}"/>
                                 </Button>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
