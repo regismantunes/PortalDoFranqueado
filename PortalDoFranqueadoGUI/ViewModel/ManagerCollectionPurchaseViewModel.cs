@@ -12,7 +12,7 @@ using System.Windows.Data;
 
 namespace PortalDoFranqueado.ViewModel
 {
-    internal class ManagerCollectionPurchaseViewModel : BaseViewModel
+    internal class ManagerCollectionPurchaseViewModel : FileViewViewModel
     {
         private readonly TemporaryLocalRepository _cache;
 
@@ -41,6 +41,8 @@ namespace PortalDoFranqueado.ViewModel
             if (!reload && _loaded)
                 return;
 
+            Task? taskAfterLoad = null;
+
             try
             {
                 DesableContent();
@@ -56,32 +58,14 @@ namespace PortalDoFranqueado.ViewModel
                 Legendable?.SendMessage("Carregando fotos...");
                 var myFiles = await API.ApiFile.GetFromCollection(Purchase.CollectionId);
 
-                var files = new List<FileView>();
-                myFiles.ToList()
-                       .ForEach(f => files.Add(new FileView(f)));
+                var files = myFiles.Select(f => new FileView(f)).ToList();
 
-                var hasError = false;
-                files.AsParallel()
-                     .ForAll(async fileView =>
-                     {
-                         try
-                         {
-                             fileView.PrepareDirectory();
-                             if (!fileView.FileExists)
-                                 await fileView.Download();
-
-                             if (fileView.FileExists)
-                                 Me?.Dispatcher.BeginInvoke(fileView.LoadImageData);
-                         }
-                         catch (Exception ex)
-                         {
-                             if (!hasError)
-                             {
-                                 hasError = true;
-                                 Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
-                             }
-                         }
-                     });
+                var filesToLoadImageData = files.ToArray();
+                taskAfterLoad = new Task(() =>
+                {
+                    Task.Delay(500).Wait();
+                    LoadFiles(filesToLoadImageData).ConfigureAwait(false);
+                });
 
                 Legendable?.SendMessage("Carregando familias e fornecedores...");
                 var families = await _cache.LoadFamilies();
@@ -130,6 +114,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 OnPropertyChanged(nameof(Products));
                 OnPropertyChanged(nameof(Amount));
+                taskAfterLoad?.Start();
             }
             catch (Exception ex)
             {

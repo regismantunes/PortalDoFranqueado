@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using PortalDoFranqueado.Model;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace PortalDoFranqueado.ViewModel
 {
@@ -66,6 +68,7 @@ namespace PortalDoFranqueado.ViewModel
         public bool FileExists { get; private set; }
         public ImageSource? ImageData { get; private set; }
         public Stretch Stretch { get; private set; }
+        public string MiniatureFilePath { get; private set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -117,6 +120,7 @@ namespace PortalDoFranqueado.ViewModel
                 File.Move(tempFile, FilePath, true);
                 FileExists = true;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FileExists)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FilePath)));
             }
         }
 
@@ -135,7 +139,7 @@ namespace PortalDoFranqueado.ViewModel
                     imageData.BeginInit();
                     imageData.StreamSource = fileStream;
                     imageData.EndInit();
-
+                    
                     ImageData = imageData;
                     Stretch = Stretch.Uniform;
                 }
@@ -144,6 +148,7 @@ namespace PortalDoFranqueado.ViewModel
                     ImageData = IconManager.GetToImageSourceFromIcon(FilePath);
                     Stretch = Stretch.None;
                 }
+
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ImageData)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Stretch)));
             }
@@ -158,6 +163,33 @@ namespace PortalDoFranqueado.ViewModel
         {
             FilePath = filePath;
             LoadImageData();
+        }
+
+        public void GenerateMiniature()
+        {
+            if (!FileExists ||
+                !string.IsNullOrEmpty(MiniatureFilePath))
+                return;
+
+            MiniatureFilePath = Path.Combine(Path.GetTempPath(), "BROTHERS", "Franqueados", string.Concat("m_", Id, '_', Name, Extension));
+
+            if (!File.Exists(MiniatureFilePath))
+            {
+                using var image = Image.FromFile(FilePath);
+                var dummyCallBack = new Image.GetThumbnailImageAbort(ThumbnailCallback);
+                var height = image.Height > image.Width ? 100 : (image.Height * 100) / image.Width;
+                var width = image.Height < image.Width ? 100 : (image.Width * 100) / image.Height;
+                var miniature = image.GetThumbnailImage(width, height, dummyCallBack, IntPtr.Zero);
+
+                miniature.Save(MiniatureFilePath);
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MiniatureFilePath)));
+        }
+
+        private bool ThumbnailCallback()
+        {
+            return false;
         }
     }
 }

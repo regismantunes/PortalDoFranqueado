@@ -13,7 +13,7 @@ using System.Windows.Data;
 
 namespace PortalDoFranqueado.ViewModel
 {
-    public class FranchiseePurchaseStoreViewModel : BaseViewModel, IReloadable
+    public class FranchiseePurchaseStoreViewModel : FileViewViewModel, IReloadable
     {
         public bool ExpandGroups { get; set; } = true;
         private readonly TemporaryLocalRepository _cache;
@@ -297,6 +297,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 var emptyProducts = true;
                 var propertyGroup = new PropertyGroupDescriptionPublicChange("FamilyName");
+                Task? taskAfterLoad = null;
                 
                 if (_store != null)
                 {
@@ -339,32 +340,14 @@ namespace PortalDoFranqueado.ViewModel
                         Legendable?.SendMessage("Carregando fotos...");
                         var myFiles = await API.ApiFile.GetFromCollection(Collection.Id);
 
-                        var files = new List<FileView>();
-                        myFiles.ToList()
-                               .ForEach(f => files.Add(new FileView(f)));
-
-                        var hasError = false;
-                        files.AsParallel()
-                             .ForAll(async fileView =>
-                             {
-                                 try
-                                 {
-                                     fileView.PrepareDirectory();
-                                     if (!fileView.FileExists)
-                                         await fileView.Download();
-
-                                     if (fileView.FileExists)
-                                         Me?.Dispatcher.BeginInvoke(fileView.LoadImageData);
-                                 }
-                                 catch (Exception ex)
-                                 {
-                                     if (!hasError)
-                                     {
-                                         hasError = true;
-                                         Me?.Dispatcher.BeginInvoke(() => MessageBox.Show(Me, ex.Message, "BROTHERS - Falha ao carregar produtos", MessageBoxButton.OK, MessageBoxImage.Error));
-                                     }
-                                 }
-                             });
+                        var files = myFiles.Select(f => new FileView(f)).ToList();
+                        
+                        var filesToLoadImageData = files.ToArray();
+                        taskAfterLoad = new Task(() =>
+                        {
+                            Task.Delay(500).Wait();
+                            LoadFiles(filesToLoadImageData).ConfigureAwait(false);
+                        });
 
                         Legendable?.SendMessage("Carregando familias e fornecedores...");
                         var families = await _cache.LoadFamilies();
@@ -454,6 +437,7 @@ namespace PortalDoFranqueado.ViewModel
                 OnPropertyChanged(nameof(PurchaseSuggestion));
                 OnPropertyChanged(nameof(VisibilitySuggestion));
                 UpdateAmount();
+                taskAfterLoad?.Start();
             }
             catch (Exception ex)
             {

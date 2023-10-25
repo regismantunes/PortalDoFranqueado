@@ -1,10 +1,12 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
+using NuGet;
 using PortalDoFranqueado.Model;
 using PortalDoFranqueado.Repository;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -62,8 +64,7 @@ namespace PortalDoFranqueado.ViewModel
                     Legendable?.SendMessage(string.Empty);
                 else
                 {
-                    myFiles.ToList()
-                           .ForEach(f => Files.Add(new FileView(f)));
+                    Files.AddRange(myFiles.Select(f => new FileView(f)));
 
                     try
                     {
@@ -72,14 +73,30 @@ namespace PortalDoFranqueado.ViewModel
                                 var i = 1;
                                 var length = Files.Count;
                                 var hasError = false;
-                                Files.AsParallel()
-                                     .ForAll(async file =>
+                                Files.ToArray()
+                                    .AsParallel()
+                                    .ForAll(async file =>
                                     {
                                         try
                                         {
                                             file.PrepareDirectory();
                                             if (!file.FileExists)
+                                            {
+                                                /*file.PropertyChanged += (object? sender, PropertyChangedEventArgs e) =>
+                                                {
+                                                    Me?.Dispatcher.BeginInvoke(() =>
+                                                    {
+                                                        if (e.PropertyName == nameof(file.FileExists))
+                                                        {
+                                                            if (i < length)
+                                                                Legendable?.SendMessage($"Carregando arquivos {i++} de {length}...");
+                                                            else
+                                                                Legendable?.SendMessage(string.Empty);
+                                                        }
+                                                    });
+                                                };*/
                                                 await file.Download();
+                                            }
 
                                             Me?.Dispatcher.BeginInvoke(() =>
                                             {
