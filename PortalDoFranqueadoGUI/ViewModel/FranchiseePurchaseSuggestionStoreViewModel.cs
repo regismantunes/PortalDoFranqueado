@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
+using PortalDoFranqueado.API;
 using PortalDoFranqueado.Model;
 using PortalDoFranqueado.Repository;
 using System;
@@ -120,9 +121,24 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
+                if (!_purchaseId.HasValue)
+                {
+                    var purchase = new Purchase()
+                    {
+                        CollectionId = Collection.Id,
+                        Items = Array.Empty<PurchaseItem>(),
+                        Status = PurchaseStatus.Opened,
+                        StoreId = Store.Id
+                    };
+
+                    _purchaseId = await ApiPurchase.Save(purchase);
+                    if (!_purchaseId.HasValue)
+                        throw new Exception("Falha ao salvar pedido de compra.");
+                }
+
                 var purchaseSuggestion = new PurchaseSuggestion
                 {
-                    PurchaseId = _purchaseId ?? 0,
+                    PurchaseId = _purchaseId.Value,
                     AverageTicket = AverageTicket.Value,
                     Coverage = Coverage.Value,
                     PartsPerService = PartsPerService.Value,
