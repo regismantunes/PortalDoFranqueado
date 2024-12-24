@@ -15,15 +15,11 @@ namespace PortalDoFranqueadoAPI.Repositories.Util
                 obj.Length == 0)
                 return DBNull.Value;
 
-            var text = string.Empty;
-            foreach (var item in obj)
-                text += string.Concat(item, '|');
-
-            return text[0..^1];
+            return string.Join('|', obj);
         }
 
         public static int ToZeroIfNull(this int? obj)
-            => obj is null ? 0 : obj.Value;
+            => obj ?? 0;
 
         public static string[]? GetStringArray(this DbDataReader reader, string name)
         {

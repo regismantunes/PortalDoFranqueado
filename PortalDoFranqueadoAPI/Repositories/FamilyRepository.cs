@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,17 +15,17 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand("SELECT * FROM Family", connection);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 var list = new List<Family>();
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync().AsNoContext())
                     list.Add(new Family()
                     {
                         Id = reader.GetInt32("Id"),
@@ -33,13 +34,13 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 if (loadSizes)
                 {
-                    await reader.CloseAsync();
+                    await reader.CloseAsync().AsNoContext();
 
                     cmd.CommandText = "SELECT * FROM Family_Size";
-                    reader = await cmd.ExecuteReaderAsync();
+                    reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                     var tamanhos = new List<KeyValuePair<int, ProductSize>>();
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync().AsNoContext())
                         tamanhos.Add(new KeyValuePair<int, ProductSize>(
                             reader.GetInt32("FamilyId"),
                             new ProductSize()
@@ -58,7 +59,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
     }

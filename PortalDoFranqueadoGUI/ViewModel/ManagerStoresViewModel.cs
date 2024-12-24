@@ -25,7 +25,7 @@ namespace PortalDoFranqueado.ViewModel
             public int? Id { get => _id; set { _id = value; OnPropertyChanged(); } }
             public string? Name { get => _name; set { _name = value; OnPropertyChanged(); } }
             public string? DocumentNumber { get => _documentNumber; set { _documentNumber = value; OnPropertyChanged(); OnPropertyChanged(nameof(FormatedDocumentNumber)); } }
-            public string? FormatedDocumentNumber => _documentNumber?.ToCNPJFormat();
+            public string? FormatedDocumentNumber => _documentNumber?.ToCnpjFormat();
 
             public bool NameFocus { get => _nameFocus; private set { _nameFocus = value; OnPropertyChanged(); } }
             public bool DocumentNumberFocus { get => _documentNumberFocus; private set { _documentNumberFocus = value; OnPropertyChanged(); } }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var campaigns = await CampaignRepository.GetList(_connection);
+                var campaigns = await CampaignRepository.GetList(_connection).AsNoContext();
 
                 return Ok(campaigns);
             }
@@ -42,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await CampaignRepository.Insert(_connection, campaign);
+                var id = await CampaignRepository.Insert(_connection, campaign).AsNoContext();
 
                 return Ok(id);
             }
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var sucess = await CampaignRepository.Delete(_connection, id);
+                var sucess = await CampaignRepository.Delete(_connection, id).AsNoContext();
 
                 return Ok(sucess);
             }
@@ -80,7 +81,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 var campaignStatus = (CampaignStatus)status;
 
-                await CampaignRepository.ChangeStatus(_connection, id, campaignStatus);
+                await CampaignRepository.ChangeStatus(_connection, id, campaignStatus).AsNoContext();
 
                 return Ok();
             }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var suppliers = await SupplierRepository.GetList(_connection, false);
+                var suppliers = await SupplierRepository.GetList(_connection, false).AsNoContext();
 
                 return Ok(suppliers);
             }
@@ -42,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var suppliers = await SupplierRepository.GetList(_connection, true);
+                var suppliers = await SupplierRepository.GetList(_connection, true).AsNoContext();
 
                 return Ok(suppliers);
             }
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var supplier = await StoreRepository.Get(_connection, id);
+                var supplier = await StoreRepository.Get(_connection, id).AsNoContext();
 
                 return Ok(supplier);
             }
@@ -78,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await SupplierRepository.Insert(_connection, supplier);
+                var id = await SupplierRepository.Insert(_connection, supplier).AsNoContext();
 
                 return Ok(id);
             }
@@ -96,7 +97,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var sucess = await SupplierRepository.Delete(_connection, id);
+                var sucess = await SupplierRepository.Delete(_connection, id).AsNoContext();
 
                 return Ok(sucess);
             }
@@ -114,7 +115,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await SupplierRepository.Update(_connection, supplier);
+                await SupplierRepository.Update(_connection, supplier).AsNoContext();
 
                 return Ok();
             }

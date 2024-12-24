@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -13,18 +14,18 @@ namespace PortalDoFranqueadoAPI.Repositories
     {
         public static async Task<int> Save(SqlConnection connection, PurchaseSuggestion purchaseSuggestion)
         {
-            await purchaseSuggestion.Validate(connection);
+            await purchaseSuggestion.Validate(connection).AsNoContext();
 
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var newPurchaseSuggestion = purchaseSuggestion.Id == null;
 
-                using var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync().AsNoContext();
 
                 try
                 {
@@ -67,7 +68,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                         " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;";
                         cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
 
-                        await cmd.ExecuteNonQueryAsync();
+                        await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
 
                     cmd.CommandText = "INSERT INTO Purchase_Suggestion_Family (PurchaseSuggestionId, FamilyId, [Percentage], FamilySuggestedItems)" +
@@ -105,19 +106,19 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.InsertFailException);
                     }
 
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync().AsNoContext();
 
                     return purchaseSuggestion.Id.Value;
                 }
                 catch
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync().AsNoContext();
                     throw;
                 }
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -125,7 +126,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -135,14 +136,14 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@PurchaseId", purchaseId);
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
-                if (await reader.ReadAsync())
+                if (await reader.ReadAsync().AsNoContext())
                 {
                     var purchase = LoadPurchaseSuggestion(reader);
-                    await reader.CloseAsync();
-                    await purchase.LoadPurchaseSuggestionFamilies(connection);
-                    await purchase.LoadPurchaseSuggestionFamiliesSizes(connection);
+                    await reader.CloseAsync().AsNoContext();
+                    await purchase.LoadPurchaseSuggestionFamilies(connection).AsNoContext();
+                    await purchase.LoadPurchaseSuggestionFamiliesSizes(connection).AsNoContext();
 
                     return purchase;
                 }
@@ -151,7 +152,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -176,7 +177,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             {
                 if (connection.State != ConnectionState.Open)
                 {
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                     if (connection.State != ConnectionState.Open)
                         throw new Exception(MessageRepositories.ConnectionNotOpenException);
                     connectionWasClosed = true;
@@ -189,8 +190,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;", connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
+                while (await reader.ReadAsync().AsNoContext())
                 {
                     var family = new Family
                     {
@@ -209,14 +210,14 @@ namespace PortalDoFranqueadoAPI.Repositories
                     });
                 }
 
-                await reader.CloseAsync();
+                await reader.CloseAsync().AsNoContext();
 
                 purchaseSuggestion.Families = listItems.ToArray();
             }
             finally
             {
                 if (connectionWasClosed)
-                    await connection.CloseAsync();
+                    await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -229,7 +230,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             {
                 if (connection.State != ConnectionState.Open)
                 {
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                     if (connection.State != ConnectionState.Open)
                         throw new Exception(MessageRepositories.ConnectionNotOpenException);
                     connectionWasClosed = true;
@@ -246,8 +247,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;", connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
+                while (await reader.ReadAsync().AsNoContext())
                 {
                     var size = new ProductSize
                     {
@@ -265,7 +266,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     });
                 }
 
-                await reader.CloseAsync();
+                await reader.CloseAsync().AsNoContext();
 
                 purchaseSuggestion.Families?
                     .ToList()
@@ -278,7 +279,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             finally
             {
                 if (connectionWasClosed)
-                    await connection.CloseAsync();
+                    await connection.CloseAsync().AsNoContext();
             }
         }
     }

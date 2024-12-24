@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await PurchaseRepository.Save(_connection, purchase);
+                var id = await PurchaseRepository.Save(_connection, purchase).AsNoContext();
 
                 return Ok(id);
             }
@@ -42,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchase = await PurchaseRepository.Get(_connection, collectionId, storeId);
+                var purchase = await PurchaseRepository.Get(_connection, collectionId, storeId).AsNoContext();
 
                 return Ok(purchase);
             }
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchases = await PurchaseRepository.GetList(_connection, collectionId);
+                var purchases = await PurchaseRepository.GetList(_connection, collectionId).AsNoContext();
 
                 return Ok(purchases);
             }
@@ -78,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchase = await PurchaseRepository.Get(_connection, purchaseId);
+                var purchase = await PurchaseRepository.Get(_connection, purchaseId).AsNoContext();
 
                 return Ok(purchase);
             }
@@ -96,7 +97,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await PurchaseRepository.Reverse(_connection, purchaseId);
+                await PurchaseRepository.Reverse(_connection, purchaseId).AsNoContext();
 
                 return Ok();
             }

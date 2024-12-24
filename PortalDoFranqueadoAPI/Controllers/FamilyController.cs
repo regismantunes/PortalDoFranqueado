@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
 using System.Data.SqlClient;
@@ -32,7 +33,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var families = await FamilyRepository.GetList(_connection, withSizes);
+                var families = await FamilyRepository.GetList(_connection, withSizes).AsNoContext();
 
                 return Ok(families);
             }

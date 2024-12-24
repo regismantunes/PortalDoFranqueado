@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueadoAPI.Repositories;
+﻿using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace PortalDoFranqueadoAPI.Models.Validations
             if (currentCollection.Id != purchase.CollectionId)
                 throw new Exception("Esse período de compras não está aberto.");
 
-            var openedPurchase = await PurchaseRepository.Get(connection, purchase.CollectionId, purchase.StoreId, false);
+            var openedPurchase = await PurchaseRepository.Get(connection, purchase.CollectionId, purchase.StoreId, false).AsNoContext();
 
             if (openedPurchase == null)
                 return;

@@ -3,6 +3,7 @@ using PortalDoFranqueadoAPI.Models;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -14,18 +15,18 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 using var cmd = new SqlCommand("SELECT TOP 1 * FROM Informative", connection);
 
-                using var reader = await cmd.ExecuteReaderAsync();
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 var result = new Informative();
 
-                if (await reader.ReadAsync())
+                if (await reader.ReadAsync().AsNoContext())
                 {
                     result.Title = reader.GetString("Title");
                     result.Text = reader.GetString("Text");
@@ -35,7 +36,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -43,7 +44,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -58,12 +59,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                 {
                     cmd.CommandText = "INSERT INTO Informative (Title, Text) VALUES (@Title, @Text)";
-                    await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    await cmd.ExecuteNonQueryAsync().AsNoContext();
                 }
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
     }

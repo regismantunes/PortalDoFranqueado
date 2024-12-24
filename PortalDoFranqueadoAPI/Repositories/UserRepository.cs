@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -17,7 +18,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -32,12 +33,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     cmd.Parameters.AddWithValue("@username", username);
 
-                    using var reader = await cmd.ExecuteReaderAsync();
+                    using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
-                    if (await reader.ReadAsync())
+                    if (await reader.ReadAsync().AsNoContext())
                     {
                         id = reader.GetInt32("Id");
-                        var passwordHash = reader.GetValue("Password") as string;// reader.GetString("Password");
+                        var passwordHash = reader.GetValue("Password") as string;
                         if (string.IsNullOrEmpty(passwordHash))
                         {
                             passwordHash = reader.GetValue("ResetPasswordCode") as string;
@@ -64,7 +65,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                             };
                         }
 
-                        await reader.CloseAsync();
+                        await reader.CloseAsync().AsNoContext();
                     }
                 }
 
@@ -80,7 +81,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         cmdRP.Parameters.AddWithValue("@ResetPasswordAttempts", resetPasswordAttempts);
                         cmdRP.Parameters.AddWithValue("@Id", id);
 
-                        await cmdRP.ExecuteNonQueryAsync();
+                        await cmdRP.ExecuteNonQueryAsync().AsNoContext();
                     }
                     else
                     {
@@ -91,7 +92,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                         cmdRP.Parameters.AddWithValue("@Id", id);
 
-                        await cmdRP.ExecuteNonQueryAsync();
+                        await cmdRP.ExecuteNonQueryAsync().AsNoContext();
                     }
                 }
 
@@ -99,7 +100,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync();
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -107,7 +108,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -115,9 +116,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var cmd = new SqlCommand("SELECT * FROM [User] WHERE [Status] = 1;", connection);
 
                 var list = new List<User>();
-                using (var reader = await cmd.ExecuteReaderAsync())
+                using (var reader = await cmd.ExecuteReaderAsync().AsNoContext())
                 {
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync().AsNoContext())
                         list.Add(new User()
                         {
                             Id = reader.GetInt32("Id"),
@@ -128,16 +129,16 @@ namespace PortalDoFranqueadoAPI.Repositories
                             Active = true
                         });
 
-                    await reader.CloseAsync();
+                    await reader.CloseAsync().AsNoContext();
                 }
 
-                var stores = await StoreRepository.GetList(connection);
+                var stores = await StoreRepository.GetList(connection).AsNoContext();
 
                 var dic = new Dictionary<int, List<Store>>();
                 cmd.CommandText = "SELECT * FROM User_Store";
-                using(var reader = await cmd.ExecuteReaderAsync())
+                using(var reader = await cmd.ExecuteReaderAsync().AsNoContext())
                 {
-                    while(await reader.ReadAsync())
+                    while(await reader.ReadAsync().AsNoContext())
                     {
                         var userId = reader.GetInt32("UserId");
                         var storeId = reader.GetInt32("StoreId");
@@ -154,7 +155,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -164,7 +165,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -180,7 +181,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@Role", (int)user.Role);
                 cmd.Parameters.AddWithValue("@Treatment", user.Treatment.ToDBValue());
 
-                var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                var dbid = await cmd.ExecuteScalarAsync().AsNoContext();
                 if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
@@ -195,7 +196,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         cmd.Parameters.AddWithValue("@UserId", id);
                         cmd.Parameters.AddWithValue("@StoreId", store.Id);
 
-                        await cmd.ExecuteNonQueryAsync();
+                        await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
                 }
 
@@ -203,7 +204,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -211,7 +212,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -226,7 +227,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -236,7 +237,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -249,12 +250,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     cmdStores.Parameters.AddWithValue("@Id", user.Id);
 
-                    using var reader = await cmdStores.ExecuteReaderAsync();
-                    while (await reader.ReadAsync())
+                    using var reader = await cmdStores.ExecuteReaderAsync().AsNoContext();
+                    while (await reader.ReadAsync().AsNoContext())
                         stores.Add(reader.GetInt32("StoreId"));
                 }
 
-                using var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync().AsNoContext();
                 try
                 {
                     using var cmd = new SqlCommand("UPDATE [User]" +
@@ -284,7 +285,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                 cmd.Parameters.AddWithValue("@UserId", user.Id);
                                 cmd.Parameters.AddWithValue("@StoreId", store.Id);
 
-                                await cmd.ExecuteNonQueryAsync();
+                                await cmd.ExecuteNonQueryAsync().AsNoContext();
                             }
                         }
 
@@ -304,21 +305,21 @@ namespace PortalDoFranqueadoAPI.Repositories
                             cmd.Parameters.AddWithValue("@UserId", user.Id);
                             cmd.Parameters.AddWithValue("@StoreId", store);
 
-                            await cmd.ExecuteNonQueryAsync();
+                            await cmd.ExecuteNonQueryAsync().AsNoContext();
                         }
                     }
 
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync().AsNoContext();
                 }
                 catch
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync().AsNoContext();
                     throw;
                 }
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -328,7 +329,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             {
                 var resetCodeHash = HashService.ComputeHash(resetCode, "SHA256");
 
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -346,7 +347,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -357,7 +358,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (!newPassword.Equals(newPasswordConfirmation))
                     throw new Exception("A confirmação da senha não confere com a nova senha informada.");
 
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -369,9 +370,9 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
-                using (var reader = await cmd.ExecuteReaderAsync())
+                using (var reader = await cmd.ExecuteReaderAsync().AsNoContext())
                 {
-                    if (await reader.ReadAsync())
+                    if (await reader.ReadAsync().AsNoContext())
                     {
                         var passwordHash = reader.GetValue("Password") as string;
                         if (!string.IsNullOrEmpty(passwordHash))
@@ -384,7 +385,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         }
                     }
 
-                    await reader.CloseAsync();
+                    await reader.CloseAsync().AsNoContext();
                 }
 
                 var newPasswordHash = HashService.ComputeHash(newPassword, "SHA256");
@@ -397,11 +398,11 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@Password", newPasswordHash);
 
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync().AsNoContext();
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
     }

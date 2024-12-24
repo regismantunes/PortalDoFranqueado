@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -25,7 +26,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var files = await FileRepository.GetFilesFromAuxiliary(_connection, id);
+                var files = await FileRepository.GetFilesFromAuxiliary(_connection, id).AsNoContext();
 
                 return Ok(files);
             }
@@ -43,7 +44,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var ids = await FileRepository.InsertFilesToAuxiliary(_connection, id, files);
+                var ids = await FileRepository.InsertFilesToAuxiliary(_connection, id, files).AsNoContext();
 
                 return Ok(ids);
             }
@@ -61,7 +62,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var files = await FileRepository.GetFilesFromCampaign(_connection, id);
+                var files = await FileRepository.GetFilesFromCampaign(_connection, id).AsNoContext();
 
                 return Ok(files);
             }
@@ -79,7 +80,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var files = await FileRepository.GetFilesFromCollection(_connection, id);
+                var files = await FileRepository.GetFilesFromCollection(_connection, id).AsNoContext();
 
                 return Ok(files);
             }
@@ -97,7 +98,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var ids = await FileRepository.InsertFilesToCampaign(_connection, id, files);
+                var ids = await FileRepository.InsertFilesToCampaign(_connection, id, files).AsNoContext();
 
                 return Ok(ids);
             }
@@ -115,7 +116,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var ids = await FileRepository.InsertFilesToCollection(_connection, id, files);
+                var ids = await FileRepository.InsertFilesToCollection(_connection, id, files).AsNoContext();
 
                 return Ok(ids);
             }
@@ -133,7 +134,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await FileRepository.Insert(_connection, file);
+                var id = await FileRepository.Insert(_connection, file).AsNoContext();
 
                 return Ok(id);
             }
@@ -151,7 +152,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var files = await FileRepository.GetFiles(_connection, new int[] { id });
+                var files = await FileRepository.GetFiles(_connection, new int[] { id }).AsNoContext();
 
                 return Ok(files[0]);
             }
@@ -173,7 +174,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 var file = files[0];
 
                 var stream = new MemoryStream();
-                await file.CopyToAsync(stream);
+                await file.CopyToAsync(stream).AsNoContext();
                 
                 stream.Position = 0;
                 var reader = new BinaryReader(stream);
@@ -190,7 +191,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                     if (count < buffer.Length &&
                         i < file.Length)
-                        await Task.Delay(1000);
+                        await Task.Delay(1000).AsNoContext();
                 }
 
                 var sb64 = Convert.ToBase64String(allBytes);
@@ -233,7 +234,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await FileRepository.DeleteFiles(_connection, filesId);
+                await FileRepository.DeleteFiles(_connection, filesId).AsNoContext();
 
                 return Ok();
             }
@@ -251,7 +252,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await FileRepository.DeleteFile(_connection, id);
+                await FileRepository.DeleteFile(_connection, id).AsNoContext();
 
                 return Ok();
             }

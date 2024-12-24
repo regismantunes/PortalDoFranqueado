@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System;
 using PortalDoFranqueadoAPI.Models;
 using System.Collections.Generic;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -13,7 +14,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -21,10 +22,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var cmd = new SqlCommand("SELECT * FROM Supplier" +
                                 (onlyActives ? " WHERE Active = 1" : string.Empty), connection);
 
-                using var reader = await cmd.ExecuteReaderAsync();
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 var list = new List<Supplier>();
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync().AsNoContext())
                     list.Add(new Supplier()
                     {
                         Id = reader.GetInt32("Id"),
@@ -36,7 +37,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -44,7 +45,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -52,9 +53,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var cmd = new SqlCommand("SELECT * FROM Supplier WHERE Id = @Id", connection);
                 cmd.Parameters.AddWithValue("@Id", id);
 
-                using var reader = await cmd.ExecuteReaderAsync();
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
-                if (await reader.ReadAsync())
+                if (await reader.ReadAsync().AsNoContext())
                     return new Supplier()
                     {
                         Id = reader.GetInt32("Id"),
@@ -66,7 +67,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -74,7 +75,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -86,7 +87,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@Name", supplier.Name);
                 cmd.Parameters.AddWithValue("@Active", 1);
 
-                var dbid = await cmd.ExecuteScalarAsync();
+                var dbid = await cmd.ExecuteScalarAsync().AsNoContext();
                 if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
@@ -94,7 +95,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -102,7 +103,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -115,7 +116,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -123,7 +124,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -142,7 +143,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
     }

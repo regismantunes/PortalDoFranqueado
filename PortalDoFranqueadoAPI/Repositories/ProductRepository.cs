@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
@@ -15,7 +16,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -29,9 +30,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                     if (familyId.HasValue)
                         cmd.Parameters.AddWithValue("@FamilyId", familyId);
 
-                    using var reader = await cmd.ExecuteReaderAsync();
+                    using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync().AsNoContext())
                         list.Add(new Product()
                         {
                             Id = reader.GetInt32("Id"),
@@ -43,14 +44,14 @@ namespace PortalDoFranqueadoAPI.Repositories
                             SupplierId = reader.GetValue("SupplierId") as int?
                         });
 
-                    await reader.CloseAsync();
+                    await reader.CloseAsync().AsNoContext();
                 }
 
                 return list.ToArray();
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -77,7 +78,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@SupplierId", product.SupplierId.ToDBValue());
                 cmd.Parameters.AddWithValue("@Description", product.Description.ToDBValue());
 
-                var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                var dbid = await cmd.ExecuteScalarAsync().AsNoContext();
                 if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
@@ -85,7 +86,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -95,7 +96,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -122,7 +123,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -130,12 +131,12 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var transaction = await connection.BeginTransactionAsync();
+                using var transaction = await connection.BeginTransactionAsync().AsNoContext();
 
                 try
                 {
@@ -145,7 +146,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     cmd.Parameters.AddWithValue("@Id", id);
 
-                    var fileIdObj = await cmd.ExecuteScalarAsync();
+                    var fileIdObj = await cmd.ExecuteScalarAsync().AsNoContext();
 
                     cmd.CommandText = "DELETE FROM Product WHERE Id = @Id;";
 
@@ -153,21 +154,21 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     if (sucess &&
                         fileIdObj is int fileId)
-                        await FileRepository.DeleteFile(connection, fileId, transaction);
+                        await FileRepository.DeleteFile(connection, fileId, transaction).AsNoContext();
                     
-                    await transaction.CommitAsync();
+                    await transaction.CommitAsync().AsNoContext();
 
                     return sucess;
                 }
                 catch
                 {
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync().AsNoContext();
                     throw;
                 }
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
     }

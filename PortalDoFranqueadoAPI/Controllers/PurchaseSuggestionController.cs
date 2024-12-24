@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await PurchaseSuggestionRepository.Save(_connection, purchaseSuggestion);
+                var id = await PurchaseSuggestionRepository.Save(_connection, purchaseSuggestion).AsNoContext();
 
                 return Ok(id);
             }
@@ -41,7 +42,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var purchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(_connection, purchaseid);
+                var purchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(_connection, purchaseid).AsNoContext();
 
                 return Ok(purchaseSuggestion);
             }

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System;
 using System.Data.SqlClient;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Models.Validations
 {
@@ -18,7 +19,7 @@ namespace PortalDoFranqueadoAPI.Models.Validations
             if (currentCollection.Id != purchase.CollectionId)
                 throw new Exception("Esse período de compras não está aberto.");
 
-            var openedPurchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(connection, purchaseSuggestion.PurchaseId);
+            var openedPurchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(connection, purchaseSuggestion.PurchaseId).AsNoContext();
 
             if (openedPurchaseSuggestion == null)
                 return;

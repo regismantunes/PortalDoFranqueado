@@ -29,7 +29,7 @@ namespace PortalDoFranqueado.Export.Excel
                 var ws = wb.ActiveSheet as Worksheet;
 
                 ws.get_Range("B2").Value = purchase.Store.Name;
-                ws.get_Range("P2").Value = purchase.Store.DocumentNumber.ToCNPJFormat();
+                ws.get_Range("P2").Value = purchase.Store.DocumentNumber.ToCnpjFormat();
 
                 var families = purchase.Items.GroupBy(i => i.Product.Family.Name,
                                                       i => i.Product.Price * i.Quantity,

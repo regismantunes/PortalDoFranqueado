@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -11,12 +12,12 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/main")]
     [ApiController]
-    public class MainScreenController : ControllerBase, IDisposable
+    public class MainViewController : ControllerBase, IDisposable
     {
         private readonly SqlConnection _connection;
         private readonly IConfiguration _configuration;
 
-        public MainScreenController(SqlConnection connection, IConfiguration configuration)
+        public MainViewController(SqlConnection connection, IConfiguration configuration)
             => (_connection, _configuration) = (connection, configuration);
 
         [HttpGet]
@@ -46,8 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await _connection.OpenAsync();
-                await _connection.CloseAsync();
+                await _connection.OpenAsync().AsNoContext();
+                await _connection.CloseAsync().AsNoContext();
                 return true;
             }
             catch 
@@ -80,14 +81,14 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var informative = await InformativeRepository.Get(_connection);
-                var infoCompras = await CollectionRepository.GetInfo(_connection);
+                var informative = await InformativeRepository.Get(_connection).AsNoContext();
+                var infoCompras = await CollectionRepository.GetInfo(_connection).AsNoContext();
 
                 var auxiliarySupportId = int.Parse(_configuration["AppSettings:AuxiliaryApoioId"]);
                 var auxiliaryPhotoId = int.Parse(_configuration["AppSettings:AuxiliaryFotosId"]);
 
-                var campaigns = await CampaignRepository.GetList(_connection, true);
-                var stores = await StoreRepository.GetListByUser(_connection, int.Parse(User.Identity.Name));
+                var campaigns = await CampaignRepository.GetList(_connection, true).AsNoContext();
+                var stores = await StoreRepository.GetListByUser(_connection, int.Parse(User.Identity.Name)).AsNoContext();
 
                 return Ok(new
                 {
@@ -115,7 +116,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var informative = await InformativeRepository.Get(_connection);
+                var informative = await InformativeRepository.Get(_connection).AsNoContext();
 
                 var auxiliarySupportId = int.Parse(_configuration["AppSettings:AuxiliaryApoioId"]);
                 var auxiliaryPhototId = int.Parse(_configuration["AppSettings:AuxiliaryFotosId"]);
@@ -142,7 +143,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var informative = await InformativeRepository.Get(_connection);
+                var informative = await InformativeRepository.Get(_connection).AsNoContext();
                 
                 return new
                 {
@@ -183,7 +184,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await InformativeRepository.Save(_connection, informative);
+                await InformativeRepository.Save(_connection, informative).AsNoContext();
 
                 return Ok();
             }
@@ -200,6 +201,6 @@ namespace PortalDoFranqueadoAPI.Controllers
             GC.SuppressFinalize(this);
         }
 
-        ~MainScreenController() => Dispose();
+        ~MainViewController() => Dispose();
     }
 }

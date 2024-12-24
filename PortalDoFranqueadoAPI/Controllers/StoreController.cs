@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var stores = await StoreRepository.GetList(_connection);
+                var stores = await StoreRepository.GetList(_connection).AsNoContext();
 
                 return Ok(stores);
             }
@@ -42,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var store = await StoreRepository.Get(_connection, id);
+                var store = await StoreRepository.Get(_connection, id).AsNoContext();
 
                 return Ok(store);
             }
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await StoreRepository.Insert(_connection, store);
+                var id = await StoreRepository.Insert(_connection, store).AsNoContext();
 
                 return Ok(id);
             }
@@ -78,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var sucess = await StoreRepository.Delete(_connection, id);
+                var sucess = await StoreRepository.Delete(_connection, id).AsNoContext();
 
                 return Ok(sucess);
             }
@@ -96,7 +97,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await StoreRepository.Update(_connection, store);
+                await StoreRepository.Update(_connection, store).AsNoContext();
 
                 return Ok();
             }

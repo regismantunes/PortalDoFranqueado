@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -21,7 +22,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                 {
                     connectionWasOpened = false;
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                 }
 
                 if (connection.State != ConnectionState.Open)
@@ -39,14 +40,14 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@id", id);
 
-                using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 return LoadFile(reader);
             }
             finally
             {
                 if (!connectionWasOpened)
-                    await connection.CloseAsync().ConfigureAwait(false);
+                    await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -54,7 +55,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -71,13 +72,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             " FROM [File]" +
                                             $" WHERE Id IN ({criteriaIds})", connection);
 
-                using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 return await LoadFiles(reader);
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -89,7 +90,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                 {
                     connectionWasOpened = false;
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                 }
 
                 if (connection.State != ConnectionState.Open)
@@ -109,14 +110,14 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@CampaignId", id);
 
-                using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 return await LoadFiles(reader);
             }
             finally
             {
                 if (!connectionWasOpened)
-                    await connection.CloseAsync().ConfigureAwait(false);
+                    await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -128,7 +129,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                 {
                     connectionWasOpened = false;
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                 }
 
                 if (connection.State != ConnectionState.Open)
@@ -148,14 +149,14 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@CollectionId", id);
 
-                using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 return await LoadFiles(reader);
             }
             finally
             {
                 if (!connectionWasOpened)
-                    await connection.CloseAsync().ConfigureAwait(false);
+                    await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -163,7 +164,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -182,23 +183,23 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 cmd.Parameters.AddWithValue("@AuxiliaryId", id);
 
-                using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+                using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
                 return await LoadFiles(reader);
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
         private static async Task<MyFile[]> LoadFiles(SqlDataReader reader)
         {
             var list = new List<MyFile>();
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().AsNoContext())
                 list.Add(LoadFile(reader));
 
-            await reader.CloseAsync();
+            await reader.CloseAsync().AsNoContext();
 
             return list.ToArray();
         }
@@ -223,7 +224,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                 {
                     connectionWasOpened = false;
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                 }
 
                 if (connection.State != ConnectionState.Open)
@@ -239,7 +240,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 cmd.Parameters.AddWithValue("@Size", file.Size);
                 cmd.Parameters.AddWithValue("@CompressionType", file.CompressionType);
 
-                var dbid = await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+                var dbid = await cmd.ExecuteScalarAsync().AsNoContext();
                 if (dbid == null)
                     throw new Exception(MessageRepositories.InsertFailException);
 
@@ -248,7 +249,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             finally
             {
                 if (!connectionWasOpened)
-                    await connection.CloseAsync().ConfigureAwait(false);
+                    await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -256,7 +257,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -283,7 +284,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -291,7 +292,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -318,7 +319,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -326,7 +327,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                await connection.OpenAsync();
+                await connection.OpenAsync().AsNoContext();
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
@@ -353,7 +354,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
             finally
             {
-                await connection.CloseAsync().ConfigureAwait(false);
+                await connection.CloseAsync().AsNoContext();
             }
         }
 
@@ -446,7 +447,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                 {
                     connectionWasOpened = false;
-                    await connection.OpenAsync();
+                    await connection.OpenAsync().AsNoContext();
                 }
 
                 if (connection.State != ConnectionState.Open)
@@ -457,12 +458,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var cmd = new SqlCommand("DELETE FROM [File]" +
                                             $" WHERE Id IN ({criteria})", connection, transaction as SqlTransaction);
 
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync().AsNoContext();
             }
             finally
             {
                 if (!connectionWasOpened)
-                    await connection.CloseAsync().ConfigureAwait(false);
+                    await connection.CloseAsync().AsNoContext();
             }
         }
     }

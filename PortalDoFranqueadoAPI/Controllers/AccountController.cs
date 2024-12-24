@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Extensions;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -27,16 +28,16 @@ namespace PortalDoFranqueadoAPI.Controllers
             try
             {
                 var resetPasswordMaxAttempts = short.Parse(_configuration["AppSettings:ResetPasswordAttempts"]);
-                // Recupera o usuário
-                var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts);
-                // Verifica se o usuário existe
+                
+                var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts).AsNoContext();
+                
                 if (user == null)
                     return BadRequest(new { message = "Usuário ou senha inválidos" });
-                // Gera o Token
+                
                 var authenticateData = TokenService.GerarTokenJwt(_configuration["AppSettings:SecretToken"], user);
-                // Oculta a senha
+                
                 user.Password = string.Empty;
-                // Retorna os dados
+                
                 return new
                 {
                     Token = authenticateData.Token,
@@ -59,7 +60,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var users = await UserRepository.GetList(_connection);
+                var users = await UserRepository.GetList(_connection).AsNoContext();
 
                 return Ok(users);
             }
@@ -77,7 +78,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await UserRepository.Insert(_connection, user);
+                var id = await UserRepository.Insert(_connection, user).AsNoContext();
 
                 return Ok(id);
             }
@@ -95,7 +96,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var sucess = await UserRepository.Delete(_connection, id);
+                var sucess = await UserRepository.Delete(_connection, id).AsNoContext();
 
                 return Ok(sucess);
             }
@@ -113,7 +114,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await UserRepository.Update(_connection, user);
+                await UserRepository.Update(_connection, user).AsNoContext();
 
                 return Ok();
             }
@@ -133,7 +134,7 @@ namespace PortalDoFranqueadoAPI.Controllers
             {
                 var resetCode = Random.Shared.Next(0, 999999).ToString("000000");
 
-                if (await UserRepository.ResetPassword(_connection, id, resetCode))
+                if (await UserRepository.ResetPassword(_connection, id, resetCode).AsNoContext())
                     return Ok(resetCode);
 
                 return BadRequest(new { message = "O usuário não foi encontrado." });
@@ -155,7 +156,7 @@ namespace PortalDoFranqueadoAPI.Controllers
                 if (!User.Identity.Name.Equals(changePassword.Id.ToString()))
                     throw new Exception("O código do usuário informado deve ser igual ao código do usuário atual.");
 
-                await UserRepository.ChangePassword(_connection, changePassword.Id, changePassword.NewPassword, changePassword.NewPasswordConfirmation, changePassword.CurrentPassword);
+                await UserRepository.ChangePassword(_connection, changePassword.Id, changePassword.NewPassword, changePassword.NewPasswordConfirmation, changePassword.CurrentPassword).AsNoContext();
 
                 return Ok();
             }

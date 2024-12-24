@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
@@ -24,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collections = await CollectionRepository.GetList(_connection);
+                var collections = await CollectionRepository.GetList(_connection).AsNoContext();
 
                 return Ok(collections);
             }
@@ -42,7 +43,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collections = await CollectionRepository.GetList(_connection, false);
+                var collections = await CollectionRepository.GetList(_connection, false).AsNoContext();
 
                 return Ok(collections);
             }
@@ -60,7 +61,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collections = await CollectionRepository.Get(_connection, id);
+                var collections = await CollectionRepository.Get(_connection, id).AsNoContext();
 
                 return Ok(collections);
             }
@@ -78,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var collection = await CollectionRepository.GetOpenedCollection(_connection);
+                var collection = await CollectionRepository.GetOpenedCollection(_connection).AsNoContext();
 
                 return Ok(collection);
             }
@@ -96,7 +97,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var id = await CollectionRepository.Insert(_connection, collection);
+                var id = await CollectionRepository.Insert(_connection, collection).AsNoContext();
                 
                 return Ok(id);
             }
@@ -114,7 +115,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var sucess = await CollectionRepository.Delete(_connection, id);
+                var sucess = await CollectionRepository.Delete(_connection, id).AsNoContext();
 
                 return Ok(sucess);
             }
@@ -136,13 +137,13 @@ namespace PortalDoFranqueadoAPI.Controllers
 
                 if (collectionStatus == CollectionStatus.Opened)
                 {
-                    var hasOpened = await CollectionRepository.HasOpenedCollection(_connection);
+                    var hasOpened = await CollectionRepository.HasOpenedCollection(_connection).AsNoContext();
 
                     if (hasOpened)
                         return BadRequest(new { message = "Já existe um período de compras aberto." });
                 }
 
-                await CollectionRepository.ChangeStatus(_connection, id, collectionStatus);
+                await CollectionRepository.ChangeStatus(_connection, id, collectionStatus).AsNoContext();
 
                 return Ok();
             }
@@ -160,7 +161,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                await CollectionRepository.Update(_connection, collection);
+                await CollectionRepository.Update(_connection, collection).AsNoContext();
 
                 return Ok();
             }
