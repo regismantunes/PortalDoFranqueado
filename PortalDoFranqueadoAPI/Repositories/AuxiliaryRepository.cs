@@ -18,9 +18,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT FileId" +
-                                                " FROM Auxiliary_File" +
-                                                " WHERE AuxiliaryId = @id", connection);
+                using var cmd = new SqlCommand( """
+                                                SELECT FileId
+                                                FROM Auxiliary_File
+                                                WHERE AuxiliaryId = @id
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@id", id);
 

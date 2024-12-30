@@ -142,14 +142,14 @@ namespace PortalDoFranqueado.ViewModel
 
                     if (_id == null)
                     {
-                        _supplier.Id = await API.ApiSupplier.Insert(_supplier);
+                        _supplier.Id = await Api.ApiSupplier.Insert(_supplier);
                         _id = _supplier.Id;
                         CancelEdit();
                         AfterInsert?.Invoke(this, EventArgs.Empty);
                     }
                     else
                     {
-                        await API.ApiSupplier.Update(_supplier);
+                        await Api.ApiSupplier.Update(_supplier);
                         CancelEdit();
                         AfterUpdate?.Invoke(this, EventArgs.Empty);
                     }
@@ -173,7 +173,7 @@ namespace PortalDoFranqueado.ViewModel
                         return;
                     }
 
-                    if (await API.ApiSupplier.Delete(_supplier.Id))
+                    if (await Api.ApiSupplier.Delete(_supplier.Id))
                         AfterDelete?.Invoke(this, EventArgs.Empty);
                 }
                 catch (Exception ex)
@@ -280,7 +280,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                var suppliers = await API.ApiSupplier.GetSuppliers(false);
+                var suppliers = await Api.ApiSupplier.GetSuppliers(false);
                 Suppliers.Clear();
 
                 suppliers.ToList()

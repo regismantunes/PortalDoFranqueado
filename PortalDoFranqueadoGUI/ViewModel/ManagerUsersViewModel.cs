@@ -206,14 +206,14 @@ namespace PortalDoFranqueado.ViewModel
 
                     if (_id == null)
                     {
-                        _user.Id = await API.ApiAccount.Insert(_user);
+                        _user.Id = await Api.ApiAccount.Insert(_user);
                         _id = _user.Id;
                         CancelEdit();
                         AfterInsert?.Invoke(this, EventArgs.Empty);
                     }
                     else
                     {
-                        await API.ApiAccount.Update(_user);
+                        await Api.ApiAccount.Update(_user);
                         CancelEdit();
                         AfterUpdate?.Invoke(this, EventArgs.Empty);
                     }
@@ -237,7 +237,7 @@ namespace PortalDoFranqueado.ViewModel
                         return;
                     }
 
-                    if (await API.ApiAccount.Delete(_user.Id))
+                    if (await Api.ApiAccount.Delete(_user.Id))
                         AfterDelete?.Invoke(this, EventArgs.Empty);
                 }
                 catch (Exception ex)
@@ -259,7 +259,7 @@ namespace PortalDoFranqueado.ViewModel
                         return;
                     }
 
-                    var resetCode = await API.ApiAccount.ResetPassword(_user.Id);
+                    var resetCode = await Api.ApiAccount.ResetPassword(_user.Id);
                     MessageBox.Show(Window, $"A senha do usuário {_email} foi resetada!{Environment.NewLine}" +
                                             $"O código para reativação é: {resetCode}", "BRTHERS - Resetar senha", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -369,7 +369,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                var users = await API.ApiAccount.GetUsers();
+                var users = await Api.ApiAccount.GetUsers();
                 Users.Clear();
 
                 users.ToList()

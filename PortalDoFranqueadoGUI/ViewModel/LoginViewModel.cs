@@ -108,7 +108,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private async Task ValidateConnection(string currentVersion)
         {
-            var connectionValidateInto = await API.ApiMainScreen.ValidateConnection(currentVersion);
+            var connectionValidateInto = await Api.ApiMainScreen.ValidateConnection(currentVersion);
 
             EnableContent();
 
@@ -172,7 +172,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 try
                 {
-                    await API.ApiAccount.Login(EmailLogin, password);
+                    await Api.ApiAccount.Login(EmailLogin, password);
                     _persistCache.LastUserName = EmailLogin;
                     _persistCache.SaveAsync();
                 }

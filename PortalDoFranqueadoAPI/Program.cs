@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using PortalDoFranqueadoAPI.Middleware;
+using System;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -13,21 +15,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddControllers();
 //builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(builder.Configuration["ConnectionStrings:Default"]));
-builder.Services.AddTransient<SqlConnection>(_ => new SqlConnection(
-#if DEBUG
-    builder.Configuration.GetConnectionString("Default")
-#else
-    Environment.GetEnvironmentVariable("SQLAZURECONNSTR_Default")
-#endif
-    ));
 
-var key = Encoding.ASCII.GetBytes(
 #if DEBUG
-    builder.Configuration["AppSettings:SecretToken"]
+var sqlConnection = builder.Configuration.GetConnectionString("Default");
+var secretToken = builder.Configuration["AppSettings:SecretToken"];
 #else
-    Environment.GetEnvironmentVariable("APPSETTING_SecretToken")
+var sqlConnection = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_Default");
+var secretToken = Environment.GetEnvironmentVariable("APPSETTING_SecretToken");
 #endif
-    );
+
+if (string.IsNullOrEmpty(sqlConnection))
+    throw new InvalidOperationException("Não foi possível obter a string de conexão do banco de dados.");
+
+if (string.IsNullOrEmpty(secretToken))
+    throw new InvalidOperationException("Não foi possível obter o token de segurança.");
+
+builder.Services.AddTransient(_ => new SqlConnection(sqlConnection));
+
+var key = Encoding.ASCII.GetBytes(secretToken);
 builder.Services.AddAuthentication(x =>
     {
         x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -67,5 +72,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Run();

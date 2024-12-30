@@ -287,7 +287,7 @@ namespace PortalDoFranqueado.ViewModel
                                 ContentType = mimeType
                             };
 
-                            var id = await API.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
+                            var id = await Api.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
 
                             myFile.Id = id[0];
                             var file = new FileView(myFile);
@@ -299,7 +299,7 @@ namespace PortalDoFranqueado.ViewModel
                             });
 
                             var bytes = File.ReadAllBytes(selectedFile);
-                            await API.ApiFile.UploadFile(myFile, bytes);
+                            await Api.ApiFile.UploadFile(myFile, bytes);
                         }
                     });
                 }
@@ -327,7 +327,7 @@ namespace PortalDoFranqueado.ViewModel
                 _collection.StartDate = CollectionStartDate;
                 _collection.EndDate = CollectionEndDate;
 
-                await API.ApiCollection.Update(_collection);
+                await Api.ApiCollection.Update(_collection);
             }
             catch (Exception ex)
             {
@@ -366,10 +366,10 @@ namespace PortalDoFranqueado.ViewModel
                     product.SupplierId = null;
 
                 if (productVM.Id.HasValue)
-                    await API.ApiProduct.Update(product);
+                    await Api.ApiProduct.Update(product);
                 else
                 {
-                    var id = await API.ApiProduct.Insert(_collection.Id, product);
+                    var id = await Api.ApiProduct.Insert(_collection.Id, product);
                     productVM.Id = id;
                 }
 
@@ -401,9 +401,9 @@ namespace PortalDoFranqueado.ViewModel
                 DesableContent();
 
                 if (produto.Id.HasValue)
-                    await API.ApiProduct.Delete(produto.Id.Value);
+                    await Api.ApiProduct.Delete(produto.Id.Value);
                 else if (produto.FileView.Id != 0)
-                    await API.ApiFile.Delete(produto.FileView.Id);
+                    await Api.ApiFile.Delete(produto.FileView.Id);
 
                 Products.Remove(produto);
 
@@ -433,7 +433,7 @@ namespace PortalDoFranqueado.ViewModel
                 ItemsEnabled = false;
 
                 Legendable?.SendMessage("Preparando ambiente...");
-                var myFiles = await API.ApiFile.GetFromCollection(_collection.Id);
+                var myFiles = await Api.ApiFile.GetFromCollection(_collection.Id);
 
                 var files = myFiles.Select(f => new FileView(f)).ToList();
 
@@ -445,7 +445,7 @@ namespace PortalDoFranqueado.ViewModel
                 });
 
                 Legendable?.SendMessage("Carregando produtos...");
-                var products = await API.ApiProduct.Get(_collection.Id);
+                var products = await Api.ApiProduct.Get(_collection.Id);
 
                 Legendable?.SendMessage("Carregando famílias...");
                 var cache = (TemporaryLocalRepository)App.Current.Resources["TempCache"];

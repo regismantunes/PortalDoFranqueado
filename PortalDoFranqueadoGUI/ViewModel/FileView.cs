@@ -112,7 +112,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private async Task UpdateContentDataAsync()
         {
-            var tempFile = await API.ApiFile.DownloadFile(this);
+            var tempFile = await Api.ApiFile.DownloadFile(this);
 
             if (tempFile != null &&
                 !string.IsNullOrEmpty(FilePath))

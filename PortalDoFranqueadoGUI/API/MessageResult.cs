@@ -1,4 +1,4 @@
-﻿namespace PortalDoFranqueado.API
+﻿namespace PortalDoFranqueado.Api
 {
     internal class MessageResult
     {

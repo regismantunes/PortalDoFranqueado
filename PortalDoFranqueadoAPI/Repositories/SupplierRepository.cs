@@ -19,8 +19,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT * FROM Supplier" +
-                                (onlyActives ? " WHERE Active = 1" : string.Empty), connection);
+                using var cmd = new SqlCommand( $"""
+                                                SELECT * FROM Supplier
+                                                {(onlyActives ? " WHERE Active = 1" : string.Empty)}
+                                                """, connection);
 
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
@@ -50,7 +52,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT * FROM Supplier WHERE Id = @Id", connection);
+                using var cmd = new SqlCommand( """
+                                                SELECT *
+                                                FROM Supplier
+                                                WHERE Id = @Id
+                                                """, connection);
                 cmd.Parameters.AddWithValue("@Id", id);
 
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
@@ -80,9 +86,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("INSERT INTO Supplier (Name, Active)" +
-                                            " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Name, @Active);", connection);
+                using var cmd = new SqlCommand( """
+                                                INSERT INTO Supplier (Name, Active)
+                                                OUTPUT INSERTED.Id
+                                                VALUES (@Name, @Active);
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Name", supplier.Name);
                 cmd.Parameters.AddWithValue("@Active", 1);
@@ -108,7 +116,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("DELETE FROM Supplier WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand( """
+                                                DELETE FROM Supplier
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -129,10 +140,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("UPDATE Supplier" +
-                                                " SET Name = @Name" +
-                                                    ", Active = @Active" +
-                                                " WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand("""
+                                                UPDATE Supplier
+                                                    SET Name = @Name
+                                                    ,   Active = @Active
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Name", supplier.Name);
                 cmd.Parameters.AddWithValue("@Active", supplier.Active);

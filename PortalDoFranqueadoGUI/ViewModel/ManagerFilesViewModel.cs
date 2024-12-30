@@ -37,7 +37,7 @@ namespace PortalDoFranqueado.ViewModel
             _id = id;
             TitleMessage = title;
             Files = new ObservableCollection<FileView>();
-            VisibilityChangeButtons = API.Configuration.Current.Session.User.Role == UserRole.Manager ? Visibility.Visible : Visibility.Collapsed;
+            VisibilityChangeButtons = Api.Configuration.Current.Session.User.Role == UserRole.Manager ? Visibility.Visible : Visibility.Collapsed;
             
             LoadedCommand = new RelayCommand(async() => await LoadFiles());
             AddFilesCommand = new RelayCommand(AddFiles);
@@ -57,8 +57,8 @@ namespace PortalDoFranqueado.ViewModel
 
                 Legendable?.SendMessage("Carregando arquivos...");
                 var myFiles = _ownerType == FileOwner.Auxiliary ?
-                    await API.ApiFile.GetFromAuxiliary(_id) :
-                    await API.ApiFile.GetFromCampaign(_id);
+                    await Api.ApiFile.GetFromAuxiliary(_id) :
+                    await Api.ApiFile.GetFromCampaign(_id);
 
                 if (myFiles.Length == 0)
                     Legendable?.SendMessage(string.Empty);
@@ -282,8 +282,8 @@ namespace PortalDoFranqueado.ViewModel
                         {
                             Legendable?.SendMessage($"Preparando ambiente para salvar {insertedFiles.Length} arquivos...");
                             var ids = _ownerType == FileOwner.Auxiliary ?
-                                await API.ApiFile.InsertAuxiliaryFiles(_id, insertedFiles) :
-                                await API.ApiFile.InsertCampaignFiles(_id, insertedFiles);
+                                await Api.ApiFile.InsertAuxiliaryFiles(_id, insertedFiles) :
+                                await Api.ApiFile.InsertCampaignFiles(_id, insertedFiles);
 
                             for (var i = 0; i < ids.Length; i++)
                             {
@@ -292,7 +292,7 @@ namespace PortalDoFranqueado.ViewModel
                                 var file = fileView.Clone();
                                 file.Id = ids[i];
                                 var bytes = File.ReadAllBytes(fileView.FilePath);
-                                await API.ApiFile.UploadFile(file, bytes);
+                                await Api.ApiFile.UploadFile(file, bytes);
 
                                 fileView.Id = file.Id;
                             }
@@ -312,7 +312,7 @@ namespace PortalDoFranqueado.ViewModel
                             {
                                 var removedFile = removedIds[i];
                                 Legendable?.SendMessage($"Excluindo arquivos ({i + 1} de {removedFiles.Count()})...");
-                                await API.ApiFile.Delete(removedFile.Id);
+                                await Api.ApiFile.Delete(removedFile.Id);
                                 Me?.Dispatcher.BeginInvoke(() => Files.Remove(removedFile));
                             }
                         }

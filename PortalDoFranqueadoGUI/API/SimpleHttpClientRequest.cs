@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueado.API
+namespace PortalDoFranqueado.Api
 {
     public class SimpleHttpClientRequest
     {
@@ -40,14 +40,14 @@ namespace PortalDoFranqueado.API
 
         public static async Task Delete(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var response = await client.DeleteAsync(requestUri);
             await GetResult(response);
         }
 
         public static async Task Delete<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var request = new HttpRequestMessage(HttpMethod.Delete, requestUri)
             {
                 Content = new StringContent(JsonSerializer.Serialize(value), Encoding.UTF8, "application/json")
@@ -59,14 +59,14 @@ namespace PortalDoFranqueado.API
 
         public static async Task Get(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var response = await client.GetAsync(requestUri);
             await GetResult(response);
         }
 
         public static async Task<string> GetFile(string? requestUri, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateHttpClient(bearerToken);
             using var response = await client.GetAsync(requestUri);
 
             var contentStream = await response.Content.ReadAsStreamAsync();
@@ -80,7 +80,7 @@ namespace PortalDoFranqueado.API
 
         public static async Task Patch<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var response = await client.PatchAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
@@ -88,7 +88,7 @@ namespace PortalDoFranqueado.API
 
         public static async Task Post<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var response = await client.PostAsync(requestUri, new StringContent(
                     JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
@@ -96,7 +96,7 @@ namespace PortalDoFranqueado.API
 
         public static async Task Put<TValue>(string? requestUri, TValue value, string? bearerToken = null)
         {
-            using var client = CreateJsonHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateJsonHttpClient(bearerToken);
             var response = await client.PutAsync(requestUri, new StringContent(
                         JsonSerializer.Serialize(value), Encoding.UTF8, "application/json"));
             await GetResult(response);
@@ -104,7 +104,7 @@ namespace PortalDoFranqueado.API
 
         public static async Task PostFile(string? requestUri, byte[] bytes, string contentType, string name, string fileName, string? bearerToken = null)
         {
-            using var client = CreateHttpClient(bearerToken);
+            using var client = HttpClientRequestHelper.CreateHttpClient(bearerToken);
             
             var multpartContent = new MultipartFormDataContent();
             var content = new ByteArrayContent(bytes);
@@ -114,29 +114,6 @@ namespace PortalDoFranqueado.API
 
             var response = await client.PostAsync(requestUri, multpartContent);
             await GetResult(response);
-        }
-
-        private static HttpClient CreateHttpClient(string? bearerToken)
-        {
-            var client = new HttpClient()
-            {
-                Timeout = new TimeSpan(0, 10, 0)
-            };
-
-            if (!string.IsNullOrEmpty(bearerToken))
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
-
-            return client;
-        }
-
-        private static HttpClient CreateJsonHttpClient(string? bearerToken)
-        {
-            var client = CreateHttpClient(bearerToken);
-
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            return client;
         }
 
         public static async Task GetResult(HttpResponseMessage response)

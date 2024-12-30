@@ -28,15 +28,17 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT Id" +
-                                                ", CreatedDate" +
-                                                ", [Name]" +
-                                                ", Size" +
-                                                ", Extension" +
-                                                ", CompressionType" +
-                                                ", ContentType" +
-                                            " FROM [File]" +
-                                            " WHERE Id = @Id", connection);
+                using var cmd = new SqlCommand( """
+                                                SELECT  Id
+                                                    ,   CreatedDate
+                                                    ,   [Name]
+                                                    ,   Size
+                                                    ,   Extension
+                                                    ,   CompressionType
+                                                    ,   ContentType
+                                                FROM [File]
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@id", id);
 

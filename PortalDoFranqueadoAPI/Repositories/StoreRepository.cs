@@ -19,11 +19,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT Store.*" +
-                                            " FROM Store" +
-                                                " INNER JOIN User_Store" +
-                                                    " ON Store.Id = User_Store.StoreId" +
-                                            " WHERE User_Store.UserId = @UserId;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT Store.*
+                                            FROM Store
+                                                INNER JOIN User_Store
+                                                    ON Store.Id = User_Store.StoreId
+                                            WHERE User_Store.UserId = @UserId;
+                                            """, connection);
                 cmd.Parameters.AddWithValue("@UserId", idUser);
 
                 var reader = await cmd.ExecuteReaderAsync().AsNoContext();
@@ -92,8 +94,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Store" +
-                                        " WHERE Id = @Id;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM Store
+                                            WHERE Id = @Id;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -124,9 +129,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("INSERT INTO Store (Name, DocumentNumber)" +
-                                            " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Name, @DocumentNumber);", connection);
+                using var cmd = new SqlCommand( """
+                                                INSERT INTO Store (Name, DocumentNumber)
+                                                OUTPUT INSERTED.Id
+                                                VALUES (@Name, @DocumentNumber);
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Name", store.Name);
                 cmd.Parameters.AddWithValue("@DocumentNumber", store.DocumentNumber);
@@ -152,7 +159,10 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("DELETE FROM Store WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand( """
+                                                DELETE FROM Store
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -173,10 +183,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("UPDATE Store" +
-                                                " SET Name = @Name" +
-                                                    ", DocumentNumber = @DocumentNumber" +
-                                                " WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand( """
+                                                UPDATE Store
+                                                    SET Name = @Name
+                                                    ,   DocumentNumber = @DocumentNumber
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Name", store.Name);
                 cmd.Parameters.AddWithValue("@DocumentNumber", store.DocumentNumber);

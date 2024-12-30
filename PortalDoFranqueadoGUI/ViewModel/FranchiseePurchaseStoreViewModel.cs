@@ -122,7 +122,7 @@ namespace PortalDoFranqueado.ViewModel
 
                     DesableContent();
 
-                    var purchase = await API.ApiPurchase.Get(_purchaseId.Value);
+                    var purchase = await Api.ApiPurchase.Get(_purchaseId.Value);
 
                     if(purchase == null)
                     {
@@ -163,7 +163,7 @@ namespace PortalDoFranqueado.ViewModel
                                    .ToArray()
                 };
 
-                var id = await API.ApiPurchase.Save(purchase);
+                var id = await Api.ApiPurchase.Save(purchase);
 
                 _purchaseId = id;
                 SaveIsEnabled = false;
@@ -302,7 +302,7 @@ namespace PortalDoFranqueado.ViewModel
                 if (_store != null)
                 {
                     Legendable?.SendMessage("Obtendo informações de compra...");
-                    Collection = await API.ApiCollection.GetOpened();
+                    Collection = await Api.ApiCollection.GetOpened();
                     OnPropertyChanged(nameof(Collection));
 
                     if (Collection == null)
@@ -313,19 +313,19 @@ namespace PortalDoFranqueado.ViewModel
                     }
 
                     Legendable?.SendMessage("Carregando produtos...");
-                    Collection.Products = await API.ApiProduct.Get(Collection.Id);
+                    Collection.Products = await Api.ApiProduct.Get(Collection.Id);
                     
                     if (Collection.Products.Length > 0)
                     {
                         emptyProducts = false;
 
                         Legendable?.SendMessage("Carregando informações salvas...");
-                        var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
+                        var purchase = await Api.ApiPurchase.Get(Collection.Id, _store.Id);
 
                         _purchaseId = purchase?.Id;
 
                         PurchaseSuggestion = _purchaseId.HasValue ?
-                            await API.ApiPurchaseSuggestion.GetByPurchaseId(_purchaseId.Value) : 
+                            await Api.ApiPurchaseSuggestion.GetByPurchaseId(_purchaseId.Value) : 
                             null;
 
                         ExportIsEnabled = _purchaseId.HasValue;
@@ -338,7 +338,7 @@ namespace PortalDoFranqueado.ViewModel
                             SetStatusClosed();
 
                         Legendable?.SendMessage("Carregando fotos...");
-                        var myFiles = await API.ApiFile.GetFromCollection(Collection.Id);
+                        var myFiles = await Api.ApiFile.GetFromCollection(Collection.Id);
 
                         var files = myFiles.Select(f => new FileView(f)).ToList();
                         

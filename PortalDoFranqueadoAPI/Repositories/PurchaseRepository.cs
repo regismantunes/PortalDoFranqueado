@@ -30,14 +30,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                 try
                 {
                     var command = newPurchase ?
-                                "INSERT INTO Purchase (StoreId, CollectionId, Status)" +
-                                    " OUTPUT INSERTED.Id" +
-                                    " VALUES (@StoreId, @CollectionId, @Status);" :
-                                "UPDATE Purchase" +
-                                    " SET StoreId = @StoreId" +
-                                        ", CollectionId = @CollectionId" +
-                                        ", Status = @Status" +
-                                    " WHERE Id = @Id;";
+                                """
+                                INSERT INTO Purchase (StoreId, CollectionId, Status)
+                                OUTPUT INSERTED.Id
+                                VALUES (@StoreId, @CollectionId, @Status);
+                                """ :
+                                """
+                                UPDATE Purchase
+                                    SET StoreId = @StoreId
+                                    ,   CollectionId = @CollectionId
+                                    ,   Status = @Status
+                                    WHERE Id = @Id;
+                                """;
 
                     using var cmd = new SqlCommand(command, connection, (SqlTransaction)transaction);
 
@@ -46,9 +50,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     cmd.Parameters.AddWithValue("@Status", (int)purchase.Status);
                     if (newPurchase)
                     {
-                        var dbid = (int?)await cmd.ExecuteScalarAsync().AsNoContext();
-                        if (dbid == null)
-                            throw new Exception(MessageRepositories.InsertFailException);
+                        var dbid = (int?)await cmd.ExecuteScalarAsync().AsNoContext()
+                            ?? throw new Exception(MessageRepositories.InsertFailException);
 
                         purchase.Id = Convert.ToInt32(dbid);
                     }
@@ -60,15 +63,19 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.UpdateFailException);
 
                         cmd.Parameters.Clear();
-                        cmd.CommandText = "DELETE FROM Purchase_Product" +
-                                        " WHERE PurchaseId = @PurchaseId;";
+                        cmd.CommandText =   """
+                                            DELETE FROM Purchase_Product
+                                            WHERE PurchaseId = @PurchaseId;
+                                            """;
                         cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
 
                         await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
 
-                    cmd.CommandText = "INSERT INTO Purchase_Product (PurchaseId, Item, ProductId, SizeId, Quantity)" +
-                                        " VALUES (@PurchaseId, @Item, @ProductId, @SizeId, @Quantity);";
+                    cmd.CommandText =   """
+                                        INSERT INTO Purchase_Product (PurchaseId, Item, ProductId, SizeId, Quantity)
+                                        VALUES (@PurchaseId, @Item, @ProductId, @SizeId, @Quantity);
+                                        """;
 
                     var count = 0;
                     foreach(var item in purchase.Items.Where(i => i.Quantity > 0))
@@ -110,8 +117,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Purchase" +
-                                        " WHERE Id = @Id;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM Purchase
+                                            WHERE Id = @Id;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", purchaseId);
 
@@ -157,14 +167,17 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand("SELECT pp.*, fs.[Order]" +
-                                            " FROM Purchase_Product AS pp" +
-                                                " INNER JOIN Product AS p" +
-                                                    " ON p.Id = pp.ProductId" +
-                                                " INNER JOIN Family_Size AS fs" +
-                                                    " ON fs.FamilyId = p.FamilyId" +
-                                                    " AND fs.SizeId = pp.SizeId" +
-                                            " WHERE PurchaseId = @PurchaseId;", connection);
+                using var cmd = new SqlCommand( """
+                                                SELECT pp.*
+                                                    ,   fs.[Order]
+                                                FROM Purchase_Product AS pp
+                                                    INNER JOIN Product AS p
+                                                        ON p.Id = pp.ProductId
+                                                    INNER JOIN Family_Size AS fs
+                                                        ON fs.FamilyId = p.FamilyId
+                                                        AND fs.SizeId = pp.SizeId
+                                                WHERE PurchaseId = @PurchaseId;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseId", purchase.Id);
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
@@ -204,9 +217,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Purchase" +
-                                        " WHERE CollectionId = @CollectionId" +
-                                            " AND StoreId = @StoreId;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM Purchase
+                                            WHERE   CollectionId = @CollectionId
+                                                AND StoreId = @StoreId;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
                 cmd.Parameters.AddWithValue("@StoreId", storeId);
@@ -240,8 +256,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Purchase" +
-                                        " WHERE CollectionId = @CollectionId;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM Purchase
+                                            WHERE CollectionId = @CollectionId;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
 
@@ -272,9 +291,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT Id FROM Purchase" +
-                                            " WHERE CollectionId = @CollectionId" +
-                                                " AND Status = 0;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT Id
+                                            FROM Purchase
+                                            WHERE CollectionId = @CollectionId
+                                                AND Status = 0;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@CollectionId", collectionId);
 
@@ -295,9 +317,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("UPDATE Purchase" +
-                                                " SET Status = 0" +
-                                                " WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand( """
+                                                UPDATE Purchase
+                                                    SET Status = 0
+                                                WHERE Id = @Id;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", purchaseId);
 

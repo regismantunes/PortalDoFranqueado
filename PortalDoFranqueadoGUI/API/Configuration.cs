@@ -3,7 +3,7 @@ using PortalDoFranqueado.Model;
 using System;
 using System.IO;
 
-namespace PortalDoFranqueado.API
+namespace PortalDoFranqueado.Api
 {
     public class Configuration
     {

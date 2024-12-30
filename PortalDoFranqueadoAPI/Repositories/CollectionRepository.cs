@@ -19,9 +19,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT EndDate FROM [Collection]" +
-                                                " WHERE Excluded = 0" +
-                                                    " AND Status = 1", connection);
+                using var cmd = new SqlCommand("""
+                                                SELECT EndDate
+                                                FROM [Collection]
+                                                WHERE Excluded = 0
+                                                    AND Status = 1
+                                                """, connection);
 
                 var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
@@ -38,10 +41,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                     await reader.CloseAsync().AsNoContext();
 
                     cmd.Parameters.Clear();
-                    cmd.CommandText = "SELECT MIN(StartDate) AS NextDate" +
-                                    " FROM [Collection]" +
-                                    " WHERE Excluded = 0" +
-                                        " AND StartDate >= @dataAtual;";
+                    cmd.CommandText =   """
+                                        SELECT MIN(StartDate) AS NextDate
+                                        FROM [Collection]
+                                        WHERE Excluded = 0
+                                            AND StartDate >= @dataAtual;
+                                        """;
                     cmd.Parameters.AddWithValue("@dataAtual", DateTime.Now);
 
                     reader = await cmd.ExecuteReaderAsync().AsNoContext();
@@ -76,9 +81,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM [Collection]" +
-                                            " WHERE Excluded = 0" +
-                                (onlyActives ? " AND Status IN (0,1);" : string.Empty), connection);
+                var cmd = new SqlCommand(   $"""
+                                            SELECT * FROM [Collection]
+                                            WHERE Excluded = 0
+                                            {(onlyActives ? " AND Status IN (0,1);" : string.Empty)}
+                                            """, connection);
 
                 var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
@@ -103,9 +110,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM [Collection]" +
-                                            " WHERE Excluded = 0" +
-                                                " AND Id = @Id;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT * FROM [Collection]
+                                            WHERE Excluded = 0
+                                                AND Id = @Id;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -131,9 +140,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT Id FROM [Collection]" +
-                                            " WHERE Excluded = 0" +
-                                                " AND Status = 1;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT Id
+                                            FROM [Collection]
+                                            WHERE Excluded = 0
+                                                AND Status = 1;
+                                            """, connection);
 
                 return await cmd.ExecuteScalarAsync().AsNoContext() != null;
             }
@@ -152,9 +164,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM [Collection]" +
-                                            " WHERE Excluded = 0" +
-                                                " AND Status = 1;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM [Collection]
+                                            WHERE Excluded = 0
+                                                AND Status = 1;
+                                            """, connection);
 
                 var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
@@ -191,10 +206,12 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    using var cmd = new SqlCommand("SELECT [Status]" +
-                                                    " FROM [Collection]" +
-                                                    " WHERE Excluded = 0" +
-                                                        " AND Id = @Id;", connection, (SqlTransaction)transaction);
+                    using var cmd = new SqlCommand("""
+                                                    SELECT [Status]
+                                                    FROM [Collection]
+                                                    WHERE Excluded = 0
+                                                        AND Id = @Id;
+                                                    """, connection, (SqlTransaction)transaction);
 
                     cmd.Parameters.AddWithValue("@Id", id);
 
@@ -203,10 +220,12 @@ namespace PortalDoFranqueadoAPI.Repositories
                     if (previusStatus == null)
                         throw new Exception(MessageRepositories.UpdateFailException);
 
-                    cmd.CommandText = "UPDATE [Collection]" +
-                                        $" SET [Status] = {(int)status}" +
-                                        " WHERE Excluded = 0" +
-                                            " AND Id = @Id;";
+                    cmd.CommandText =   $"""
+                                        UPDATE [Collection]
+                                            SET [Status] = {(int)status}
+                                        WHERE Excluded = 0
+                                            AND Id = @Id;
+                                        """;
 
                     if (await cmd.ExecuteNonQueryAsync() == 0)
                         throw new Exception(MessageRepositories.UpdateFailException);
@@ -216,9 +235,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                                                            null);
                     if (purchaseStatus != null)
                     {
-                        cmd.CommandText = "UPDATE Purchase" +
-                                            $" SET [Status] = {(int)purchaseStatus}" +
-                                            " WHERE CollectionId = @Id;";
+                        cmd.CommandText =   $"""
+                                            UPDATE Purchase
+                                                SET [Status] = {(int)purchaseStatus}
+                                            WHERE CollectionId = @Id;
+                                            """;
 
                         await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
@@ -245,10 +266,12 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
-
-                var cmd = new SqlCommand("INSERT INTO Collection (StartDate, EndDate, Status, Excluded)" +
-                                            " OUTPUT INSERTED.Id" +
-                                            " VALUES (@StartDate, @EndDate, @Status, 0);", connection);
+                
+                var cmd = new SqlCommand(   """
+                                            INSERT INTO Collection (StartDate, EndDate, Status, Excluded)
+                                            OUTPUT INSERTED.Id
+                                            VALUES (@StartDate, @EndDate, @Status, 0);
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@StartDate", collection.StartDate);
                 cmd.Parameters.AddWithValue("@EndDate", collection.EndDate);
@@ -275,9 +298,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE Collection" +
-                                            " SET Excluded = 1" +
-                                            " WHERE Id = @Id;", connection);
+                var cmd = new SqlCommand(   """
+                                            UPDATE Collection
+                                                SET Excluded = 1
+                                            WHERE Id = @Id;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -298,11 +323,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("UPDATE Collection" +
-                                            " SET StartDate = @StartDate" +
-                                                ", EndDate = @EndDate" +
-                                            " WHERE Excluded = 0" +
-                                                " AND Id = @Id;", connection);
+                var cmd = new SqlCommand(   """
+                                            UPDATE Collection
+                                                SET StartDate = @StartDate
+                                                ,   EndDate = @EndDate
+                                            WHERE   Excluded = 0
+                                                AND Id = @Id;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@Id", colecao.Id);
                 cmd.Parameters.AddWithValue("@StartDate", colecao.StartDate);

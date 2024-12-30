@@ -51,12 +51,12 @@ namespace PortalDoFranqueado.ViewModel
                 OnPropertyChanged(nameof(Store));
 
                 Legendable?.SendMessage("Carregando produtos...");
-                var products = (await API.ApiProduct.Get(Purchase.CollectionId))
+                var products = (await Api.ApiProduct.Get(Purchase.CollectionId))
                                                     .Where(p => Purchase.Items.Any(i => i.ProductId == p.Id))
                                                     .ToList();
 
                 Legendable?.SendMessage("Carregando fotos...");
-                var myFiles = await API.ApiFile.GetFromCollection(Purchase.CollectionId);
+                var myFiles = await Api.ApiFile.GetFromCollection(Purchase.CollectionId);
 
                 var files = myFiles.Select(f => new FileView(f)).ToList();
 

@@ -76,7 +76,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             _controls = new Stack<ContentControl>();
 
-            API.Configuration.Current.SessionChanged += SessionChanged;
+            Api.Configuration.Current.SessionChanged += SessionChanged;
 
             ChangeCurrentView();
 
@@ -93,7 +93,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private void Logout()
         {
-            API.Configuration.Current.DisconectSession();
+            Api.Configuration.Current.DisconectSession();
         }
 
         private void ChangePassword()
@@ -151,7 +151,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private void SessionChanged(object? sender, EventArgs e)
         {
-            VisibilityLogout = API.Configuration.Current.Session == null ? Visibility.Hidden : Visibility.Visible;
+            VisibilityLogout = Api.Configuration.Current.Session == null ? Visibility.Hidden : Visibility.Visible;
             VisibilityChagePassword = VisibilityLogout;
             ChangeCurrentView();
         }
@@ -165,9 +165,9 @@ namespace PortalDoFranqueado.ViewModel
         private void ChangeCurrentView()
         {
             _controls.Clear();
-            CurrentViewControl = API.Configuration.Current.Session == null ? new Login() :
-                                 API.Configuration.Current.Session.ResetPassword ? new ChangePassword() :
-                                 API.Configuration.Current.Session.User.Role == UserRole.Manager ? new MainManager() : 
+            CurrentViewControl = Api.Configuration.Current.Session == null ? new Login() :
+                                 Api.Configuration.Current.Session.ResetPassword ? new ChangePassword() :
+                                 Api.Configuration.Current.Session.User.Role == UserRole.Manager ? new MainManager() : 
                                                                                                    new MainFranchisee();
         }
 

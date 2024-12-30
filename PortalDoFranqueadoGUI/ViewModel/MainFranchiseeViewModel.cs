@@ -85,7 +85,7 @@ namespace PortalDoFranqueado.ViewModel
 
             MaxWidthInformativeText = 0;
 
-            API.Configuration.Current.SessionConnected += SessionConnected;
+            Api.Configuration.Current.SessionConnected += SessionConnected;
 
             LoadedCommand = new RelayCommand(() =>
             {
@@ -147,7 +147,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliaryPhotoId.Value, "FOTOS E VÍDEOS"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, Api.Configuration.Current.Session.AuxiliaryPhotoId.Value, "FOTOS E VÍDEOS"));
             }
             finally
             {
@@ -181,7 +181,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, API.Configuration.Current.Session.AuxiliarySupportId.Value, "MATERIAL DE APOIO"));
+                Navigator.NavigateTo(new ManagerFiles(FileOwner.Auxiliary, Api.Configuration.Current.Session.AuxiliarySupportId.Value, "MATERIAL DE APOIO"));
             }
             finally
             {
@@ -258,7 +258,7 @@ namespace PortalDoFranqueado.ViewModel
 
         private void UpdateSessionInformations()
         {
-            _user = API.Configuration.Current.Session?.User;
+            _user = Api.Configuration.Current.Session?.User;
 
             WellcomeMessage = _user == null ? string.Empty : $"SEJA BEM VINDO {(!string.IsNullOrEmpty(_user.Treatment) ? _user.Treatment.ToUpper() + ' ' : string.Empty)} {_user.Name.ToUpper()}";
 
@@ -269,13 +269,13 @@ namespace PortalDoFranqueado.ViewModel
 
         private async void UpdateInformative()
         {
-            if (API.Configuration.Current.Session != null)
+            if (Api.Configuration.Current.Session != null)
             {
                 try
                 {
                     DesableContent();
 
-                    var mainInfos = await API.ApiMainScreen.GetInfos();
+                    var mainInfos = await Api.ApiMainScreen.GetInfos();
 
                     InformativeTitle = mainInfos.InformativeTitle;
                     InformativeText = mainInfos.InformativeText;

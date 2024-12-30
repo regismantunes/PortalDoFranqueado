@@ -149,14 +149,14 @@ namespace PortalDoFranqueado.ViewModel
 
                     if (_id == null)
                     {
-                        _store.Id = await API.ApiStore.Insert(_store);
+                        _store.Id = await Api.ApiStore.Insert(_store);
                         _id = _store.Id;
                         CancelEdit();
                         AfterInsert?.Invoke(this, EventArgs.Empty);
                     }
                     else
                     {
-                        await API.ApiStore.Update(_store);
+                        await Api.ApiStore.Update(_store);
                         CancelEdit();
                         AfterUpdate?.Invoke(this, EventArgs.Empty);
                     }
@@ -180,7 +180,7 @@ namespace PortalDoFranqueado.ViewModel
                         return;
                     }
 
-                    if (await API.ApiStore.Delete(_store.Id))
+                    if (await Api.ApiStore.Delete(_store.Id))
                         AfterDelete?.Invoke(this, EventArgs.Empty);
                 }
                 catch (Exception ex)
@@ -287,7 +287,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                var stores = await API.ApiStore.GetStores();
+                var stores = await Api.ApiStore.GetStores();
                 Stores.Clear();
 
                 stores.ToList()

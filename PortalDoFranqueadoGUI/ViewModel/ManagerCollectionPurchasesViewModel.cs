@@ -73,7 +73,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                await API.ApiPurchase.Reverse(purchaseVM.Purchase.Id.Value);
+                await Api.ApiPurchase.Reverse(purchaseVM.Purchase.Id.Value);
 
                 purchaseVM.Status = PurchaseStatus.Opened;
                 purchaseVM.CanReverse = false;
@@ -90,15 +90,15 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                var purchases = await API.ApiPurchase.GetPurchases(Collection.Id);
+                var purchases = await Api.ApiPurchase.GetPurchases(Collection.Id);
 
                 if (purchases.Length > 0)
                 {
                     if (_cache.Stores.Count == 0)
-                        _cache.Stores = await API.ApiStore.GetStores();
+                        _cache.Stores = await Api.ApiStore.GetStores();
                     
                     var stores = _cache.Stores.ToArray();
-                    var products = await API.ApiProduct.Get(Collection.Id);
+                    var products = await Api.ApiProduct.Get(Collection.Id);
 
                     purchases.ToList()
                              .ForEach(purchase =>

@@ -66,7 +66,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 Campaigns.Clear();
 
-                var campaigns = await API.ApiCampaign.GetCampaigns();
+                var campaigns = await Api.ApiCampaign.GetCampaigns();
 
                 foreach (var campaign in campaigns)
                     AddCampaign(campaign);
@@ -101,7 +101,7 @@ namespace PortalDoFranqueado.ViewModel
                         Status = CampaignStatus.Holding
                     };
 
-                    campaign.Id = await API.ApiCampaign.Insert(campaign);
+                    campaign.Id = await Api.ApiCampaign.Insert(campaign);
 
                     AddCampaign(campaign);
 
@@ -179,7 +179,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                await API.ApiCampaign.ChangeStatus(campaignVM.Campaign.Id, status);
+                await Api.ApiCampaign.ChangeStatus(campaignVM.Campaign.Id, status);
 
                 campaignVM.Campaign.Status = status;
                 UpdateCampaign(campaignVM);
@@ -208,7 +208,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 if (MessageBox.Show(Me,"Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
                 {
-                    await API.ApiCampaign.Delete(campaignVM.Campaign.Id);
+                    await Api.ApiCampaign.Delete(campaignVM.Campaign.Id);
                     Campaigns.Remove(campaignVM);
                 }
             }

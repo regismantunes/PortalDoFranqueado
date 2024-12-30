@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace PortalDoFranqueado.API
+namespace PortalDoFranqueado.Api
 {
     public static class ApiPurchase
     {

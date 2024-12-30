@@ -9,8 +9,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public static class InformativeRepository
     {
-        private const string RecordNotFoundException = "Não foi encontrado registro de informativo no banco de dados.";
-
         public static async Task<Informative> Get(SqlConnection connection)
         {
             try
@@ -49,16 +47,21 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("UPDATE Informative" +
-                                                " SET Title = @Title" +
-                                                    ", Text = @Text", connection);
+                using var cmd = new SqlCommand( """
+                                                UPDATE Informative
+                                                    SET Title = @Title
+                                                    ,   Text = @Text
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Title", informative.Title);
                 cmd.Parameters.AddWithValue("@Text", informative.Text);
 
                 if (await cmd.ExecuteNonQueryAsync() == 0)
                 {
-                    cmd.CommandText = "INSERT INTO Informative (Title, Text) VALUES (@Title, @Text)";
+                    cmd.CommandText =   """
+                                        INSERT INTO Informative (Title, Text)
+                                        VALUES (@Title, @Text)
+                                        """;
                     await cmd.ExecuteNonQueryAsync().AsNoContext();
                 }
             }

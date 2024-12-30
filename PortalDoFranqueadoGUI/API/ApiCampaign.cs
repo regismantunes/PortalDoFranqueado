@@ -1,7 +1,7 @@
 ﻿using PortalDoFranqueado.Model;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueado.API
+namespace PortalDoFranqueado.Api
 {
     public static class ApiCampaign
     {

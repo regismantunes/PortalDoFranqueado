@@ -13,13 +13,10 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/account")]
     [ApiController]
-    public class AccountController : ControllerBase, IDisposable
+    public class AccountController(SqlConnection connection, IConfiguration configuration) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-        private readonly IConfiguration _configuration;
-
-        public AccountController(SqlConnection connection, IConfiguration configuration)
-            => (_connection, _configuration) = (connection, configuration);
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
         [HttpPost]
         [Route("login")]
@@ -27,14 +24,18 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             try
             {
-                var resetPasswordMaxAttempts = short.Parse(_configuration["AppSettings:ResetPasswordAttempts"]);
-                
+                if (!short.TryParse(_configuration["AppSettings:ResetPasswordAttempts"], out var resetPasswordMaxAttempts))
+                    throw new InvalidOperationException("Não foi possível obter as configurações de segurança para realizar a operação");
+
+                if (_configuration["AppSettings:SecretToken"] is not string secrityToken)
+                    throw new InvalidOperationException("Não foi possível obter as configurações de segurança para realizar a operação");
+
                 var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts).AsNoContext();
                 
                 if (user == null)
                     return BadRequest(new { message = "Usuário ou senha inválidos" });
                 
-                var authenticateData = TokenService.GerarTokenJwt(_configuration["AppSettings:SecretToken"], user);
+                var authenticateData = TokenService.GerarTokenJwt(secrityToken, user);
                 
                 user.Password = string.Empty;
                 
@@ -174,25 +175,5 @@ namespace PortalDoFranqueadoAPI.Controllers
         }
 
         ~AccountController() => Dispose();
-
-        /*[HttpGet]
-        [Route("anonymous")]
-        [AllowAnonymous]
-        public string Anonymous() => "Anônimo";
-
-        [HttpGet]
-        [Route("authenticated")]
-        [Authorize]
-        public string Authenticated() => String.Format("Autenticado - {0}", User.Identity.Name);
-
-        [HttpGet]
-        [Route("employee")]
-        [Authorize(Roles = "employee,manager")]
-        public string Employee() => "Funcionário";
-
-        [HttpGet]
-        [Route("manager")]
-        [Authorize(Roles = "Manager")]
-        public string Manager() => "Gerente";*/
     }
 }

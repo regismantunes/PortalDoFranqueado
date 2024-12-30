@@ -30,17 +30,32 @@ namespace PortalDoFranqueadoAPI.Repositories
                 try
                 {
                     var command = newPurchaseSuggestion ?
-                                "INSERT INTO Purchase_Suggestion (PurchaseId, Target, AverageTicket, PartsPerService, Coverage, TotalSuggestedItems)" +
-                                    " OUTPUT INSERTED.Id" +
-                                    " VALUES (@PurchaseId, @Target, @AverageTicket, @PartsPerService, @Coverage, @TotalSuggestedItems);" :
-                                "UPDATE Purchase_Suggestion" +
-                                    " SET PurchaseId = @PurchaseId" +
-                                        ", Target = @Target" +
-                                        ", AverageTicket = @AverageTicket" +
-                                        ", PartsPerService = @PartsPerService" +
-                                        ", Coverage = @Coverage" +
-                                        ", TotalSuggestedItems = @TotalSuggestedItems" +
-                                    " WHERE Id = @Id;";
+                                """
+                                INSERT INTO Purchase_Suggestion
+                                    (   PurchaseId
+                                    ,   Target
+                                    ,   AverageTicket
+                                    ,   PartsPerService
+                                    ,   Coverage
+                                    ,   TotalSuggestedItems)
+                                OUTPUT INSERTED.Id
+                                VALUES (@PurchaseId
+                                    ,   @Target
+                                    ,   @AverageTicket
+                                    ,   @PartsPerService
+                                    ,   @Coverage
+                                    ,   @TotalSuggestedItems);
+                                """ :
+                                """
+                                UPDATE Purchase_Suggestion
+                                    SET PurchaseId = @PurchaseId
+                                    ,   Target = @Target
+                                    ,   AverageTicket = @AverageTicket
+                                    ,   PartsPerService = @PartsPerService
+                                    ,   Coverage = @Coverage
+                                    ,   TotalSuggestedItems = @TotalSuggestedItems
+                                WHERE Id = @Id;
+                                """;
 
                     using var cmd = new SqlCommand(command, connection, (SqlTransaction)transaction);
 
@@ -64,16 +79,27 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.UpdateFailException);
 
                         cmd.Parameters.Clear();
-                        cmd.CommandText = "DELETE FROM Purchase_Suggestion_Family" +
-                                        " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;";
+                        cmd.CommandText = """
+                                            DELETE FROM Purchase_Suggestion_Family
+                                            WHERE PurchaseSuggestionId = @PurchaseSuggestionId;
+                                            """;
                         cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
 
                         await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
 
-                    cmd.CommandText = "INSERT INTO Purchase_Suggestion_Family (PurchaseSuggestionId, FamilyId, [Percentage], FamilySuggestedItems)" +
-                                        " OUTPUT INSERTED.Id" +
-                                        " VALUES (@PurchaseSuggestionId, @FamilyId, @Percentage, @FamilySuggestedItems);";
+                    cmd.CommandText =   """
+                                        INSERT INTO Purchase_Suggestion_Family
+                                            (   PurchaseSuggestionId
+                                            ,   FamilyId
+                                            ,   [Percentage]
+                                            ,   FamilySuggestedItems)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@PurchaseSuggestionId
+                                            ,   @FamilyId
+                                            ,   @Percentage
+                                            ,   @FamilySuggestedItems);
+                                        """;
 
                     foreach (var item in purchaseSuggestion.Families.Where(f => f.Percentage > 0))
                     {
@@ -90,8 +116,17 @@ namespace PortalDoFranqueadoAPI.Repositories
                                    .ForEach(s => s.PurchaseSuggestionFamilyId = item.Id);
                     }
 
-                    cmd.CommandText = "INSERT INTO Purchase_Suggestion_Family_Size (PurchaseSuggestionFamilyId, SizeId, [Percentage], SizeSuggestedItems)" +
-                                        " VALUES (@PurchaseSuggestionFamilyId, @SizeId, @Percentage, @SizeSuggestedItems);";
+                    cmd.CommandText =   """
+                                        INSERT INTO Purchase_Suggestion_Family_Size
+                                            (   PurchaseSuggestionFamilyId
+                                            ,   SizeId
+                                            ,   [Percentage]
+                                            ,   SizeSuggestedItems)
+                                        VALUES (@PurchaseSuggestionFamilyId
+                                            ,   @SizeId
+                                            ,   @Percentage
+                                            ,   @SizeSuggestedItems);
+                                        """;
 
                     foreach (var size in purchaseSuggestion.Families.Where(f => f.Sizes!= null)
                                                                    .SelectMany(f => f.Sizes.Where(s => s.Percentage > 0)))
@@ -131,8 +166,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("SELECT * FROM Purchase_Suggestion" +
-                                        " WHERE PurchaseId = @PurchaseId;", connection);
+                var cmd = new SqlCommand(   """
+                                            SELECT *
+                                            FROM Purchase_Suggestion
+                                            WHERE PurchaseId = @PurchaseId;
+                                            """, connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseId", purchaseId);
 
@@ -183,11 +221,14 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand("SELECT psf.*, f.Name AS FamilyName" +
-                                            " FROM Purchase_Suggestion_Family AS psf" +
-                                                " INNER JOIN Family AS f" +
-                                                    " ON f.Id = psf.FamilyId" +
-                                            " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;", connection);
+                using var cmd = new SqlCommand( """
+                                                SELECT  psf.*
+                                                    ,   f.Name AS FamilyName
+                                                FROM Purchase_Suggestion_Family AS psf
+                                                    INNER JOIN Family AS f
+                                                        ON f.Id = psf.FamilyId
+                                                WHERE PurchaseSuggestionId = @PurchaseSuggestionId;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
@@ -236,15 +277,18 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand("SELECT psfs.*, fs.[Order]" +
-                                            " FROM Purchase_Suggestion_Family AS psf" +
-                                                " INNER JOIN Purchase_Suggestion_Family_Size AS psfs" +
-                                                    " ON psfs.PurchaseSuggestionFamilyId = psf.Id" +
-                                                " INNER JOIN Family AS f" +
-                                                    " ON f.Id = psf.FamilyId" +
-                                                " INNER JOIN Family_Size AS fs" +
-                                                    " ON fs.SizeId = psfs.SizeId" +
-                                            " WHERE PurchaseSuggestionId = @PurchaseSuggestionId;", connection);
+                using var cmd = new SqlCommand("""
+                                                SELECT   psfs.*
+                                                ,       fs.[Order]
+                                                FROM Purchase_Suggestion_Family AS psf
+                                                    INNER JOIN Purchase_Suggestion_Family_Size AS psfs
+                                                        ON psfs.PurchaseSuggestionFamilyId = psf.Id
+                                                    INNER JOIN Family AS f
+                                                        ON f.Id = psf.FamilyId
+                                                    INNER JOIN Family_Size AS fs
+                                                        ON fs.SizeId = psfs.SizeId
+                                                WHERE PurchaseSuggestionId = @PurchaseSuggestionId;
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@PurchaseSuggestionId", purchaseSuggestion.Id);
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();

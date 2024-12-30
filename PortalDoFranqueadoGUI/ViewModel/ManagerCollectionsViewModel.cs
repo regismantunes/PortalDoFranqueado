@@ -128,7 +128,7 @@ namespace PortalDoFranqueado.ViewModel
             {
                 DesableContent();
 
-                await API.ApiCollection.ChangeStatus(collection.Id, status);
+                await Api.ApiCollection.ChangeStatus(collection.Id, status);
 
                 collection.Status = status;
                 LoadFilteredCollections();
@@ -157,7 +157,7 @@ namespace PortalDoFranqueado.ViewModel
 
                 if(MessageBox.Show(Me,"Deseja realmente excluir?", "BROTHERS - Excluir", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
                 {
-                    await API.ApiCollection.Delete(collection.Id);
+                    await Api.ApiCollection.Delete(collection.Id);
                     _collections.Remove(collection);
                     LoadFilteredCollections();
                 }
@@ -198,7 +198,7 @@ namespace PortalDoFranqueado.ViewModel
                         Status = CollectionStatus.Pendding
                     };
 
-                    var newId = await API.ApiCollection.Insert(newCollection);
+                    var newId = await Api.ApiCollection.Insert(newCollection);
 
                     newCollection.Id = newId;
 
@@ -277,7 +277,7 @@ namespace PortalDoFranqueado.ViewModel
                 DesableContent();
 
                 _collections.Clear();
-                _collections.AddRange(await (!_showClosed ? API.ApiCollection.GetNoClosed() : API.ApiCollection.GetAll()));
+                _collections.AddRange(await (!_showClosed ? Api.ApiCollection.GetNoClosed() : Api.ApiCollection.GetAll()));
 
                 LoadFilteredCollections();
             }

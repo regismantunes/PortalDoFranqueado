@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.API;
+using PortalDoFranqueado.Api;
 using PortalDoFranqueado.Model;
 using PortalDoFranqueado.Repository;
 using System;
@@ -155,7 +155,7 @@ namespace PortalDoFranqueado.ViewModel
                                         .ToArray()
                 };
 
-                var id = await API.ApiPurchaseSuggestion.Save(purchaseSuggestion);
+                var id = await Api.ApiPurchaseSuggestion.Save(purchaseSuggestion);
 
                 await LoadPurchaseSuggestion();
             }
@@ -211,7 +211,7 @@ namespace PortalDoFranqueado.ViewModel
                 if (_store != null)
                 {
                     Legendable?.SendMessage("Obtendo informações de compra...");
-                    Collection = await API.ApiCollection.GetOpened();
+                    Collection = await Api.ApiCollection.GetOpened();
                     OnPropertyChanged(nameof(Collection));
 
                     if (Collection == null)
@@ -222,7 +222,7 @@ namespace PortalDoFranqueado.ViewModel
                     }
 
                     Legendable?.SendMessage("Carregando informações salvas...");
-                    var purchase = await API.ApiPurchase.Get(Collection.Id, _store.Id);
+                    var purchase = await Api.ApiPurchase.Get(Collection.Id, _store.Id);
 
                     _purchaseId = purchase?.Id;
 
@@ -288,7 +288,7 @@ namespace PortalDoFranqueado.ViewModel
                 var families = await _cache.LoadFamilies();
 
                 Legendable?.SendMessage("Carregando informações cadastradas...");
-                var purchaseSuggestion = await API.ApiPurchaseSuggestion.GetByPurchaseId(_purchaseId.Value);
+                var purchaseSuggestion = await Api.ApiPurchaseSuggestion.GetByPurchaseId(_purchaseId.Value);
 
                 PurchaseSuggestionFamilySizeViewModel.ReadyOnly = false;
 

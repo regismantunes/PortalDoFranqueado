@@ -1,6 +1,6 @@
 ﻿using PortalDoFranqueado.Model;
 using PortalDoFranqueado.ViewModel;
-using PortalDoFranqueado.API;
+using PortalDoFranqueado.Api;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;

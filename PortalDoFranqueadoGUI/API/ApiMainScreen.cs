@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using PortalDoFranqueado.Model;
 
-namespace PortalDoFranqueado.API
+namespace PortalDoFranqueado.Api
 {
     public static class ApiMainScreen
     {

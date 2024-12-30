@@ -47,8 +47,8 @@ namespace PortalDoFranqueado.ViewModel
 
         public ChangePasswordViewModel()
         {
-            var user = API.Configuration.Current.Session.User;
-            var resetPassword = API.Configuration.Current.Session.ResetPassword;
+            var user = Api.Configuration.Current.Session.User;
+            var resetPassword = Api.Configuration.Current.Session.ResetPassword;
 
             MensagemUsuario = $"{user.Name}, informe sua nova senha.";
             VisibilityCurrentPassword = resetPassword ? Visibility.Collapsed : Visibility.Visible;
@@ -104,10 +104,10 @@ namespace PortalDoFranqueado.ViewModel
 
                 try
                 {
-                    await API.ApiAccount.ChangePassword(currentPassword, password1, password2);
+                    await Api.ApiAccount.ChangePassword(currentPassword, password1, password2);
 
-                    API.Configuration.Current.Session.ResetPassword = false;
-                    API.Configuration.Current.NotifySessionChange();
+                    Api.Configuration.Current.Session.ResetPassword = false;
+                    Api.Configuration.Current.NotifySessionChange();
                 }
                 catch (Exception ex)
                 {

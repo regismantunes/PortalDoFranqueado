@@ -56,9 +56,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("INSERT INTO Campaign (Title, Status)" +
-                                            " OUTPUT INSERTED.Id" +
-                                            " VALUES (@Title, @Status)", connection);
+                var cmd = new SqlCommand("""
+                                        INSERT INTO Campaign (Title, Status)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@Title, @Status)
+                                        """, connection);
 
                 cmd.Parameters.AddWithValue("@Title", campaign.Title);
                 cmd.Parameters.AddWithValue("@Status", (int)campaign.Status);
@@ -84,7 +86,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand("DELETE FROM Campaign WHERE Id = @Id;", connection);
+                var cmd = new SqlCommand("DELETE FROM Campaign WHERE Id = @Id", connection);
 
                 cmd.Parameters.AddWithValue("@Id", id);
 
@@ -105,9 +107,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("UPDATE Campaign" +
-                                                " SET Status = @Status" +
-                                                " WHERE Id = @Id;", connection);
+                using var cmd = new SqlCommand( """
+                                                UPDATE Campaign
+                                                SET Status = @Status
+                                                WHERE Id = @Id
+                                                """, connection);
 
                 cmd.Parameters.AddWithValue("@Status", (int)status);
                 cmd.Parameters.AddWithValue("@Id", id);
