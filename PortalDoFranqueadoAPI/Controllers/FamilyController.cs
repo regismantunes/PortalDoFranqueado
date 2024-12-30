@@ -10,12 +10,9 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/family")]
     [ApiController]
-    public class FamilyController : ControllerBase, IDisposable
+    public class FamilyController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public FamilyController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("all")]
@@ -31,17 +28,8 @@ namespace PortalDoFranqueadoAPI.Controllers
 
         private async Task<ActionResult<dynamic>> GetFamilies(bool withSizes)
         {
-            try
-            {
-                var families = await FamilyRepository.GetList(_connection, withSizes).AsNoContext();
-
-                return Ok(families);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var families = await FamilyRepository.GetList(_connection, withSizes).AsNoContext();
+            return Ok(families);
         }
 
         public void Dispose()

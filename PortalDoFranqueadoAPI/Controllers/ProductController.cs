@@ -11,33 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/product")]
     [ApiController]
-    public class ProductController : ControllerBase, IDisposable
+    public class ProductController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-        /*private readonly ILogger<ProductController> _logger;
-
-        public ProductController(SqlConnection connection, ILogger<ProductController> logger)
-            => (_connection, _logger) = (connection, logger);*/
-
-        public ProductController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("{collectionId}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetProducts(int collectionId)
         {
-            try
-            {
-                var products = await ProductRepository.GetList(_connection, collectionId).AsNoContext();
-
-                return Ok(products);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var products = await ProductRepository.GetList(_connection, collectionId).AsNoContext();
+            return Ok(products);
         }
 
         [HttpPost]
@@ -45,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert(int collectionId, [FromBody] Product product)
         {
-            try
-            {
-                var id = await ProductRepository.Insert(_connection, collectionId, product).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await ProductRepository.Insert(_connection, collectionId, product).AsNoContext();
+            return Ok(id);
         }
 
         [HttpDelete]
@@ -63,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            try
-            {
-                var sucess = await ProductRepository.Delete(_connection, id).AsNoContext();
-
-                return Ok(sucess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var sucess = await ProductRepository.Delete(_connection, id).AsNoContext();
+            return Ok(sucess);
         }
 
         [HttpPut]
@@ -81,17 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Product product)
         {
-            try
-            {
-                await ProductRepository.Update(_connection, product).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            await ProductRepository.Update(_connection, product).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()

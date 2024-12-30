@@ -11,29 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/collections")]
     [ApiController]
-    public class CollectionsController : ControllerBase, IDisposable
+    public class CollectionsController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public CollectionsController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("noclosed")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetNoClosed()
         {
-            try
-            {
-                var collections = await CollectionRepository.GetList(_connection).AsNoContext();
-
-                return Ok(collections);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var collections = await CollectionRepository.GetList(_connection).AsNoContext();
+            return Ok(collections);
         }
 
         [HttpGet]
@@ -41,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetAll()
         {
-            try
-            {
-                var collections = await CollectionRepository.GetList(_connection, false).AsNoContext();
-
-                return Ok(collections);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var collections = await CollectionRepository.GetList(_connection, false).AsNoContext();
+            return Ok(collections);
         }
 
         [HttpGet]
@@ -59,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int id)
         {
-            try
-            {
-                var collections = await CollectionRepository.Get(_connection, id).AsNoContext();
-
-                return Ok(collections);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var collections = await CollectionRepository.Get(_connection, id).AsNoContext();
+            return Ok(collections);
         }
 
         [HttpGet]
@@ -77,17 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetOpened()
         {
-            try
-            {
-                var collection = await CollectionRepository.GetOpenedCollection(_connection).AsNoContext();
-
-                return Ok(collection);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var collection = await CollectionRepository.GetOpenedCollection(_connection).AsNoContext();
+            return Ok(collection);
         }
 
         [HttpPost]
@@ -95,17 +56,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Collection collection)
         {
-            try
-            {
-                var id = await CollectionRepository.Insert(_connection, collection).AsNoContext();
-                
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await CollectionRepository.Insert(_connection, collection).AsNoContext();
+            return Ok(id);
         }
 
         [HttpDelete]
@@ -113,17 +65,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            try
-            {
-                var sucess = await CollectionRepository.Delete(_connection, id).AsNoContext();
-
-                return Ok(sucess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var sucess = await CollectionRepository.Delete(_connection, id).AsNoContext();
+            return Ok(sucess);
         }
 
         [HttpPut]
@@ -131,27 +74,19 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> UpdateStatus(int id, [FromBody] int status)
         {
-            try
+            var collectionStatus = (CollectionStatus)status;
+
+            if (collectionStatus == CollectionStatus.Opened)
             {
-                var collectionStatus = (CollectionStatus)status;
+                var hasOpened = await CollectionRepository.HasOpenedCollection(_connection).AsNoContext();
 
-                if (collectionStatus == CollectionStatus.Opened)
-                {
-                    var hasOpened = await CollectionRepository.HasOpenedCollection(_connection).AsNoContext();
-
-                    if (hasOpened)
-                        return BadRequest(new { message = "Já existe um período de compras aberto." });
-                }
-
-                await CollectionRepository.ChangeStatus(_connection, id, collectionStatus).AsNoContext();
-
-                return Ok();
+                if (hasOpened)
+                    return BadRequest(new { message = "Já existe um período de compras aberto." });
             }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+
+            await CollectionRepository.ChangeStatus(_connection, id, collectionStatus).AsNoContext();
+
+            return Ok();
         }
 
         [HttpPut]
@@ -159,17 +94,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Collection collection)
         {
-            try
-            {
-                await CollectionRepository.Update(_connection, collection).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            await CollectionRepository.Update(_connection, collection).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()

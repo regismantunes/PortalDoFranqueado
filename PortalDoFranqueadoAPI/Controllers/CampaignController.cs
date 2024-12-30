@@ -11,29 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/campaign")]
     [ApiController]
-    public class CampaignController : ControllerBase, IDisposable
+    public class CampaignController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public CampaignController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("all")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetCampaigns()
         {
-            try
-            {
-                var campaigns = await CampaignRepository.GetList(_connection).AsNoContext();
-
-                return Ok(campaigns);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var campaigns = await CampaignRepository.GetList(_connection).AsNoContext();
+            return Ok(campaigns);
         }
 
         [HttpPost]
@@ -41,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Campaign campaign)
         {
-            try
-            {
-                var id = await CampaignRepository.Insert(_connection, campaign).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await CampaignRepository.Insert(_connection, campaign).AsNoContext();
+            return Ok(id);
         }
 
         [HttpDelete]
@@ -59,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            try
-            {
-                var sucess = await CampaignRepository.Delete(_connection, id).AsNoContext();
-
-                return Ok(sucess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var sucess = await CampaignRepository.Delete(_connection, id).AsNoContext();
+            return Ok(sucess);
         }
 
         [HttpPut]
@@ -77,19 +47,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> UpdateStatus(int id, [FromBody] int status)
         {
-            try
-            {
-                var campaignStatus = (CampaignStatus)status;
-
-                await CampaignRepository.ChangeStatus(_connection, id, campaignStatus).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var campaignStatus = (CampaignStatus)status;
+            await CampaignRepository.ChangeStatus(_connection, id, campaignStatus).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()

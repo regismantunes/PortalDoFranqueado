@@ -11,29 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/purchase")]
     [ApiController]
-    public class PurchaseController : ControllerBase, IDisposable
+    public class PurchaseController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public PurchaseController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpPut]
         [Route("")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Save([FromBody] Purchase purchase)
         {
-            try
-            {
-                var id = await PurchaseRepository.Save(_connection, purchase).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await PurchaseRepository.Save(_connection, purchase).AsNoContext();
+            return Ok(id);
         }
 
         [HttpGet]
@@ -41,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int collectionId, int storeId)
         {
-            try
-            {
-                var purchase = await PurchaseRepository.Get(_connection, collectionId, storeId).AsNoContext();
-
-                return Ok(purchase);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var purchase = await PurchaseRepository.Get(_connection, collectionId, storeId).AsNoContext();
+            return Ok(purchase);
         }
 
         [HttpGet]
@@ -59,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetPurchases(int collectionId)
         {
-            try
-            {
-                var purchases = await PurchaseRepository.GetList(_connection, collectionId).AsNoContext();
-
-                return Ok(purchases);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var purchases = await PurchaseRepository.GetList(_connection, collectionId).AsNoContext();
+            return Ok(purchases);
         }
 
         [HttpGet]
@@ -77,17 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int purchaseId)
         {
-            try
-            {
-                var purchase = await PurchaseRepository.Get(_connection, purchaseId).AsNoContext();
-
-                return Ok(purchase);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var purchase = await PurchaseRepository.Get(_connection, purchaseId).AsNoContext();
+            return Ok(purchase);
         }
 
         [HttpPut]
@@ -95,17 +56,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Reverse([FromBody] int purchaseId)
         {
-            try
-            {
-                await PurchaseRepository.Reverse(_connection, purchaseId).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            await PurchaseRepository.Reverse(_connection, purchaseId).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()

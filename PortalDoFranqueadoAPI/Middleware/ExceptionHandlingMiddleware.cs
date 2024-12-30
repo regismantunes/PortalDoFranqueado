@@ -31,7 +31,12 @@ namespace PortalDoFranqueadoAPI.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new ErrorResponse(exception.Message);
+#if DEBUG
+            var message = exception.Message;
+#else
+            const message = "Internal Server Error";
+#endif
+            var response = new ErrorResponse(message);
 
             return context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }

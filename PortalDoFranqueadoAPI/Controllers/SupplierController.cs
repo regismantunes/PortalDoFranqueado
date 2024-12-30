@@ -11,29 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/supplier")]
     [ApiController]
-    public class SupplierController : ControllerBase, IDisposable
+    public class SupplierController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public SupplierController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("all")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetSuppliers()
         {
-            try
-            {
-                var suppliers = await SupplierRepository.GetList(_connection, false).AsNoContext();
-
-                return Ok(suppliers);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var suppliers = await SupplierRepository.GetList(_connection, false).AsNoContext();
+            return Ok(suppliers);
         }
 
         [HttpGet]
@@ -41,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetActivesSuppliers()
         {
-            try
-            {
-                var suppliers = await SupplierRepository.GetList(_connection, true).AsNoContext();
-
-                return Ok(suppliers);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var suppliers = await SupplierRepository.GetList(_connection, true).AsNoContext();
+            return Ok(suppliers);
         }
 
         [HttpGet]
@@ -59,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int id)
         {
-            try
-            {
-                var supplier = await StoreRepository.Get(_connection, id).AsNoContext();
-
-                return Ok(supplier);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var supplier = await StoreRepository.Get(_connection, id).AsNoContext();
+            return Ok(supplier);
         }
 
         [HttpPost]
@@ -77,17 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Supplier supplier)
         {
-            try
-            {
-                var id = await SupplierRepository.Insert(_connection, supplier).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await SupplierRepository.Insert(_connection, supplier).AsNoContext();
+            return Ok(id);
         }
 
         [HttpDelete]
@@ -95,17 +56,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            try
-            {
-                var sucess = await SupplierRepository.Delete(_connection, id).AsNoContext();
-
-                return Ok(sucess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var sucess = await SupplierRepository.Delete(_connection, id).AsNoContext();
+            return Ok(sucess);
         }
 
         [HttpPut]
@@ -113,17 +65,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Supplier supplier)
         {
-            try
-            {
-                await SupplierRepository.Update(_connection, supplier).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            await SupplierRepository.Update(_connection, supplier).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()

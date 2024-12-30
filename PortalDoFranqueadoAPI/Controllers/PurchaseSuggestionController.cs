@@ -11,28 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/purchasesuggestion")]
     [ApiController]
-    public class PurchaseSuggestionController : ControllerBase, IDisposable
+    public class PurchaseSuggestionController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public PurchaseSuggestionController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpPut]
         [Route("")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Save([FromBody] PurchaseSuggestion purchaseSuggestion)
         {
-            try
-            {
-                var id = await PurchaseSuggestionRepository.Save(_connection, purchaseSuggestion).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var id = await PurchaseSuggestionRepository.Save(_connection, purchaseSuggestion).AsNoContext();
+            return Ok(id);
         }
 
         [HttpGet]
@@ -40,16 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetByPurchaseId(int purchaseid)
         {
-            try
-            {
-                var purchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(_connection, purchaseid).AsNoContext();
-
-                return Ok(purchaseSuggestion);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var purchaseSuggestion = await PurchaseSuggestionRepository.GetByPurchaseId(_connection, purchaseid).AsNoContext();
+            return Ok(purchaseSuggestion);
         }
 
         public void Dispose()

@@ -12,13 +12,10 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/main")]
     [ApiController]
-    public class MainViewController : ControllerBase, IDisposable
+    public class MainViewController(SqlConnection connection, IConfiguration configuration) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-        private readonly IConfiguration _configuration;
-
-        public MainViewController(SqlConnection connection, IConfiguration configuration)
-            => (_connection, _configuration) = (connection, configuration);
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+        private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
         [HttpGet]
         [Route("validateconnection/{version}")]

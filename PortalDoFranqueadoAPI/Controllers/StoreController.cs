@@ -11,29 +11,17 @@ namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/store")]
     [ApiController]
-    public class StoreController : ControllerBase, IDisposable
+    public class StoreController(SqlConnection connection) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection;
-
-        public StoreController(SqlConnection connection)
-            => _connection = connection;
+        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
 
         [HttpGet]
         [Route("all")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetStores()
         {
-            try
-            {
-                var stores = await StoreRepository.GetList(_connection).AsNoContext();
-
-                return Ok(stores);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var stores = await StoreRepository.GetList(_connection).AsNoContext();
+            return Ok(stores);
         }
 
         [HttpGet]
@@ -41,17 +29,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int id)
         {
-            try
-            {
-                var store = await StoreRepository.Get(_connection, id).AsNoContext();
-
-                return Ok(store);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var store = await StoreRepository.Get(_connection, id).AsNoContext();
+            return Ok(store);
         }
 
         [HttpPost]
@@ -59,17 +38,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Store store)
         {
-            try
-            {
-                var id = await StoreRepository.Insert(_connection, store).AsNoContext();
-
-                return Ok(id);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var id = await StoreRepository.Insert(_connection, store).AsNoContext();
+            return Ok(id);
         }
 
         [HttpDelete]
@@ -77,17 +47,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            try
-            {
-                var sucess = await StoreRepository.Delete(_connection, id).AsNoContext();
-
-                return Ok(sucess);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            var sucess = await StoreRepository.Delete(_connection, id).AsNoContext();
+            return Ok(sucess);
         }
 
         [HttpPut]
@@ -95,17 +56,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Store store)
         {
-            try
-            {
-                await StoreRepository.Update(_connection, store).AsNoContext();
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            
+            await StoreRepository.Update(_connection, store).AsNoContext();
+            return Ok();
         }
 
         public void Dispose()
