@@ -3,14 +3,16 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class CampaignRepository
+    public class CampaignRepository(SqlConnection connection, IFileRepository fileRepository) : ICampaignRepository
     {
-        public static async Task<Campaign[]> GetList(SqlConnection connection, bool onlyActives = false, bool loadFiles = false)
+        public async Task<IEnumerable<Campaign>> GetList(bool onlyActives = false, bool loadFiles = false)
         {
             try
             {
@@ -19,8 +21,11 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand("SELECT * FROM Campaign" +
-                            (onlyActives ? " WHERE Status = 1" : string.Empty), connection);
+                using var cmd = new SqlCommand( $"""
+                                                SELECT *
+                                                FROM Campaign
+                                                {(onlyActives ? " WHERE Status = 1" : string.Empty)}
+                                                """, connection);
 
                 using var reader = await cmd.ExecuteReaderAsync().AsNoContext();
 
@@ -37,9 +42,9 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 if (loadFiles)
                     foreach (var campaign in list)
-                        campaign.Files = await FileRepository.GetFilesFromCampaign(connection, campaign.Id).AsNoContext();
+                        campaign.Files = await fileRepository.GetFilesFromCampaign(campaign.Id).AsNoContext();
                 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -47,7 +52,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, Campaign campaign)
+        public async Task<int> Insert(Campaign campaign)
         {
             try
             {
@@ -77,7 +82,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -98,7 +103,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task ChangeStatus(SqlConnection connection, int id, CampaignStatus status)
+        public async Task ChangeStatus(int id, CampaignStatus status)
         {
             try
             {

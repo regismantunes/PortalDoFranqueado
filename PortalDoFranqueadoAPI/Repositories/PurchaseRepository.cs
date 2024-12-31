@@ -1,21 +1,20 @@
 ﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
-using PortalDoFranqueadoAPI.Models.Validations;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class PurchaseRepository
+    public class PurchaseRepository(SqlConnection connection) : IPurchaseRepository
     {
-        public static async Task<int> Save(SqlConnection connection, Purchase purchase)
+        public async Task<int> Save(Purchase purchase)
         {
-            await purchase.Validate(connection).AsNoContext();
-
             try
             {
                 await connection.OpenAsync().AsNoContext();
@@ -63,7 +62,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                             throw new Exception(MessageRepositories.UpdateFailException);
 
                         cmd.Parameters.Clear();
-                        cmd.CommandText =   """
+                        cmd.CommandText = """
                                             DELETE FROM Purchase_Product
                                             WHERE PurchaseId = @PurchaseId;
                                             """;
@@ -72,13 +71,13 @@ namespace PortalDoFranqueadoAPI.Repositories
                         await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
 
-                    cmd.CommandText =   """
+                    cmd.CommandText = """
                                         INSERT INTO Purchase_Product (PurchaseId, Item, ProductId, SizeId, Quantity)
                                         VALUES (@PurchaseId, @Item, @ProductId, @SizeId, @Quantity);
                                         """;
 
                     var count = 0;
-                    foreach(var item in purchase.Items.Where(i => i.Quantity > 0))
+                    foreach (var item in purchase.Items.Where(i => i.Quantity > 0))
                     {
                         count++;
                         cmd.Parameters.Clear();
@@ -108,7 +107,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase?> Get(SqlConnection connection, int purchaseId)
+        public async Task<Purchase?> Get(int purchaseId)
         {
             try
             {
@@ -117,7 +116,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT *
                                             FROM Purchase
                                             WHERE Id = @Id;
@@ -131,7 +130,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     var purchase = LoadPurchase(reader);
                     await reader.CloseAsync().AsNoContext();
-                    await purchase.LoadPurchaseItems(connection).AsNoContext();
+                    await LoadPurchaseItems(purchase).AsNoContext();
                     return purchase;
                 }
 
@@ -152,7 +151,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Status = (PurchaseStatus)reader.GetInt16("Status")
             };
 
-        private static async Task LoadPurchaseItems(this Purchase purchase, SqlConnection connection)
+        private async Task LoadPurchaseItems(Purchase purchase)
         {
             var listItems = new List<PurchaseItem>();
             var connectionWasClosed = false;
@@ -167,7 +166,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT pp.*
                                                     ,   fs.[Order]
                                                 FROM Purchase_Product AS pp
@@ -208,7 +207,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase?> Get(SqlConnection connection, int collectionId, int storeId, bool loadItems = true)
+        public async Task<Purchase?> Get(int collectionId, int storeId, bool loadItems = true)
         {
             try
             {
@@ -217,7 +216,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT *
                                             FROM Purchase
                                             WHERE   CollectionId = @CollectionId
@@ -234,7 +233,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     var purchase = LoadPurchase(reader);
                     await reader.CloseAsync().AsNoContext();
                     if (loadItems)
-                        await purchase.LoadPurchaseItems(connection).AsNoContext();
+                        await LoadPurchaseItems(purchase).AsNoContext();
 
                     return purchase;
                 }
@@ -247,7 +246,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Purchase[]> GetList(SqlConnection connection, int collectionId)
+        public async Task<IEnumerable<Purchase>> GetList(int collectionId)
         {
             try
             {
@@ -256,7 +255,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT *
                                             FROM Purchase
                                             WHERE CollectionId = @CollectionId;
@@ -272,9 +271,9 @@ namespace PortalDoFranqueadoAPI.Repositories
                 await reader.CloseAsync().AsNoContext();
 
                 foreach (var purchase in list)
-                    await purchase.LoadPurchaseItems(connection).AsNoContext();
+                    await LoadPurchaseItems(purchase).AsNoContext();
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -282,7 +281,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> HasOpened(SqlConnection connection, int collectionId)
+        public async Task<bool> HasOpened(int collectionId)
         {
             try
             {
@@ -291,7 +290,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT Id
                                             FROM Purchase
                                             WHERE CollectionId = @CollectionId
@@ -308,7 +307,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Reverse(SqlConnection connection, int purchaseId)
+        public async Task Reverse(int purchaseId)
         {
             try
             {
@@ -317,7 +316,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 UPDATE Purchase
                                                     SET Status = 0
                                                 WHERE Id = @Id;

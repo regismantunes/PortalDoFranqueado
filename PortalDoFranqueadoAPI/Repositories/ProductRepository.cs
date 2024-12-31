@@ -2,17 +2,18 @@
 using PortalDoFranqueadoAPI.Repositories.Util;
 using System.Data;
 using PortalDoFranqueadoAPI.Models.Validations;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class ProductRepository
+    public class ProductRepository(SqlConnection connection, IFileRepository fileRepository) : IProductRepository
     {
-        public static async Task<Product[]> GetList(SqlConnection connection, int collectionId, int? familyId = null)
+        public async Task<Product[]> GetList(int collectionId, int? familyId = null)
         {
             try
             {
@@ -58,7 +59,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, int collectionId, Product product)
+        public async Task<int> Insert(int collectionId, Product product)
         {
             product.Validate();
 
@@ -69,7 +70,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             INSERT INTO Product
                                                 (   CollectionId
                                                 ,   FamilyId
@@ -108,7 +109,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(SqlConnection connection, Product product)
+        public async Task Update(Product product)
         {
             product.Validate();
 
@@ -119,7 +120,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             UPDATE Product
                                                 SET FamilyId = @FamilyId
                                                 ,   FileId = @FileId
@@ -147,7 +148,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -160,7 +161,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 try
                 {
-                    var cmd = new SqlCommand(   """
+                    var cmd = new SqlCommand("""
                                                 SELECT FileId
                                                 FROM Product
                                                 WHERE Id = @Id;
@@ -170,7 +171,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     var fileIdObj = await cmd.ExecuteScalarAsync().AsNoContext();
 
-                    cmd.CommandText =   """
+                    cmd.CommandText = """
                                         DELETE FROM Product
                                         WHERE Id = @Id; 
                                         """;
@@ -179,8 +180,8 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     if (sucess &&
                         fileIdObj is int fileId)
-                        await FileRepository.DeleteFile(connection, fileId, transaction).AsNoContext();
-                    
+                        await fileRepository.DeleteFile(fileId, transaction).AsNoContext();
+
                     await transaction.CommitAsync().AsNoContext();
 
                     return sucess;

@@ -1,21 +1,20 @@
 ﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
 using PortalDoFranqueadoAPI.Models.Validations;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class PurchaseSuggestionRepository
+    public class PurchaseSuggestionRepository(SqlConnection connection) : IPurchaseSuggestionRepository
     {
-        public static async Task<int> Save(SqlConnection connection, PurchaseSuggestion purchaseSuggestion)
+        public async Task<int> Save(PurchaseSuggestion purchaseSuggestion)
         {
-            await purchaseSuggestion.Validate(connection).AsNoContext();
-
             try
             {
                 await connection.OpenAsync().AsNoContext();
@@ -65,7 +64,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     cmd.Parameters.AddWithValue("@PartsPerService", purchaseSuggestion.PartsPerService);
                     cmd.Parameters.AddWithValue("@Coverage", purchaseSuggestion.Coverage);
                     cmd.Parameters.AddWithValue("@TotalSuggestedItems", purchaseSuggestion.TotalSuggestedItems);
-                    
+
                     if (newPurchaseSuggestion)
                     {
                         purchaseSuggestion.Id = (int?)await cmd.ExecuteScalarAsync() ??
@@ -88,7 +87,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         await cmd.ExecuteNonQueryAsync().AsNoContext();
                     }
 
-                    cmd.CommandText =   """
+                    cmd.CommandText = """
                                         INSERT INTO Purchase_Suggestion_Family
                                             (   PurchaseSuggestionId
                                             ,   FamilyId
@@ -116,7 +115,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                    .ForEach(s => s.PurchaseSuggestionFamilyId = item.Id);
                     }
 
-                    cmd.CommandText =   """
+                    cmd.CommandText = """
                                         INSERT INTO Purchase_Suggestion_Family_Size
                                             (   PurchaseSuggestionFamilyId
                                             ,   SizeId
@@ -128,7 +127,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             ,   @SizeSuggestedItems);
                                         """;
 
-                    foreach (var size in purchaseSuggestion.Families.Where(f => f.Sizes!= null)
+                    foreach (var size in purchaseSuggestion.Families.Where(f => f.Sizes != null)
                                                                    .SelectMany(f => f.Sizes.Where(s => s.Percentage > 0)))
                     {
                         cmd.Parameters.Clear();
@@ -157,7 +156,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<PurchaseSuggestion?> GetByPurchaseId(SqlConnection connection, int purchaseId)
+        public async Task<PurchaseSuggestion?> GetByPurchaseId(int purchaseId)
         {
             try
             {
@@ -166,7 +165,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT *
                                             FROM Purchase_Suggestion
                                             WHERE PurchaseId = @PurchaseId;
@@ -180,8 +179,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                 {
                     var purchase = LoadPurchaseSuggestion(reader);
                     await reader.CloseAsync().AsNoContext();
-                    await purchase.LoadPurchaseSuggestionFamilies(connection).AsNoContext();
-                    await purchase.LoadPurchaseSuggestionFamiliesSizes(connection).AsNoContext();
+                    await LoadPurchaseSuggestionFamilies(purchase).AsNoContext();
+                    await LoadPurchaseSuggestionFamiliesSizes(purchase).AsNoContext();
 
                     return purchase;
                 }
@@ -206,7 +205,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 TotalSuggestedItems = (int?)reader.GetValue("TotalSuggestedItems")
             };
 
-        private static async Task LoadPurchaseSuggestionFamilies(this PurchaseSuggestion purchaseSuggestion, SqlConnection connection)
+        private async Task LoadPurchaseSuggestionFamilies(PurchaseSuggestion purchaseSuggestion)
         {
             var listItems = new List<PurchaseSuggestionFamily>();
             var connectionWasClosed = false;
@@ -221,7 +220,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     connectionWasClosed = true;
                 }
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT  psf.*
                                                     ,   f.Name AS FamilyName
                                                 FROM Purchase_Suggestion_Family AS psf
@@ -262,7 +261,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        private static async Task LoadPurchaseSuggestionFamiliesSizes(this PurchaseSuggestion purchaseSuggestion, SqlConnection connection)
+        private async Task LoadPurchaseSuggestionFamiliesSizes(PurchaseSuggestion purchaseSuggestion)
         {
             var listItems = new List<PurchaseSuggestionFamilySize>();
             var connectionWasClosed = false;
@@ -278,8 +277,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                 }
 
                 using var cmd = new SqlCommand("""
-                                                SELECT   psfs.*
-                                                ,       fs.[Order]
+                                                SELECT  psfs.*
+                                                    ,   fs.[Order]
                                                 FROM Purchase_Suggestion_Family AS psf
                                                     INNER JOIN Purchase_Suggestion_Family_Size AS psfs
                                                         ON psfs.PurchaseSuggestionFamilyId = psf.Id
@@ -314,7 +313,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 purchaseSuggestion.Families?
                     .ToList()
-                    .ForEach(f => 
+                    .ForEach(f =>
                         f.Sizes = listItems
                             .Where(s => s.PurchaseSuggestionFamilyId == f.Id)
                             .ToArray()

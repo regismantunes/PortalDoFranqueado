@@ -1,22 +1,23 @@
-﻿using PortalDoFranqueadoAPI.Extensions;
-using PortalDoFranqueadoAPI.Repositories;
+﻿using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Models.Validations.Interfaces;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Models.Validations
 {
-    public static class PurchaseValidation
+    public class PurchaseValidation(ICollectionRepository collectionRepository, IPurchaseRepository purchaseRepository) : IPurchaseValidation
     {
-        public static async Task Validate(this Purchase purchase, SqlConnection connection)
+        public async Task Validate(Purchase purchase)
         {
-            var currentCollection = await CollectionRepository.GetOpenedCollection(connection) ?? 
+            var currentCollection = await collectionRepository.GetOpenedCollection() ??
                 throw new Exception("O período de compras não está aberto.");
 
             if (currentCollection.Id != purchase.CollectionId)
                 throw new Exception("Esse período de compras não está aberto.");
 
-            var openedPurchase = await PurchaseRepository.Get(connection, purchase.CollectionId, purchase.StoreId, false).AsNoContext();
+            var openedPurchase = await purchaseRepository.Get(purchase.CollectionId, purchase.StoreId, false).AsNoContext();
 
             if (openedPurchase == null)
                 return;

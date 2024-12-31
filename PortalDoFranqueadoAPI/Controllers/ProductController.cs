@@ -2,25 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
-using PortalDoFranqueadoAPI.Repositories;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/product")]
     [ApiController]
-    public class ProductController(SqlConnection connection) : ControllerBase, IDisposable
+    public class ProductController(IProductRepository productRepository) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
         [HttpGet]
         [Route("{collectionId}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetProducts(int collectionId)
         {
-            var products = await ProductRepository.GetList(_connection, collectionId).AsNoContext();
+            var products = await productRepository.GetList(collectionId).AsNoContext();
             return Ok(products);
         }
 
@@ -29,7 +26,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert(int collectionId, [FromBody] Product product)
         {
-            var id = await ProductRepository.Insert(_connection, collectionId, product).AsNoContext();
+            var id = await productRepository.Insert(collectionId, product).AsNoContext();
             return Ok(id);
         }
 
@@ -38,7 +35,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            var sucess = await ProductRepository.Delete(_connection, id).AsNoContext();
+            var sucess = await productRepository.Delete(id).AsNoContext();
             return Ok(sucess);
         }
 
@@ -47,13 +44,12 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Product product)
         {
-            await ProductRepository.Update(_connection, product).AsNoContext();
+            await productRepository.Update(product).AsNoContext();
             return Ok();
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 

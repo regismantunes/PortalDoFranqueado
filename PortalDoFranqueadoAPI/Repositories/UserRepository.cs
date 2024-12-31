@@ -1,7 +1,7 @@
 ﻿using PortalDoFranqueadoAPI.Models;
 using System.Data;
 using PortalDoFranqueadoAPI.Services;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using PortalDoFranqueadoAPI.Models.Validations;
 using PortalDoFranqueadoAPI.Repositories.Util;
 using System.Threading.Tasks;
@@ -9,13 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PortalDoFranqueadoAPI.Extensions;
-using System.Web;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class UserRepository
+    public class UserRepository(SqlConnection connection, IStoreRepository storeRepository) : IUserRepository
     {
-        public static async Task<(User?,bool)> GetAuthenticated(SqlConnection connection, string username, string password, short resetPasswordMaxAttempts)
+        public async Task<(User?, bool)> GetAuthenticated(string username, string password, short resetPasswordMaxAttempts)
         {
             try
             {
@@ -78,7 +79,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     if (user == null)
                     {
                         resetPasswordAttempts++;
-                        using var cmdRP = new SqlCommand(   """
+                        using var cmdRP = new SqlCommand("""
                                                             UPDATE [User]
                                                                 SET ResetPasswordAttempts = @ResetPasswordAttempts
                                                             WHERE Id = @Id
@@ -91,7 +92,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     }
                     else
                     {
-                        using var cmdRP = new SqlCommand(   """
+                        using var cmdRP = new SqlCommand("""
                                                             UPDATE [User]
                                                                 SET ResetPasswordCode = NULL
                                                                 ,   ResetPasswordAttempts = NULL
@@ -112,7 +113,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<User[]> GetList(SqlConnection connection)
+        public async Task<IEnumerable<User>> GetList()
         {
             try
             {
@@ -121,7 +122,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT *
                                                 FROM [User]
                                                 WHERE [Status] = 1;
@@ -144,16 +145,16 @@ namespace PortalDoFranqueadoAPI.Repositories
                     await reader.CloseAsync().AsNoContext();
                 }
 
-                var stores = await StoreRepository.GetList(connection).AsNoContext();
+                var stores = await storeRepository.GetList().AsNoContext();
 
                 var dic = new Dictionary<int, List<Store>>();
-                cmd.CommandText =   """
+                cmd.CommandText = """
                                     SELECT *
                                     FROM User_Store
                                     """;
-                using(var reader = await cmd.ExecuteReaderAsync().AsNoContext())
+                using (var reader = await cmd.ExecuteReaderAsync().AsNoContext())
                 {
-                    while(await reader.ReadAsync().AsNoContext())
+                    while (await reader.ReadAsync().AsNoContext())
                     {
                         var userId = reader.GetInt32("UserId");
                         var storeId = reader.GetInt32("StoreId");
@@ -166,7 +167,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 list.ForEach(u => u.Stores = dic.TryGetValue(u.Id, out List<Store>? value) ? value.ToArray() : null);
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -174,7 +175,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, User user)
+        public async Task<int> Insert(User user)
         {
             user.Validate();
 
@@ -185,7 +186,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 INSERT INTO [User]
                                                     (   Name
                                                     ,   [Status]
@@ -217,7 +218,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 if (user.Stores?.Any() ?? false)
                 {
-                    cmd.CommandText =   """
+                    cmd.CommandText = """
                                         INSERT INTO User_Store
                                             (   UserId
                                             ,   StoreId) 
@@ -242,7 +243,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -251,7 +252,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 UPDATE [User]
                                                     SET [Status] = 0
                                                 WHERE Id = @Id;
@@ -267,7 +268,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(SqlConnection connection, User user)
+        public async Task Update(User user)
         {
             user.Validate();
 
@@ -280,7 +281,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var stores = new List<int>();
 
-                using (var cmdStores = new SqlCommand(  """
+                using (var cmdStores = new SqlCommand("""
                                                         SELECT StoreId
                                                         FROM User_Store
                                                         WHERE UserId = @Id
@@ -296,7 +297,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 using var transaction = await connection.BeginTransactionAsync().AsNoContext();
                 try
                 {
-                    using var cmd = new SqlCommand( """
+                    using var cmd = new SqlCommand("""
                                                     UPDATE [User] 
                                                         SET Name = @Name 
                                                         ,   Email = @Email 
@@ -316,7 +317,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                     if (user.Stores?.Any() ?? false)
                     {
-                        cmd.CommandText =   """
+                        cmd.CommandText = """
                                             INSERT INTO User_Store (UserId, StoreId)
                                             VALUES (@UserId, @StoreId);
                                             """;
@@ -338,7 +339,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     var storesToDelete = stores.Where(s => !(user.Stores?.Any(store => store.Id == s) ?? false));
                     if (storesToDelete.Any())
                     {
-                        cmd.CommandText =   """
+                        cmd.CommandText = """
                                             DELETE FROM User_Store
                                             WHERE UserId = @UserId
                                                 AND StoreId = @StoreId
@@ -368,7 +369,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> ResetPassword(SqlConnection connection, int id, string resetCode)
+        public async Task<bool> ResetPassword(int id, string resetCode)
         {
             try
             {
@@ -379,7 +380,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 UPDATE [User]
                                                     SET [Password] = NULL
                                                     ,   ResetPasswordCode = @ResetCode
@@ -398,7 +399,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task ChangePassword(SqlConnection connection, int id, string newPassword, string newPasswordConfirmation, string? currentPassword = null)
+        public async Task ChangePassword(int id, string newPassword, string newPasswordConfirmation, string? currentPassword = null)
         {
             const string HashAlgorithm = "SHA256";
 
@@ -412,7 +413,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT Password
                                                 FROM [User]
                                                 WHERE Id = @Id
@@ -441,7 +442,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 var newPasswordHash = HashService.ComputeHash(newPassword, HashAlgorithm);
 
-                cmd.CommandText =   """
+                cmd.CommandText = """
                                     UPDATE [User]
                                         SET Password = @Password
                                         ,   ResetPasswordCode = NULL

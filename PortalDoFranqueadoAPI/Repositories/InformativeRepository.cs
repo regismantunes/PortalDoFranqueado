@@ -1,15 +1,16 @@
 ﻿using System.Data;
 using PortalDoFranqueadoAPI.Models;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using System;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class InformativeRepository
+    public class InformativeRepository(SqlConnection connection) : IInformativeRepository
     {
-        public static async Task<Informative> Get(SqlConnection connection)
+        public async Task<Informative> Get()
         {
             try
             {
@@ -38,7 +39,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Save(SqlConnection connection, Informative informative)
+        public async Task Save(Informative informative)
         {
             try
             {

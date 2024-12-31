@@ -3,14 +3,15 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class StoreRepository
+    public class StoreRepository(SqlConnection connection) : IStoreRepository
     {
-        public static async Task<Store[]> GetListByUser(SqlConnection connection, int idUser)
+        public async Task<IEnumerable<Store>> GetListByUser(int idUser)
         {
             try
             {
@@ -19,7 +20,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT Store.*
                                             FROM Store
                                                 INNER JOIN User_Store
@@ -39,7 +40,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         DocumentNumber = reader.GetValue("DocumentNumber") as string
                     });
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -47,7 +48,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Store[]> GetList(SqlConnection connection)
+        public async Task<IEnumerable<Store>> GetList()
         {
             bool connectionWasClosed = false;
             try
@@ -76,7 +77,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 
                 await reader.CloseAsync().AsNoContext();
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -85,7 +86,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Store?> Get(SqlConnection connection, int id)
+        public async Task<Store?> Get(int id)
         {
             try
             {
@@ -94,7 +95,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                var cmd = new SqlCommand(   """
+                var cmd = new SqlCommand("""
                                             SELECT *
                                             FROM Store
                                             WHERE Id = @Id;
@@ -120,7 +121,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, Store store)
+        public async Task<int> Insert(Store store)
         {
             try
             {
@@ -129,7 +130,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 INSERT INTO Store (Name, DocumentNumber)
                                                 OUTPUT INSERTED.Id
                                                 VALUES (@Name, @DocumentNumber);
@@ -150,7 +151,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -159,7 +160,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 DELETE FROM Store
                                                 WHERE Id = @Id;
                                                 """, connection);
@@ -174,7 +175,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(SqlConnection connection, Store store)
+        public async Task Update(Store store)
         {
             try
             {
@@ -183,7 +184,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 UPDATE Store
                                                     SET Name = @Name
                                                     ,   DocumentNumber = @DocumentNumber

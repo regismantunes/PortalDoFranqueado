@@ -2,25 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
-using PortalDoFranqueadoAPI.Repositories;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/supplier")]
     [ApiController]
-    public class SupplierController(SqlConnection connection) : ControllerBase, IDisposable
+    public class SupplierController(ISupplierRepository supplierRepository) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
         [HttpGet]
         [Route("all")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetSuppliers()
         {
-            var suppliers = await SupplierRepository.GetList(_connection, false).AsNoContext();
+            var suppliers = await supplierRepository.GetList(false).AsNoContext();
             return Ok(suppliers);
         }
 
@@ -29,7 +26,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetActivesSuppliers()
         {
-            var suppliers = await SupplierRepository.GetList(_connection, true).AsNoContext();
+            var suppliers = await supplierRepository.GetList(true).AsNoContext();
             return Ok(suppliers);
         }
 
@@ -38,7 +35,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int id)
         {
-            var supplier = await StoreRepository.Get(_connection, id).AsNoContext();
+            var supplier = await supplierRepository.Get(id).AsNoContext();
             return Ok(supplier);
         }
 
@@ -47,7 +44,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Supplier supplier)
         {
-            var id = await SupplierRepository.Insert(_connection, supplier).AsNoContext();
+            var id = await supplierRepository.Insert(supplier).AsNoContext();
             return Ok(id);
         }
 
@@ -56,7 +53,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            var sucess = await SupplierRepository.Delete(_connection, id).AsNoContext();
+            var sucess = await supplierRepository.Delete(id).AsNoContext();
             return Ok(sucess);
         }
 
@@ -65,13 +62,12 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Supplier supplier)
         {
-            await SupplierRepository.Update(_connection, supplier).AsNoContext();
+            await supplierRepository.Update(supplier).AsNoContext();
             return Ok();
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 

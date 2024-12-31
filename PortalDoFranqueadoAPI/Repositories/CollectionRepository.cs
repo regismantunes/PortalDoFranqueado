@@ -3,14 +3,16 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class CollectionRepository
+    public class CollectionRepository(SqlConnection connection) : ICollectionRepository
     {
-        public static async Task<CollectionInfo> GetInfo(SqlConnection connection)
+        public async Task<CollectionInfo> GetInfo()
         {
             try
             {
@@ -72,7 +74,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection[]> GetList(SqlConnection connection, bool onlyActives = true)
+        public async Task<Collection[]> GetList(bool onlyActives = true)
         {
             try
             {
@@ -101,7 +103,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection?> Get(SqlConnection connection, int id)
+        public async Task<Collection?> Get(int id)
         {
             try
             {
@@ -131,7 +133,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> HasOpenedCollection(SqlConnection connection)
+        public async Task<bool> HasOpenedCollection()
         {
             try
             {
@@ -155,7 +157,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Collection?> GetOpenedCollection(SqlConnection connection)
+        public async Task<Collection?> GetOpenedCollection()
         {
             try
             {
@@ -193,7 +195,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 Status = (CollectionStatus)reader.GetInt16("Status")
             };
 
-        public static async Task ChangeStatus(SqlConnection connection, int id, CollectionStatus status)
+        public async Task ChangeStatus(int id, CollectionStatus status)
         {
             try
             {
@@ -258,7 +260,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, Collection collection)
+        public async Task<int> Insert(Collection collection)
         {
             try
             {
@@ -289,7 +291,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -314,7 +316,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(SqlConnection connection, Collection colecao)
+        public async Task Update(Collection colecao)
         {
             try
             {

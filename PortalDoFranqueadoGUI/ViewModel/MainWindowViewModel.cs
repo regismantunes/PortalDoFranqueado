@@ -114,7 +114,7 @@ namespace PortalDoFranqueado.ViewModel
         {
             Me = window;
             CurrentViewControlFocused = true;
-            Task.Factory.StartNew(() => VerifyUpdate());
+            Task.Factory.StartNew(VerifyUpdate);
         }
 
         public async Task VerifyUpdate()

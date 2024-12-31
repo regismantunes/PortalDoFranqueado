@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Enums
 {
     public enum CollectionStatus
     {

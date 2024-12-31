@@ -3,15 +3,16 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class FamilyRepository
+    public class FamilyRepository(SqlConnection connection) : IFamilyRepository
     {
-        public static async Task<Family[]> GetList(SqlConnection connection, bool loadSizes)
+        public async Task<IEnumerable<Family>> GetList(bool loadSizes)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                                             select item.Value).ToArray();
                 }
 
-                return list.ToArray();
+                return list;
             }
             finally
             {

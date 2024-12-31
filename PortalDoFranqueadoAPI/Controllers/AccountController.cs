@@ -1,34 +1,30 @@
-﻿using PortalDoFranqueadoAPI.Repositories;
-using PortalDoFranqueadoAPI.Services;
+﻿using PortalDoFranqueadoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using PortalDoFranqueadoAPI.Models;
-using System.Data.SqlClient;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/account")]
     [ApiController]
-    public class AccountController(SqlConnection connection, IConfiguration configuration) : ControllerBase, IDisposable
+    public class AccountController(IConfiguration configuration, IUserRepository userRepository) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult<dynamic>> Authenticate([FromBody] UserInput model)
         {
-            if (!short.TryParse(_configuration["AppSettings:ResetPasswordAttempts"], out var resetPasswordMaxAttempts))
+            if (!short.TryParse(configuration["AppSettings:ResetPasswordAttempts"], out var resetPasswordMaxAttempts))
                 throw new InvalidOperationException("Não foi possível obter as configurações de segurança para realizar a operação");
 
-            if (_configuration["AppSettings:SecretToken"] is not string secrityToken)
+            if (configuration["AppSettings:SecretToken"] is not string secrityToken)
                 throw new InvalidOperationException("Não foi possível obter as configurações de segurança para realizar a operação");
 
-            var (user, resetPassword) = await UserRepository.GetAuthenticated(_connection, model.Username, model.Password, resetPasswordMaxAttempts).AsNoContext();
+            var (user, resetPassword) = await userRepository.GetAuthenticated(model.Username, model.Password, resetPasswordMaxAttempts).AsNoContext();
 
             if (user == null)
                 return BadRequest(new { message = "Usuário ou senha inválidos" });
@@ -51,7 +47,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> GetUsers()
         {
-            var users = await UserRepository.GetList(_connection).AsNoContext();
+            var users = await userRepository.GetList().AsNoContext();
             return Ok(users);
         }
 
@@ -60,7 +56,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Insert([FromBody] User user)
         {
-            var id = await UserRepository.Insert(_connection, user).AsNoContext();
+            var id = await userRepository.Insert(user).AsNoContext();
             return Ok(id);
         }
 
@@ -69,7 +65,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            var sucess = await UserRepository.Delete(_connection, id).AsNoContext();
+            var sucess = await userRepository.Delete(id).AsNoContext();
             return Ok(sucess);
         }
 
@@ -78,7 +74,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Update([FromBody] User user)
         {
-            await UserRepository.Update(_connection, user).AsNoContext();
+            await userRepository.Update(user).AsNoContext();
             return Ok();
         }
 
@@ -89,7 +85,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         {
             var resetCode = Random.Shared.Next(0, 999999).ToString("000000");
 
-            if (await UserRepository.ResetPassword(_connection, id, resetCode).AsNoContext())
+            if (await userRepository.ResetPassword(id, resetCode).AsNoContext())
                 return Ok(resetCode);
 
             return BadRequest(new { message = "O usuário não foi encontrado." });
@@ -103,14 +99,13 @@ namespace PortalDoFranqueadoAPI.Controllers
                 if (!User.Identity.Name.Equals(changePassword.Id.ToString()))
                     throw new Exception("O código do usuário informado deve ser igual ao código do usuário atual.");
 
-                await UserRepository.ChangePassword(_connection, changePassword.Id, changePassword.NewPassword, changePassword.NewPasswordConfirmation, changePassword.CurrentPassword).AsNoContext();
+                await userRepository.ChangePassword(changePassword.Id, changePassword.NewPassword, changePassword.NewPasswordConfirmation, changePassword.CurrentPassword).AsNoContext();
 
                 return Ok();
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 

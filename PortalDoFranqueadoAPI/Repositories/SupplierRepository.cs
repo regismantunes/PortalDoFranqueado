@@ -1,16 +1,17 @@
 ﻿using System.Threading.Tasks;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System;
 using PortalDoFranqueadoAPI.Models;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class SupplierRepository
+    public class SupplierRepository(SqlConnection connection) : ISupplierRepository
     {
-        public static async Task<Supplier[]> GetList(SqlConnection connection, bool onlyActives)
+        public async Task<IEnumerable<Supplier>> GetList(bool onlyActives)
         {
             try
             {
@@ -19,7 +20,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( $"""
+                using var cmd = new SqlCommand($"""
                                                 SELECT * FROM Supplier
                                                 {(onlyActives ? " WHERE Active = 1" : string.Empty)}
                                                 """, connection);
@@ -35,7 +36,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                         Active = reader.GetBoolean("Active")
                     });
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
@@ -43,7 +44,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<Supplier?> Get(SqlConnection connection, int id)
+        public async Task<Supplier?> Get(int id)
         {
             try
             {
@@ -52,7 +53,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT *
                                                 FROM Supplier
                                                 WHERE Id = @Id
@@ -77,7 +78,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<int> Insert(SqlConnection connection, Supplier supplier)
+        public async Task<int> Insert(Supplier supplier)
         {
             try
             {
@@ -86,7 +87,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 INSERT INTO Supplier (Name, Active)
                                                 OUTPUT INSERTED.Id
                                                 VALUES (@Name, @Active);
@@ -107,7 +108,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task<bool> Delete(SqlConnection connection, int id)
+        public async Task<bool> Delete(int id)
         {
             try
             {
@@ -116,7 +117,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 DELETE FROM Supplier
                                                 WHERE Id = @Id;
                                                 """, connection);
@@ -131,7 +132,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public static async Task Update(SqlConnection connection, Supplier supplier)
+        public async Task Update(Supplier supplier)
         {
             try
             {

@@ -1,4 +1,7 @@
-﻿namespace PortalDoFranqueadoAPI.Models
+﻿using PortalDoFranqueadoAPI.Enums;
+using System.Collections.Generic;
+
+namespace PortalDoFranqueadoAPI.Models
 {
     public class User
     {
@@ -9,6 +12,6 @@
         public string? Password { get; set; }
         public UserRole Role { get; set; }
         public bool Active { get; set; }
-        public Store[]? Stores { get; set; }
+        public IEnumerable<Store>? Stores { get; set; }
     }
 }

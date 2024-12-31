@@ -4,24 +4,24 @@ using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using System.Linq;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/files")]
     [ApiController]
-    public class FileController(SqlConnection connection) : ControllerBase, IDisposable
+    public class FileController(IFileRepository fileRepository) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
         [HttpGet]
         [Route("auxiliary/{id}")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetAuxiliaryFiles(int id)
         {
-            var files = await FileRepository.GetFilesFromAuxiliary(_connection, id).AsNoContext();
+            var files = await fileRepository.GetFilesFromAuxiliary(id).AsNoContext();
             return Ok(files);
         }
 
@@ -30,7 +30,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> InsertAuxiliaryFiles(int id, [FromBody] MyFile[] files)
         {
-            var ids = await FileRepository.InsertFilesToAuxiliary(_connection, id, files).AsNoContext();
+            var ids = await fileRepository.InsertFilesToAuxiliary(id, files).AsNoContext();
             return Ok(ids);
         }
 
@@ -39,7 +39,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetCampaignFiles(int id)
         {
-            var files = await FileRepository.GetFilesFromCampaign(_connection, id).AsNoContext();
+            var files = await fileRepository.GetFilesFromCampaign(id).AsNoContext();
             return Ok(files);
         }
 
@@ -48,7 +48,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetCollectionFiles(int id)
         {
-            var files = await FileRepository.GetFilesFromCollection(_connection, id).AsNoContext();
+            var files = await fileRepository.GetFilesFromCollection(id).AsNoContext();
             return Ok(files);
         }
 
@@ -57,7 +57,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> InsertCampaignFiles(int id, [FromBody] MyFile[] files)
         {
-            var ids = await FileRepository.InsertFilesToCampaign(_connection, id, files).AsNoContext();
+            var ids = await fileRepository.InsertFilesToCampaign(id, files).AsNoContext();
             return Ok(ids);
         }
 
@@ -66,7 +66,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> InsertCollectionFiles(int id, [FromBody] MyFile[] files)
         {
-            var ids = await FileRepository.InsertFilesToCollection(_connection, id, files).AsNoContext();
+            var ids = await fileRepository.InsertFilesToCollection(id, files).AsNoContext();
             return Ok(ids);
         }
 
@@ -75,7 +75,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Insert([FromBody] MyFile file)
         {
-            var id = await FileRepository.Insert(_connection, file).AsNoContext();
+            var id = await fileRepository.Insert(file).AsNoContext();
             return Ok(id);
         }
 
@@ -84,8 +84,8 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> GetFile(int id)
         {
-            var files = await FileRepository.GetFiles(_connection, new int[] { id }).AsNoContext();
-            return Ok(files[0]);
+            var files = await fileRepository.GetFiles([id]).AsNoContext();
+            return Ok(files.First());
         }
 
         [HttpPost]
@@ -119,7 +119,7 @@ namespace PortalDoFranqueadoAPI.Controllers
 
             var sb64 = Convert.ToBase64String(allBytes);
 
-            FileRepository.SaveFile(_connection, id, compressionType, file.ContentType, sb64);
+            await fileRepository.SaveFile(id, compressionType, file.ContentType, sb64);
 
             return Ok();
         }
@@ -127,9 +127,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         [HttpGet]
         [Route("download/{id}")]
         [Authorize]
-        public ActionResult<dynamic> DownloadFile(int id)
+        public async Task<ActionResult<dynamic>> DownloadFile(int id)
         {
-            var (contentType, content) = FileRepository.GetFileContent(_connection, id);
+            var (contentType, content) = await fileRepository.GetFileContent(id);
             var bytes = Convert.FromBase64String(content);
             return File(bytes, contentType);
         }
@@ -139,7 +139,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> DeleteFiles([FromBody] int[] filesId)
         {
-            await FileRepository.DeleteFiles(_connection, filesId).AsNoContext();
+            await fileRepository.DeleteFiles(filesId).AsNoContext();
             return Ok();
         }
 
@@ -148,13 +148,12 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> DeleteFile(int id)
         {
-            await FileRepository.DeleteFile(_connection, id).AsNoContext();
+            await fileRepository.DeleteFile(id).AsNoContext();
             return Ok();
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 

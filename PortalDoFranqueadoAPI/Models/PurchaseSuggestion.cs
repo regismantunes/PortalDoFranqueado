@@ -1,4 +1,6 @@
-﻿namespace PortalDoFranqueadoAPI.Models
+﻿using System.Collections.Generic;
+
+namespace PortalDoFranqueadoAPI.Models
 {
     public class PurchaseSuggestion
     {
@@ -10,6 +12,6 @@
         public int? PartsPerService { get; set; }
         public decimal? Coverage { get; set; }
         public int? TotalSuggestedItems { get; set; }
-        public PurchaseSuggestionFamily[]? Families { get; set; }
+        public IEnumerable<PurchaseSuggestionFamily>? Families { get; set; }
     }
 }

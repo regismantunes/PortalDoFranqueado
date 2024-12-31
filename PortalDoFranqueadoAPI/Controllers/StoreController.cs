@@ -4,23 +4,22 @@ using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories;
 using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/store")]
     [ApiController]
-    public class StoreController(SqlConnection connection) : ControllerBase, IDisposable
+    public class StoreController(IStoreRepository storeRepository) : ControllerBase, IDisposable
     {
-        private readonly SqlConnection _connection = connection ?? throw new ArgumentNullException(nameof(connection));
-
         [HttpGet]
         [Route("all")]
         [Authorize]
         public async Task<ActionResult<dynamic>> GetStores()
         {
-            var stores = await StoreRepository.GetList(_connection).AsNoContext();
+            var stores = await storeRepository.GetList().AsNoContext();
             return Ok(stores);
         }
 
@@ -29,7 +28,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Get(int id)
         {
-            var store = await StoreRepository.Get(_connection, id).AsNoContext();
+            var store = await storeRepository.Get(id).AsNoContext();
             return Ok(store);
         }
 
@@ -38,7 +37,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Insert([FromBody] Store store)
         {
-            var id = await StoreRepository.Insert(_connection, store).AsNoContext();
+            var id = await storeRepository.Insert(store).AsNoContext();
             return Ok(id);
         }
 
@@ -47,7 +46,7 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Delete(int id)
         {
-            var sucess = await StoreRepository.Delete(_connection, id).AsNoContext();
+            var sucess = await storeRepository.Delete(id).AsNoContext();
             return Ok(sucess);
         }
 
@@ -56,13 +55,12 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize]
         public async Task<ActionResult<dynamic>> Update([FromBody] Store store)
         {
-            await StoreRepository.Update(_connection, store).AsNoContext();
+            await storeRepository.Update(store).AsNoContext();
             return Ok();
         }
 
         public void Dispose()
         {
-            _connection.Dispose();
             GC.SuppressFinalize(this);
         }
 

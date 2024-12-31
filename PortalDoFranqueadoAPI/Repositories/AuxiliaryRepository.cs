@@ -2,14 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
+using PortalDoFranqueadoAPI.Repositories.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
-    public static class AuxiliaryRepository
+    public class AuxiliaryRepository(SqlConnection connection) : IAuxiliaryRepository
     {
-        public static async Task<int[]> GetIdFiles(SqlConnection connection, int id)
+        public async Task<IEnumerable<int>> GetIdFiles(int id)
         {
             try
             {
@@ -18,7 +19,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 if (connection.State != ConnectionState.Open)
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
-                using var cmd = new SqlCommand( """
+                using var cmd = new SqlCommand("""
                                                 SELECT FileId
                                                 FROM Auxiliary_File
                                                 WHERE AuxiliaryId = @id
@@ -32,7 +33,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync().AsNoContext())
                     list.Add(reader.GetInt32("FileId"));
 
-                return list.ToArray();
+                return list;
             }
             finally
             {
