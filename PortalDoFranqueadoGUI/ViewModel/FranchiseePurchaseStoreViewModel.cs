@@ -1,7 +1,8 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using PortalDoFranqueado.Export;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.Util;
 using System;

@@ -1,5 +1,5 @@
-﻿using PortalDoFranqueadoAPI.Enums;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
+using PortalDoFranqueadoAPI.Models.Enums;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Repositories.Interfaces

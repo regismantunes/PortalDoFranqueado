@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Update;
 using PortalDoFranqueado.View;
 using System;

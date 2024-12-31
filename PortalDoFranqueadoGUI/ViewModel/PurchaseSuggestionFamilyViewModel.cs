@@ -1,5 +1,5 @@
 ﻿using NuGet;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
 using PortalDoFranqueado.Util;
 using System;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using PortalDoFranqueadoAPI.Middleware;
+using PortalDoFranqueadoAPI.Middlewares;
 using System;
 using Microsoft.Data.SqlClient;
 using System.Text;
@@ -18,7 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCors();
 builder.Services.AddControllers();
-//builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(builder.Configuration["ConnectionStrings:Default"]));
 
 #if DEBUG
 var sqlConnection = builder.Configuration.GetConnectionString("Default");

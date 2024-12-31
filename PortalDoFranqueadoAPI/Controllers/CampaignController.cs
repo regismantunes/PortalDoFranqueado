@@ -5,7 +5,7 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Models.Enums;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {

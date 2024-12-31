@@ -6,9 +6,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using PortalDoFranqueado.Model;
 using System.Drawing;
 using System.Drawing.Imaging;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.ViewModel
 {

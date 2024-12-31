@@ -6,7 +6,7 @@ using System.Data;
 using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Models.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

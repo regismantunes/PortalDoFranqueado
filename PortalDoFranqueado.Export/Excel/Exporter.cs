@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Excel;
-using PortalDoFranqueado.Model;
 using Microsoft.Office.Core;
-using PortalDoFranqueado.Model.Extensions;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Entities.Extensions;
 
 namespace PortalDoFranqueado.Export.Excel
 {

@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using NuGet;
 using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using System;
 using System.Collections;

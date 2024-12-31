@@ -1,6 +1,7 @@
 ﻿using PortalDoFranqueado.Model;
 using System.Threading.Tasks;
 using System.Linq;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.Api
 {

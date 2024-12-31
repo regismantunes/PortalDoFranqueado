@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoAPI.Enums;
+﻿using PortalDoFranqueadoAPI.Models.Enums;
 using System;
 
 namespace PortalDoFranqueadoAPI.Models

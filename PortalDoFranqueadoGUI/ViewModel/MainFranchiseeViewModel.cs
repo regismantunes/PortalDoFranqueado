@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using PortalDoFranqueado.View;
 using PortalDoFranqueado.Repository;
 using System.Diagnostics;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.ViewModel
 {

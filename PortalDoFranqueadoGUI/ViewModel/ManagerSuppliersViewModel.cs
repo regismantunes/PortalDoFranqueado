@@ -1,5 +1,5 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

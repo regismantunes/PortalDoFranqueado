@@ -1,12 +1,12 @@
 ﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using PortalDoFranqueado.Model.Extensions;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Entities.Extensions;
 
 namespace PortalDoFranqueado.ViewModel
 {
