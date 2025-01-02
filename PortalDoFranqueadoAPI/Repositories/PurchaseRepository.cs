@@ -7,7 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Models.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

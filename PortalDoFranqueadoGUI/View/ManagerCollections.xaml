@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel"
              xmlns:util="clr-namespace:PortalDoFranqueado.Util"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              d:DataContext="{d:DesignInstance Type=viewmodel:ManagerCollectionsViewModel}"
              xmlns:local="clr-namespace:PortalDoFranqueado.View"
              mc:Ignorable="d" 

@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,10 +47,10 @@ namespace PortalDoFranqueado.ViewModel
 
         public ChangePasswordViewModel()
         {
-            var user = Api.Configuration.Current.Session.User;
-            var resetPassword = Api.Configuration.Current.Session.ResetPassword;
+            var user = Api.Configuration.Current.Session?.User;
+            var resetPassword = Api.Configuration.Current.Session?.ResetPassword ?? false;
 
-            MensagemUsuario = $"{user.Name}, informe sua nova senha.";
+            MensagemUsuario = $"{user?.Name}, informe sua nova senha.";
             VisibilityCurrentPassword = resetPassword ? Visibility.Collapsed : Visibility.Visible;
 
             ChangePasswordCommand = new RelayCommand<StackPanel>(ChangePassword);
@@ -63,15 +63,18 @@ namespace PortalDoFranqueado.ViewModel
             });
         }
 
-        public async void ChangePassword(StackPanel spPasswords)
+        public async void ChangePassword(StackPanel? spPasswords)
         {
+            if (spPasswords is null)
+                return;
+
             try
             {
                 DesableContent();
 
-                var currentPassword = (spPasswords.Children[0] as PasswordBox).Password;
-                var password1 = (spPasswords.Children[1] as PasswordBox).Password;
-                var password2 = (spPasswords.Children[2] as PasswordBox).Password;
+                var currentPassword = ((PasswordBox)spPasswords.Children[0]).Password;
+                var password1 = ((PasswordBox)spPasswords.Children[1]).Password;
+                var password2 = ((PasswordBox)spPasswords.Children[2]).Password;
 
                 if (string.IsNullOrEmpty(currentPassword) &&
                     VisibilityCurrentPassword == Visibility.Visible)
@@ -106,7 +109,8 @@ namespace PortalDoFranqueado.ViewModel
                 {
                     await Api.ApiAccount.ChangePassword(currentPassword, password1, password2);
 
-                    Api.Configuration.Current.Session.ResetPassword = false;
+                    if (Api.Configuration.Current.Session != null)
+                        Api.Configuration.Current.Session.ResetPassword = false;
                     Api.Configuration.Current.NotifySessionChange();
                 }
                 catch (Exception ex)

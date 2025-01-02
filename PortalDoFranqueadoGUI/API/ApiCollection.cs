@@ -1,4 +1,5 @@
-﻿using PortalDoFranqueado.Model;
+﻿using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api

@@ -6,7 +6,7 @@
              xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel"
              xmlns:model="clr-namespace:PortalDoFranqueado.Model"
              xmlns:util="clr-namespace:PortalDoFranqueado.Util"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:PortalDoFranqueado.View"
              d:DataContext="{d:DesignInstance Type=viewmodel:ManagerCampaignsViewModel}"
              mc:Ignorable="d" 

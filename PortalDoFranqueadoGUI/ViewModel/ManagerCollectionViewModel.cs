@@ -1,6 +1,7 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.View;
 using System;
@@ -8,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -102,7 +102,7 @@ namespace PortalDoFranqueado.ViewModel
 
             public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file)
             {
-                _lockedSizes = new List<string>();
+                _lockedSizes = [];
 
                 FileId = file.Id;
                 FileView = file;
@@ -119,7 +119,7 @@ namespace PortalDoFranqueado.ViewModel
 
             public CollectionProductViewModel(ManagerCollectionViewModel owner, FileView file, Product product)
             {
-                _lockedSizes = new List<string>();
+                _lockedSizes = [];
                 if (product.LockedSizes != null)
                     _lockedSizes.AddRange(product.LockedSizes);
 
@@ -244,7 +244,7 @@ namespace PortalDoFranqueado.ViewModel
             CollectionEndDate = colecao.EndDate;
             _collection = colecao;
 
-            Products = new ObservableCollection<CollectionProductViewModel>();
+            Products = [];
             
             SaveCommand = new RelayCommand<CollectionProductViewModel>(SaveProduct);
             DeleteCommand = new RelayCommand<CollectionProductViewModel>(DeleteProduct);

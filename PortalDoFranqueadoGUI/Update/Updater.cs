@@ -13,7 +13,7 @@ namespace PortalDoFranqueado.Update
         public static void Initialize()
         {
             SquirrelAwareApp.HandleEvents(
-                  onInitialInstall: v => 
+                  onInitialInstall: v =>
                   {
                       var assemblyName = Assembly.GetExecutingAssembly().FullName;
                       _manager.CreateShortcutsForExecutable(assemblyName, ShortcutLocation.Desktop, false);
@@ -26,7 +26,7 @@ namespace PortalDoFranqueado.Update
         public static async Task<bool> HasUpdateAvailable()
         {
             var result = await _manager.CheckForUpdate();
-            return result.ReleasesToApply.Any();
+            return result.ReleasesToApply.Count != 0;
         }
 
         public static async Task Update() 

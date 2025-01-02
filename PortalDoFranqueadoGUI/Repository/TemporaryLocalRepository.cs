@@ -1,20 +1,19 @@
-﻿using PortalDoFranqueado.Model;
-using PortalDoFranqueado.ViewModel;
+﻿using PortalDoFranqueado.ViewModel;
 using PortalDoFranqueado.Api;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.Repository
 {
     public class TemporaryLocalRepository : BaseNotifyPropertyChanged
     {
-        private IReadOnlyList<Store> _stores = Array.Empty<Store>();
+        private IReadOnlyList<Store> _stores = [];
         public IReadOnlyList<Store> Stores 
         { 
             get => _stores;
             set 
-            { 
+            {
                 _stores = value;
                 OnPropertyChanged();
             }

@@ -8,7 +8,7 @@ namespace PortalDoFranqueado.Repository
 {
     public static class Worker
     {
-        private static readonly List<Task> _tasks = new();
+        private static readonly List<Task> _tasks = [];
 
         public static void StartWork(Task task)
         {

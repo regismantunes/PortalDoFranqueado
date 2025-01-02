@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoAPI.Enums;
+﻿using PortalDoFranqueadoAPI.Models.Enums;
 using PortalDoFranqueadoAPI.Models.Validations;
 using System.Collections.Generic;
 

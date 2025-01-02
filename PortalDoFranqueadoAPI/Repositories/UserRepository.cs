@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Models.Enums;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {
     public class UserRepository(SqlConnection connection, IStoreRepository storeRepository) : IUserRepository
     {
+        const string HashAlgorithm = "SHA256";
+
         public async Task<(User?, bool)> GetAuthenticated(string username, string password, short resetPasswordMaxAttempts)
         {
             try
@@ -57,7 +59,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                             resetPassword = true;
                         }
 
-                        if (HashService.VerifyHash(password, "SHA256", passwordHash))
+                        if (HashService.VerifyHash(password, HashAlgorithm, passwordHash))
                         {
                             user = new User()
                             {
@@ -370,7 +372,7 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                var resetCodeHash = HashService.ComputeHash(resetCode, "SHA256");
+                var resetCodeHash = HashService.ComputeHash(resetCode, HashAlgorithm);
 
                 await connection.OpenAsync().AsNoContext();
 
@@ -398,8 +400,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 
         public async Task ChangePassword(int id, string newPassword, string newPasswordConfirmation, string? currentPassword = null)
         {
-            const string HashAlgorithm = "SHA256";
-
             try
             {
                 if (!newPassword.Equals(newPasswordConfirmation))

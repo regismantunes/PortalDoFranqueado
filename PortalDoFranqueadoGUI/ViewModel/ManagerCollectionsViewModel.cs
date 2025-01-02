@@ -1,5 +1,6 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.View;
 using System;
 using System.Collections.Generic;
@@ -62,8 +63,8 @@ namespace PortalDoFranqueado.ViewModel
 
         public ManagerCollectionsViewModel()
         {
-            _collections = new List<Collection>();
-            FilteredCollection = new ObservableCollection<CollectionViewModel>();
+            _collections = [];
+            FilteredCollection = [];
             CollectionToAdd = new NewCollection();
 
             AddCollectionCommand = new RelayCommand(AddCollection);

@@ -1,5 +1,6 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.View;
 using System;

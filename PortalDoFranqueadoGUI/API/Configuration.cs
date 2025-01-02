@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
 using System;
 using System.IO;
 

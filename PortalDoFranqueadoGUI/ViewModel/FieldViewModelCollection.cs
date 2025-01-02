@@ -18,8 +18,8 @@ namespace PortalDoFranqueado.ViewModel
 
         public FieldViewModelCollection()
         {
-            _fields = new List<IFieldViewModel>();
-            _internalFocusedFields = new List<IFieldViewModel>();
+            _fields = [];
+            _internalFocusedFields = [];
         }
 
         public void Add(IFieldViewModel field)

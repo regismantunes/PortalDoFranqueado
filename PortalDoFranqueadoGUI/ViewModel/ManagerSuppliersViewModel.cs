@@ -1,5 +1,5 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PortalDoFranqueado.Model.Entities;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -249,7 +249,7 @@ namespace PortalDoFranqueado.ViewModel
 
         public ManagerSuppliersViewModel()
         {
-            Suppliers = new ObservableCollection<SupplierViewModel>();
+            Suppliers = [];
 
             LoadedCommand = new RelayCommand(async () => await LoadSuppliers());
             NewRecordCommand = new RelayCommand(NewRecord);

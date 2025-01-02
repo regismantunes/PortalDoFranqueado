@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueado.Model;
+﻿using PortalDoFranqueado.Model.Entities;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -15,11 +15,11 @@ namespace PortalDoFranqueado.Export
             {
 #if DEBUG
                 if (args.Length == 0)
-                    args = new string[]
-                    {
+                    args =
+                    [
                         @"C:\Users\regis\AppData\Local\Temp\tmp822D.tmp.json",
                         @"D:\Meus Arquivos\Documentos\Teste Purchase.xlsx"
-                    };
+                    ];
 #endif
                 Console.Out.WriteLine("Iniciando validações...");
                 if (args.Length == 0)

@@ -1,9 +1,10 @@
 ﻿using PortalDoFranqueado.Model;
 using System.Windows;
 using System;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using PortalDoFranqueado.View;
 using System.Windows.Controls;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.ViewModel
 {

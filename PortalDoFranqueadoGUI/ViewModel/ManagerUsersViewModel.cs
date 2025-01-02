@@ -1,5 +1,6 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
-using PortalDoFranqueado.Model;
+﻿using CommunityToolkit.Mvvm.Input;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using System;
 using System.Collections.ObjectModel;
@@ -338,7 +339,7 @@ namespace PortalDoFranqueado.ViewModel
         public ManagerUsersViewModel()
         {
             Roles = new UserRole[] { UserRole.Franchisee, UserRole.Manager };
-            Users = new ObservableCollection<UserViewModel>();
+            Users = [];
 
             LoadedCommand = new RelayCommand(async () => await LoadUsers());
             NewRecordCommand = new RelayCommand(NewRecord);

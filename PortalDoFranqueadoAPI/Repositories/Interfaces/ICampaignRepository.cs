@@ -1,5 +1,5 @@
-﻿using PortalDoFranqueadoAPI.Enums;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
+using PortalDoFranqueadoAPI.Models.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

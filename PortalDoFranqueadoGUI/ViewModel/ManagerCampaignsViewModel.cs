@@ -1,12 +1,10 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.View;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace PortalDoFranqueado.ViewModel
@@ -51,7 +49,7 @@ namespace PortalDoFranqueado.ViewModel
         
         public ManagerCampaignsViewModel()
         {
-            Campaigns = new ObservableCollection<CampaignViewModel>();
+            Campaigns = [];
             CampaignToAdd = new NewCampaign();
 
             LoadedCommand = new RelayCommand(LoadCampaigns);

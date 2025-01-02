@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.Update;
 using System;

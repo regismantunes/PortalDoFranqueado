@@ -1,7 +1,8 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using PortalDoFranqueado.Export;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using PortalDoFranqueado.Util;
 using System;
@@ -315,7 +316,7 @@ namespace PortalDoFranqueado.ViewModel
                     Legendable?.SendMessage("Carregando produtos...");
                     Collection.Products = await Api.ApiProduct.Get(Collection.Id);
                     
-                    if (Collection.Products.Length > 0)
+                    if (Collection.Products.Any())
                     {
                         emptyProducts = false;
 

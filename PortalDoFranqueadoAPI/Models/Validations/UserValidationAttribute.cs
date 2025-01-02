@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoAPI.Enums;
+﻿using PortalDoFranqueadoAPI.Models.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;

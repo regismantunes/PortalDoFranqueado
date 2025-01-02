@@ -25,7 +25,7 @@ namespace PortalDoFranqueado.Repository
 
         public PersistentLocalRepository()
         {
-            _recentUserNames = new List<string>();
+            _recentUserNames = [];
 
             _fileAddress = Path.Combine(MyTempDirectory, "persist.json");
             if (File.Exists(_fileAddress))

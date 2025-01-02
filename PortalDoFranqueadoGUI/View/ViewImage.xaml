@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:PortalDoFranqueado.View"
              xmlns:viewmodel="clr-namespace:PortalDoFranqueado.ViewModel" 
              xmlns:me="clr-namespace:PortalDoFranqueado.Util.Mouse" 
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              d:DataContext="{d:DesignInstance Type=viewmodel:ViewImageViewModel}"
              mc:Ignorable="d" 

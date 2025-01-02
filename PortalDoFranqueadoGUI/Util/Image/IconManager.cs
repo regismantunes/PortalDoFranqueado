@@ -39,8 +39,8 @@ namespace PortalDoFranqueado.Util.Image
         [DllImport("gdi32.dll")]
         private static extern bool DeleteObject(IntPtr hObject);
 
-        private static readonly Dictionary<string, ImageSource> _smallIconCache = new Dictionary<string, ImageSource>();
-        private static readonly Dictionary<string, ImageSource> _largeIconCache = new Dictionary<string, ImageSource>();
+        private static readonly Dictionary<string, ImageSource> _smallIconCache = [];
+        private static readonly Dictionary<string, ImageSource> _largeIconCache = [];
         /// <summary>
         /// Get an icon for a given filename
         /// </summary>

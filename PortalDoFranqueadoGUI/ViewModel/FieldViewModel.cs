@@ -1,4 +1,4 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;

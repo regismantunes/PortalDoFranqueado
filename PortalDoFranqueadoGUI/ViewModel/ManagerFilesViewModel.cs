@@ -1,12 +1,13 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using NuGet;
 using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
+using PortalDoFranqueado.Model.Enums;
 using PortalDoFranqueado.Repository;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace PortalDoFranqueado.ViewModel
             _ownerType = ownerType;
             _id = id;
             TitleMessage = title;
-            Files = new ObservableCollection<FileView>();
+            Files = [];
             VisibilityChangeButtons = Api.Configuration.Current.Session.User.Role == UserRole.Manager ? Visibility.Visible : Visibility.Collapsed;
             
             LoadedCommand = new RelayCommand(async() => await LoadFiles());

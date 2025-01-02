@@ -10,6 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="View\UserControl1.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="View\UserControl1.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Media\cabecalho.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -48,11 +56,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
-    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="NuGet.CommandLine" Version="6.12.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

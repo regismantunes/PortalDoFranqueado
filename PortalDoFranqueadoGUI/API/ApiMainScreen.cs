@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
 
 namespace PortalDoFranqueado.Api
 {

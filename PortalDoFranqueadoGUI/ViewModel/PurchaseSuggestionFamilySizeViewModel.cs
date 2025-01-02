@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueado.Model;
+﻿using PortalDoFranqueado.Model.Entities;
 using System.ComponentModel;
 using System.Windows;
 

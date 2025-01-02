@@ -1,5 +1,5 @@
 ﻿using NuGet;
-using PortalDoFranqueado.Model;
+using PortalDoFranqueado.Model.Entities;
 using PortalDoFranqueado.Util;
 using System;
 using System.Collections.Generic;
@@ -81,7 +81,7 @@ namespace PortalDoFranqueado.ViewModel
                 }
             };
 
-            _sizes = new List<PurchaseSuggestionFamilySize>();
+            _sizes = [];
             if (purchaseSuggestionFamily.Sizes != null)
                 _sizes.AddRange(purchaseSuggestionFamily.Sizes);
         }

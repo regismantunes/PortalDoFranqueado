@@ -1,15 +1,14 @@
 ﻿using PortalDoFranqueado.Model;
 using System.Windows;
-using System.IO;
 using System;
 using System.Linq;
-using PortalDoFranqueado.Util;
 using System.Windows.Controls;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using System.Windows.Media.Imaging;
 using PortalDoFranqueado.View;
 using PortalDoFranqueado.Repository;
-using System.Diagnostics;
+using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 
 namespace PortalDoFranqueado.ViewModel
 {
@@ -29,7 +28,7 @@ namespace PortalDoFranqueado.ViewModel
         public bool EnabledPurchase { get; private set; }
         public string TextPurchase { get; private set; }
 
-        public Campaign[] Campaigns { get; private set; }
+        public IEnumerable<Campaign> Campaigns { get; private set; }
 
         public RelayCommand LoadedCommand { get; }
         public RelayCommand PhotosCommand { get; }
@@ -280,12 +279,12 @@ namespace PortalDoFranqueado.ViewModel
                     InformativeTitle = mainInfos.InformativeTitle;
                     InformativeText = mainInfos.InformativeText;
                     EnabledPurchase = mainInfos.EnabledPurchase && 
-                                      mainInfos.Stores.Length > 0;
+                                      mainInfos.Stores.Any();
                     TextPurchase = mainInfos.TextPurchase;
 
                     Campaigns = mainInfos.Campaigns;
 
-                    _cache.Stores = mainInfos.Stores;
+                    _cache.Stores = mainInfos.Stores.ToList();
 
                     LoadCampaigns();
 
