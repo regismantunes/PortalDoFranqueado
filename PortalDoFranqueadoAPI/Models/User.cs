@@ -1,8 +1,10 @@
 ﻿using PortalDoFranqueadoAPI.Enums;
+using PortalDoFranqueadoAPI.Models.Validations;
 using System.Collections.Generic;
 
 namespace PortalDoFranqueadoAPI.Models
 {
+    [UserValidation]
     public class User
     {
         public int Id { get; set; }

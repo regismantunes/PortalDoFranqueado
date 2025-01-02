@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using System.Linq;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
@@ -56,6 +57,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Insert([FromBody] User user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.Values.First().Errors.First().ErrorMessage);
+
             var id = await userRepository.Insert(user).AsNoContext();
             return Ok(id);
         }
@@ -74,6 +78,9 @@ namespace PortalDoFranqueadoAPI.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<dynamic>> Update([FromBody] User user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState.Values.First().Errors.First().ErrorMessage);
+
             await userRepository.Update(user).AsNoContext();
             return Ok();
         }

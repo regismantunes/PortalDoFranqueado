@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System;
 using PortalDoFranqueadoAPI.Models;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace PortalDoFranqueadoAPI.Middleware
 {
@@ -19,11 +20,25 @@ namespace PortalDoFranqueadoAPI.Middleware
             {
                 await _next(context);
             }
+            catch (ValidationException ex)
+            {
+                await HandleValidationExceptionAsync(context, ex);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred.");
                 await HandleExceptionAsync(context, ex);
             }
+        }
+
+        private Task HandleValidationExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+            var response = new ErrorResponse(exception.Message);
+
+            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)

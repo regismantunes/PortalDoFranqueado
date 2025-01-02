@@ -5,21 +5,20 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Models.Validations.Interfaces;
-using PortalDoFranqueadoAPI.Models.Validations;
+using PortalDoFranqueadoAPI.Services.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/purchase")]
     [ApiController]
-    public class PurchaseController(IPurchaseRepository purchaseRepository, IPurchaseValidation purchaseValidation) : ControllerBase, IDisposable
+    public class PurchaseController(IPurchaseRepository purchaseRepository, IPurchaseService purchaseService) : ControllerBase, IDisposable
     {
         [HttpPut]
         [Route("")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Save([FromBody] Purchase purchase)
         {
-            await purchaseValidation.Validate(purchase).AsNoContext();
+            await purchaseService.Validate(purchase).AsNoContext();
 
             var id = await purchaseRepository.Save(purchase).AsNoContext();
             return Ok(id);

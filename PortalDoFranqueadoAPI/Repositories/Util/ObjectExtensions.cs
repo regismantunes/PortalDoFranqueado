@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 
 namespace PortalDoFranqueadoAPI.Repositories.Util
 {
@@ -9,10 +11,10 @@ namespace PortalDoFranqueadoAPI.Repositories.Util
         public static dynamic ToDBValue<T>(this T obj)
             => obj is null ? DBNull.Value : obj;
 
-        public static dynamic ToDBValue(this string[]? obj)
+        public static dynamic ToDBValue(this IEnumerable<string> obj)
         {
             if (obj == null ||
-                obj.Length == 0)
+                !obj.Any())
                 return DBNull.Value;
 
             return string.Join('|', obj);
@@ -21,7 +23,7 @@ namespace PortalDoFranqueadoAPI.Repositories.Util
         public static int ToZeroIfNull(this int? obj)
             => obj ?? 0;
 
-        public static string[]? GetStringArray(this DbDataReader reader, string name)
+        public static IEnumerable<string>? GetStringArray(this DbDataReader reader, string name)
         {
             var value = reader.GetValue(name);
             if (value == null ||

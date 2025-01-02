@@ -177,7 +177,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 
         public async Task<int> Insert(User user)
         {
-            user.Validate();
 
             try
             {
@@ -270,8 +269,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 
         public async Task Update(User user)
         {
-            user.Validate();
-
             try
             {
                 await connection.OpenAsync().AsNoContext();

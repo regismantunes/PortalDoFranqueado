@@ -1,21 +1,23 @@
 ﻿using PortalDoFranqueadoAPI.Enums;
 using PortalDoFranqueadoAPI.Extensions;
-using PortalDoFranqueadoAPI.Models.Validations.Interfaces;
+using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Services.Interfaces;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace PortalDoFranqueadoAPI.Models.Validations
+namespace PortalDoFranqueadoAPI.Services
 {
-    public class PurchaseValidation(ICollectionRepository collectionRepository, IPurchaseRepository purchaseRepository) : IPurchaseValidation
+    public class PurchaseService(ICollectionRepository collectionRepository, IPurchaseRepository purchaseRepository) : IPurchaseService
     {
         public async Task Validate(Purchase purchase)
         {
             var currentCollection = await collectionRepository.GetOpenedCollection() ??
-                throw new Exception("O período de compras não está aberto.");
+                throw new ValidationException("O período de compras não está aberto.");
 
             if (currentCollection.Id != purchase.CollectionId)
-                throw new Exception("Esse período de compras não está aberto.");
+                throw new ValidationException("Esse período de compras não está aberto.");
 
             var openedPurchase = await purchaseRepository.Get(purchase.CollectionId, purchase.StoreId, false).AsNoContext();
 
@@ -23,7 +25,7 @@ namespace PortalDoFranqueadoAPI.Models.Validations
                 return;
 
             if (openedPurchase.Status != PurchaseStatus.Opened)
-                throw new Exception("Essa compra não pode ser alterada porque já foi confirmada.");
+                throw new ValidationException("Essa compra não pode ser alterada porque já foi confirmada.");
 
             purchase.Id = openedPurchase.Id;
         }

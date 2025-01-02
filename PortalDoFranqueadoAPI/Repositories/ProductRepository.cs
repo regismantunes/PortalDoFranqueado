@@ -61,8 +61,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 
         public async Task<int> Insert(int collectionId, Product product)
         {
-            product.Validate();
-
             try
             {
                 await connection.OpenAsync().AsNoContext();
@@ -111,8 +109,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 
         public async Task Update(Product product)
         {
-            product.Validate();
-
             try
             {
                 await connection.OpenAsync().AsNoContext();

@@ -10,8 +10,8 @@ using Microsoft.Data.SqlClient;
 using System.Text;
 using PortalDoFranqueadoAPI.Repositories;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Models.Validations.Interfaces;
-using PortalDoFranqueadoAPI.Models.Validations;
+using PortalDoFranqueadoAPI.Services.Interfaces;
+using PortalDoFranqueadoAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +50,8 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Validations
-builder.Services.AddScoped<IPurchaseSuggestionValidation, PurchaseSuggestionValidation>();
-builder.Services.AddScoped<IPurchaseValidation, PurchaseValidation>();
+builder.Services.AddScoped<IPurchaseSuggestionService, PurchaseSuggestionService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 var key = Encoding.ASCII.GetBytes(secretToken);
 builder.Services.AddAuthentication(x =>

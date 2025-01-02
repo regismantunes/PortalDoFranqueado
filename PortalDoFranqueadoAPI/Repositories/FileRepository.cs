@@ -13,8 +13,6 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public class FileRepository(SqlConnection connection) : IFileRepository
     {
-        private readonly Lock _lockerContent = new();
-
         public async Task<MyFile> GetFile(int id)
         {
             var connectionWasOpened = true;
@@ -379,7 +377,6 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                _lockerContent.Enter();
                 connection.Open();
 
                 if (connection.State != ConnectionState.Open)
@@ -414,7 +411,6 @@ namespace PortalDoFranqueadoAPI.Repositories
             finally
             {
                 connection.Close();
-                _lockerContent.Exit();
             }
         }
 
@@ -422,7 +418,6 @@ namespace PortalDoFranqueadoAPI.Repositories
         {
             try
             {
-                _lockerContent.Enter();
                 connection.Open();
 
                 if (connection.State != ConnectionState.Open)
@@ -451,7 +446,6 @@ namespace PortalDoFranqueadoAPI.Repositories
             finally
             {
                 connection.Close();
-                _lockerContent.Exit();
             }
         }
 

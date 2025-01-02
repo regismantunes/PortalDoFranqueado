@@ -5,20 +5,20 @@ using PortalDoFranqueadoAPI.Models;
 using System;
 using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
-using PortalDoFranqueadoAPI.Models.Validations.Interfaces;
+using PortalDoFranqueadoAPI.Services.Interfaces;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {
     [Route("api/purchasesuggestion")]
     [ApiController]
-    public class PurchaseSuggestionController(IPurchaseSuggestionRepository purchaseSuggestionRepository, IPurchaseSuggestionValidation purchaseSuggestionValidation) : ControllerBase, IDisposable
+    public class PurchaseSuggestionController(IPurchaseSuggestionRepository purchaseSuggestionRepository, IPurchaseSuggestionService purchaseSuggestionService) : ControllerBase, IDisposable
     {
         [HttpPut]
         [Route("")]
         [Authorize]
         public async Task<ActionResult<dynamic>> Save([FromBody] PurchaseSuggestion purchaseSuggestion)
         {
-            await purchaseSuggestionValidation.Validate(purchaseSuggestion).AsNoContext();
+            await purchaseSuggestionService.Validate(purchaseSuggestion).AsNoContext();
 
             var id = await purchaseSuggestionRepository.Save(purchaseSuggestion).AsNoContext();
             return Ok(id);
