@@ -1,12 +1,13 @@
 ﻿using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
 {
     public static class ApiStore
     {
-        public static async Task<Store[]> GetStores()
-            => await BaseApi.GetSimpleHttpClientRequest<Store[]>("store/all")
+        public static async Task<IEnumerable<Store>> GetStores()
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Store>>("store/all")
                             .Get();
 
         public static async Task<Store?> Get(int storeId)

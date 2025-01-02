@@ -1,7 +1,7 @@
-﻿using PortalDoFranqueado.Model;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Linq;
 using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 
 namespace PortalDoFranqueado.Api
 {
@@ -36,8 +36,8 @@ namespace PortalDoFranqueado.Api
             => await BaseApi.GetSimpleHttpClientRequest<Purchase?>($"purchase/id/{purchaseId}")
                             .Get();
 
-        public static async Task<Purchase[]> GetPurchases(int collectionId)
-            => await BaseApi.GetSimpleHttpClientRequest<Purchase[]>($"purchase/collection/{collectionId}")
+        public static async Task<IEnumerable<Purchase>> GetPurchases(int collectionId)
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Purchase>>($"purchase/collection/{collectionId}")
                             .Get();
 
         public static async Task Reverse(int purchaseId)

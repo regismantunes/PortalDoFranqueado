@@ -1,21 +1,22 @@
 ﻿using PortalDoFranqueado.Model.Entities;
 using PortalDoFranqueado.Model.Enums;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
 {
     public static class ApiCollection
     {
-        public static async Task<Collection[]> GetNoClosed()
-            => await BaseApi.GetSimpleHttpClientRequest<Collection[]>("collections/noclosed")
+        public static async Task<IEnumerable<Collection>> GetNoClosed()
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Collection>>("collections/noclosed")
                             .Get();
 
-        public static async Task<Collection[]> GetAll()
-            => await BaseApi.GetSimpleHttpClientRequest<Collection[]>("collections/all")
+        public static async Task<IEnumerable<Collection>> GetAll()
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Collection>>("collections/all")
                             .Get();
 
-        public static async Task<Collection[]> Get(int id)
-            => await BaseApi.GetSimpleHttpClientRequest<Collection[]>($"collections/{id}")
+        public static async Task<IEnumerable<Collection>> Get(int id)
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Collection>>($"collections/{id}")
                             .Get();
 
         public static async Task<Collection> GetOpened()

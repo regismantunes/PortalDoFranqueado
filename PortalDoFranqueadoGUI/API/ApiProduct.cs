@@ -1,12 +1,13 @@
 ﻿using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
 {
     public static class ApiProduct
     {
-        public static async Task<Product[]> Get(int collectionId)
-            => await BaseApi.GetSimpleHttpClientRequest<Product[]>($"product/{collectionId}")
+        public static async Task<IEnumerable<Product>> Get(int collectionId)
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Product>>($"product/{collectionId}")
                             .Get();
 
         public static async Task<int> Insert(int collectionId, Product product)

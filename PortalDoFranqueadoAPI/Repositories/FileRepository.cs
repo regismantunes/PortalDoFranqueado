@@ -52,7 +52,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public async Task<IEnumerable<MyFile>> GetFiles(int[] ids)
+        public async Task<IEnumerable<MyFile>> GetFiles(IEnumerable<int> ids)
         {
             try
             {

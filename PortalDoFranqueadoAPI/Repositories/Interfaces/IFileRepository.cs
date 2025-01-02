@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
@@ -10,7 +9,7 @@ namespace PortalDoFranqueadoAPI.Repositories.Interfaces
     {
         Task<MyFile> GetFile(int id);
 
-        Task<IEnumerable<MyFile>> GetFiles(int[] ids);
+        Task<IEnumerable<MyFile>> GetFiles(IEnumerable<int> ids);
 
         Task<IEnumerable<MyFile>> GetFilesFromCampaign(int id);
 

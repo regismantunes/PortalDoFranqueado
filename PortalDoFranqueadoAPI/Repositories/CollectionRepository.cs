@@ -74,7 +74,7 @@ namespace PortalDoFranqueadoAPI.Repositories
             }
         }
 
-        public async Task<Collection[]> GetList(bool onlyActives = true)
+        public async Task<IEnumerable<Collection>> GetList(bool onlyActives = true)
         {
             try
             {
@@ -84,7 +84,8 @@ namespace PortalDoFranqueadoAPI.Repositories
                     throw new Exception(MessageRepositories.ConnectionNotOpenException);
 
                 var cmd = new SqlCommand(   $"""
-                                            SELECT * FROM [Collection]
+                                            SELECT *
+                                            FROM [Collection]
                                             WHERE Excluded = 0
                                             {(onlyActives ? " AND Status IN (0,1);" : string.Empty)}
                                             """, connection);
@@ -95,7 +96,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                 while (await reader.ReadAsync().AsNoContext())
                     list.Add(CreateCollection(reader));
 
-                return list.ToArray();
+                return list;
             }
             finally
             {

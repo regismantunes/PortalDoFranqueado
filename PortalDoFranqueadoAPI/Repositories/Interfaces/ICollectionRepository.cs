@@ -1,5 +1,6 @@
 ﻿using PortalDoFranqueadoAPI.Models;
 using PortalDoFranqueadoAPI.Models.Enums;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueadoAPI.Repositories.Interfaces
@@ -8,7 +9,7 @@ namespace PortalDoFranqueadoAPI.Repositories.Interfaces
     {
         Task<CollectionInfo> GetInfo();
 
-        Task<Collection[]> GetList(bool onlyActives = true);
+        Task<IEnumerable<Collection>> GetList(bool onlyActives = true);
 
         Task<Collection?> Get(int id);
 

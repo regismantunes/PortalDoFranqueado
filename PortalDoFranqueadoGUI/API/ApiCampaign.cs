@@ -1,13 +1,14 @@
 ﻿using PortalDoFranqueado.Model.Entities;
 using PortalDoFranqueado.Model.Enums;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
 {
     public static class ApiCampaign
     {
-        public static async Task<Campaign[]> GetCampaigns()
-            => await BaseApi.GetSimpleHttpClientRequest<Campaign[]>("campaign/all")
+        public static async Task<IEnumerable<Campaign>> GetCampaigns()
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Campaign>>("campaign/all")
                             .Get();
 
         public static async Task<int> Insert(Campaign campaign)

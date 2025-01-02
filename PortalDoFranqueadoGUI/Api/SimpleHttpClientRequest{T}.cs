@@ -11,7 +11,7 @@ namespace PortalDoFranqueado.Api
     public class SimpleHttpClientRequest<T>
     {
         public string? BearerToken { get; set; }
-        public string? RequestUri { get; set; }
+        public required string? RequestUri { get; set; }
 
         public async Task<T> Delete()
             => await Delete(RequestUri, BearerToken);
@@ -82,6 +82,8 @@ namespace PortalDoFranqueado.Api
             return await GetResult(response);
         }
 
+        private static readonly JsonSerializerOptions jsonSerializerOptions = new(JsonSerializerDefaults.Web);
+
         private static async Task<T> GetResult(HttpResponseMessage response)
         {
             var result = await response.Content.ReadAsStringAsync();
@@ -99,18 +101,16 @@ namespace PortalDoFranqueado.Api
 
                 if (result.StartsWith('{'))
                 {
-                    var msgResult = JsonSerializer.Deserialize<MessageResult>(result, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+                    var msgResult = JsonSerializer.Deserialize<MessageResult>(result, jsonSerializerOptions);
                     throw new Exception(msgResult != null ? msgResult.Message : result);
                 }
 
                 throw new Exception(string.IsNullOrEmpty(result) ? $"Falha - {response.StatusCode}" : result);
             }
 
-            var deserialized = JsonSerializer.Deserialize<T>(result, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-            if (deserialized == null)
-                throw new Exception("Não foi possível deserializar o retorno.");
-
-            return deserialized;
+            var deserialized = JsonSerializer.Deserialize<T>(result, jsonSerializerOptions);
+            
+            return deserialized ?? throw new Exception("Não foi possível deserializar o retorno.");
         }
     }
 }

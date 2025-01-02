@@ -1,4 +1,5 @@
 ﻿using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
@@ -17,8 +18,8 @@ namespace PortalDoFranqueado.Api
             Configuration.Current.SetConectedSession(session);
         }
 
-        public static async Task<User[]> GetUsers()
-            => await BaseApi.GetSimpleHttpClientRequest<User[]>("account/users/all")
+        public static async Task<IEnumerable<User>> GetUsers()
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<User>>("account/users/all")
                             .Get();
 
         public static async Task<int> Insert(User user)

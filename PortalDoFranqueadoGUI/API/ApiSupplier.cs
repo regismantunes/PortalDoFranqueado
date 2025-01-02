@@ -1,12 +1,13 @@
 ﻿using PortalDoFranqueado.Model.Entities;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PortalDoFranqueado.Api
 {
     public static class ApiSupplier
     {
-        public static async Task<Supplier[]> GetSuppliers(bool onlyActives)
-            => await BaseApi.GetSimpleHttpClientRequest<Supplier[]>($"supplier/{(onlyActives ? "actives" : "all")}")
+        public static async Task<IEnumerable<Supplier>> GetSuppliers(bool onlyActives)
+            => await BaseApi.GetSimpleHttpClientRequest<IEnumerable<Supplier>>($"supplier/{(onlyActives ? "actives" : "all")}")
                             .Get();
 
         public static async Task<Supplier> Get(int id)

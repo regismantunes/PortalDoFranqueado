@@ -93,10 +93,10 @@ namespace PortalDoFranqueado.ViewModel
 
                 var purchases = await Api.ApiPurchase.GetPurchases(Collection.Id);
 
-                if (purchases.Length > 0)
+                if (purchases.Any())
                 {
                     if (_cache.Stores.Count == 0)
-                        _cache.Stores = await Api.ApiStore.GetStores();
+                        _cache.Stores = (await Api.ApiStore.GetStores()).ToList();
                     
                     var stores = _cache.Stores.ToArray();
                     var products = await Api.ApiProduct.Get(Collection.Id);

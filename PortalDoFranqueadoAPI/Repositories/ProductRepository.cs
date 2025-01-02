@@ -13,7 +13,7 @@ namespace PortalDoFranqueadoAPI.Repositories
 {
     public class ProductRepository(SqlConnection connection, IFileRepository fileRepository) : IProductRepository
     {
-        public async Task<Product[]> GetList(int collectionId, int? familyId = null)
+        public async Task<IEnumerable<Product>> GetList(int collectionId, int? familyId = null)
         {
             try
             {
@@ -51,7 +51,7 @@ namespace PortalDoFranqueadoAPI.Repositories
                     await reader.CloseAsync().AsNoContext();
                 }
 
-                return list.ToArray();
+                return list;
             }
             finally
             {

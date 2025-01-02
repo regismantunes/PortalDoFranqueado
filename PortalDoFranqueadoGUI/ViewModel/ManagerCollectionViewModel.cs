@@ -289,7 +289,7 @@ namespace PortalDoFranqueado.ViewModel
 
                             var id = await Api.ApiFile.InsertCollectionFiles(_collection.Id, new MyFile[] { myFile });
 
-                            myFile.Id = id[0];
+                            myFile.Id = id.First();
                             var file = new FileView(myFile);
 
                             Me?.Dispatcher.Invoke(() =>

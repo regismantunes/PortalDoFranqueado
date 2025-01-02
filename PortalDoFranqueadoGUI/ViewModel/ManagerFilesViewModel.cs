@@ -61,7 +61,7 @@ namespace PortalDoFranqueado.ViewModel
                     await Api.ApiFile.GetFromAuxiliary(_id) :
                     await Api.ApiFile.GetFromCampaign(_id);
 
-                if (myFiles.Length == 0)
+                if (!myFiles.Any())
                     Legendable?.SendMessage(string.Empty);
                 else
                 {
@@ -282,9 +282,10 @@ namespace PortalDoFranqueado.ViewModel
                         if (insertedFiles.Any())
                         {
                             Legendable?.SendMessage($"Preparando ambiente para salvar {insertedFiles.Length} arquivos...");
-                            var ids = _ownerType == FileOwner.Auxiliary ?
+                            var ids = (_ownerType == FileOwner.Auxiliary ?
                                 await Api.ApiFile.InsertAuxiliaryFiles(_id, insertedFiles) :
-                                await Api.ApiFile.InsertCampaignFiles(_id, insertedFiles);
+                                await Api.ApiFile.InsertCampaignFiles(_id, insertedFiles))
+                                .ToArray();
 
                             for (var i = 0; i < ids.Length; i++)
                             {

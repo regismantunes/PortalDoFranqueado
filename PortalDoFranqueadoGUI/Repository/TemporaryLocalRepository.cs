@@ -3,6 +3,7 @@ using PortalDoFranqueado.Api;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PortalDoFranqueado.Model.Entities;
+using System.Linq;
 
 namespace PortalDoFranqueado.Repository
 {
@@ -26,7 +27,7 @@ namespace PortalDoFranqueado.Repository
         {
             if (Families == null)
             {
-                Families = await ApiFamily.GetFamilies(true);
+                Families = (await ApiFamily.GetFamilies(true)).ToList();
                 OnPropertyChanged(nameof(Families));
             }
 
@@ -37,7 +38,7 @@ namespace PortalDoFranqueado.Repository
         {
             if (Suppliers == null || reload)
             {
-                Suppliers = await ApiSupplier.GetSuppliers(true);
+                Suppliers = (await ApiSupplier.GetSuppliers(true)).ToList();
                 OnPropertyChanged(nameof(Suppliers));
             }
 
@@ -48,7 +49,7 @@ namespace PortalDoFranqueado.Repository
         {
             if (Stores.Count == 0 || reload)
             {
-                Stores = await ApiStore.GetStores();
+                Stores = (await ApiStore.GetStores()).ToList();
                 OnPropertyChanged(nameof(Stores));
             }
 
