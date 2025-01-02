@@ -1,5 +1,5 @@
 ﻿using PortalDoFranqueadoAPI.Extensions;
-using PortalDoFranqueadoAPI.Models;
+using PortalDoFranqueadoAPI.Models.Entities;
 using PortalDoFranqueadoAPI.Models.Enums;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
 using PortalDoFranqueadoAPI.Services.Interfaces;

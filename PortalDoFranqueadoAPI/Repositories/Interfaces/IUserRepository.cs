@@ -1,4 +1,4 @@
-﻿using PortalDoFranqueadoAPI.Models;
+﻿using PortalDoFranqueadoAPI.Models.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

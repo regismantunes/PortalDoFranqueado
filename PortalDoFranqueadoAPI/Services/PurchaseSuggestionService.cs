@@ -2,8 +2,8 @@
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
 using PortalDoFranqueadoAPI.Services.Interfaces;
-using PortalDoFranqueadoAPI.Models;
 using System.ComponentModel.DataAnnotations;
+using PortalDoFranqueadoAPI.Models.Entities;
 
 namespace PortalDoFranqueadoAPI.Services
 {

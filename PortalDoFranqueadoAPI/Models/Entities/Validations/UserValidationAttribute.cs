@@ -1,16 +1,17 @@
-﻿using PortalDoFranqueadoAPI.Models.Enums;
+﻿using PortalDoFranqueadoAPI.Models.Entities;
+using PortalDoFranqueadoAPI.Models.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace PortalDoFranqueadoAPI.Models.Validations
+namespace PortalDoFranqueadoAPI.Models.Entities.Validations
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class UserValidationAttribute : ValidationAttribute
     {
         public override bool IsValid(object value)
         {
-            if(value is User user)
+            if (value is User user)
                 return Validate(user);
 
             ErrorMessage = "Object need be User.";

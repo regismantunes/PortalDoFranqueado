@@ -1,7 +1,7 @@
 ﻿using PortalDoFranqueadoAPI.Models.Enums;
 using System;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Models.Entities
 {
     public class Collection
     {

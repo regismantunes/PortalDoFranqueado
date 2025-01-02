@@ -2,7 +2,7 @@
 using PortalDoFranqueadoAPI.Models.Validations;
 using System.Collections.Generic;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Models.Entities
 {
     [UserValidation]
     public class User

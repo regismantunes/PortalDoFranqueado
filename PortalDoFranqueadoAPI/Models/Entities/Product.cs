@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Models.Entities
 {
     public class Product
     {

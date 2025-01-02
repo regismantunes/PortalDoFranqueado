@@ -1,6 +1,5 @@
 ﻿using PortalDoFranqueadoAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using PortalDoFranqueadoAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
 using System.Linq;
+using PortalDoFranqueadoAPI.Models.Entities;
 
 namespace PortalDoFranqueadoAPI.Controllers
 {

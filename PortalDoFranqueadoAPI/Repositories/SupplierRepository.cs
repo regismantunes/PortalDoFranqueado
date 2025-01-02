@@ -2,10 +2,10 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using System;
-using PortalDoFranqueadoAPI.Models;
 using System.Collections.Generic;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
+using PortalDoFranqueadoAPI.Models.Entities;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

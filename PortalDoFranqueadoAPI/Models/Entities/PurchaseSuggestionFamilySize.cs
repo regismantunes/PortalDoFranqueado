@@ -1,4 +1,4 @@
-﻿namespace PortalDoFranqueadoAPI.Models
+﻿namespace PortalDoFranqueadoAPI.Models.Entities
 {
     public class PurchaseSuggestionFamilySize
     {

@@ -1,5 +1,4 @@
-﻿using PortalDoFranqueadoAPI.Models;
-using System.Data;
+﻿using System.Data;
 using PortalDoFranqueadoAPI.Services;
 using Microsoft.Data.SqlClient;
 using PortalDoFranqueadoAPI.Models.Validations;
@@ -11,6 +10,7 @@ using System.Linq;
 using PortalDoFranqueadoAPI.Extensions;
 using PortalDoFranqueadoAPI.Repositories.Interfaces;
 using PortalDoFranqueadoAPI.Models.Enums;
+using PortalDoFranqueadoAPI.Models.Entities;
 
 namespace PortalDoFranqueadoAPI.Repositories
 {

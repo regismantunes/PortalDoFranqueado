@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Models.Entities
 {
     public class PurchaseSuggestion
     {
@@ -8,7 +8,7 @@ namespace PortalDoFranqueadoAPI.Models
         public int PurchaseId { get; set; }
         public Purchase? Purchase { get; set; }
         public decimal? Target { get; set; }
-        public decimal? AverageTicket { get; set;}
+        public decimal? AverageTicket { get; set; }
         public int? PartsPerService { get; set; }
         public decimal? Coverage { get; set; }
         public int? TotalSuggestedItems { get; set; }

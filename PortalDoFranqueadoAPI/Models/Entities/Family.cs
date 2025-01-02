@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PortalDoFranqueadoAPI.Models
+namespace PortalDoFranqueadoAPI.Models.Entities
 {
     public class Family
     {
